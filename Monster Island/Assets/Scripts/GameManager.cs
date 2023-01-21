@@ -23,6 +23,8 @@ public class GameManager : MonoBehaviour
     float timeElapsed;
     private Vector3 endMarkerPos;
     private Vector3 startMarkerPos;
+    private float m_TimerDelayShowDeath;
+    private System.Action m_DeathAction;
     readonly Dictionary<CameraTransitionSquare, CameraState> cameraState = new Dictionary<CameraTransitionSquare, CameraState>();
 
     void Start()
@@ -139,16 +141,22 @@ public class GameManager : MonoBehaviour
                 // monster updates
                 for (var i = 0; i <= monsters.Length - 1; i += 1) {
                     MonsterMoveRandom(player.boxCollider, boxes, obstacles, monsters, i);
-                    if (IsWithinRange(monsters[i].transform.localPosition, player.transform.localPosition, 1))
-                    {
-                        gameOverScreen.Visibility = true;
+                    if (IsWithinRange(monsters[i].transform.localPosition, player.transform.localPosition, 1)) {
                         Debug.Log("Monster can kill");
+                        m_TimerDelayShowDeath = 0.1f;
+                        m_DeathAction = () =>
+                        {
+                            gameOverScreen.Visibility = true;
+                        };
 
                         return;
                     }
                 }
                 // night day updates
                 OnDayNightCycle(ref isDayOrNight, ref movementCount, night.sprite);
+            }
+            if (Util.HasHitTimeOnce(ref m_TimerDelayShowDeath, Time.deltaTime)) {
+                m_DeathAction?.Invoke();
             }
             // Camera updates
             InterpolateActiveCamera(mainCamera.transform, cameraState, ref timeElapsed, LerpDuration, startMarkerPos, endMarkerPos);
