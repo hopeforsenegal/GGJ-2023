@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -10,19 +11,24 @@ public class GameManager : MonoBehaviour
     public BoxCollider2D[] obstacles;
     public DayNight night;
     public Camera mainCamera;
-    public Transform[] cameraEndLocationTransforms;
+    public CameraTransitionSquare[] cameraEndLocationTransforms;
 
     // private
     bool isDayOrNight;
     int movementCount;
-    Dictionary<Transform, CameraState> cameraState = new Dictionary<Transform, CameraState>();
+    private const float LerpDuration = 0.5f;
+    float timeElapsed;
+    private Vector3 endMarkerPos;
+    private Vector3 startMarkerPos;
+    Dictionary<CameraTransitionSquare, CameraState> cameraState = new Dictionary<CameraTransitionSquare, CameraState>();
 
     void Start()
     {
+        mainCamera = Camera.main;
         player = FindObjectOfType<Player>();
         night = FindObjectOfType<DayNight>();
         obstacles = GameObject.Find("Obstacles").GetComponentsInChildren<BoxCollider2D>();
-        cameraEndLocationTransforms = GameObject.Find("CameraLocations").GetComponentsInChildren<Transform>();
+        cameraEndLocationTransforms = GameManager.GetCameraTransitionSquares();
 
         foreach (var cT in cameraEndLocationTransforms) {
             cameraState.Add(cT, new CameraState());
@@ -35,22 +41,60 @@ public class GameManager : MonoBehaviour
         var actions = GetUserActions();
         {
             // Player updates
-            if (actions.left) {
-                MovePlayer(player.boxCollider, Vector3.left * player.speed, obstacles);
+            if (actions.left)
+            {
+                var velocity = Vector3.left * player.speed;
+                if (!WillCollide(player.boxCollider, velocity, obstacles)) {
+                    player.boxCollider.transform.localPosition += velocity;
+                }
+                var (hasCollided, locationInfo) =
+                    WillCollideCameraLocation(player.boxCollider, velocity, cameraEndLocationTransforms);
+                if (hasCollided) {
+                    (startMarkerPos, endMarkerPos) = UpdateAnimationToExecute(locationInfo, mainCamera.transform, cameraState);
+                }
             }
-            if (actions.up) {
-                MovePlayer(player.boxCollider, Vector3.up * player.speed, obstacles);
+            if (actions.up)
+            {
+                var velocity = Vector3.up * player.speed;
+                if (!WillCollide(player.boxCollider, velocity, obstacles)) {
+                    player.boxCollider.transform.localPosition += velocity;
+                }
+                var (hasCollided, locationInfo) =
+                    WillCollideCameraLocation(player.boxCollider, velocity, cameraEndLocationTransforms);
+                if (hasCollided) {
+                    (startMarkerPos, endMarkerPos) = UpdateAnimationToExecute(locationInfo, mainCamera.transform, cameraState);
+                }
             }
-            if (actions.down) {
-                MovePlayer(player.boxCollider, Vector3.down * player.speed, obstacles);
+            if (actions.down)
+            {
+                var velocity = Vector3.down * player.speed;
+                if (!WillCollide(player.boxCollider, velocity, obstacles)) {
+                    player.boxCollider.transform.localPosition += velocity;
+                }
+                var (hasCollided, locationInfo) =
+                    WillCollideCameraLocation(player.boxCollider, velocity, cameraEndLocationTransforms);
+                if (hasCollided) {
+                    (startMarkerPos, endMarkerPos) = UpdateAnimationToExecute(locationInfo, mainCamera.transform, cameraState);
+                }
             }
-            if (actions.right) {
-                MovePlayer(player.boxCollider, Vector3.right * player.speed, obstacles);
+            if (actions.right)
+            {
+                var velocity = Vector3.right * player.speed;
+                if (!WillCollide(player.boxCollider, velocity, obstacles)) {
+                    player.boxCollider.transform.localPosition += velocity;
+                }
+                var (hasCollided, locationInfo) =
+                    WillCollideCameraLocation(player.boxCollider, velocity, cameraEndLocationTransforms);
+                if (hasCollided) {
+                    (startMarkerPos, endMarkerPos) = UpdateAnimationToExecute(locationInfo, mainCamera.transform, cameraState);
+                }
             }
             // night day updates
             if (actions.movement) {
                 OnDayNightCycle(ref isDayOrNight, ref movementCount, night.sprite);
             }
+            // Camera updates
+            GameManager.InterpolateActiveCamera(mainCamera.transform, cameraState, ref timeElapsed, LerpDuration, startMarkerPos, endMarkerPos);
         }
     }
 
@@ -67,21 +111,25 @@ public class GameManager : MonoBehaviour
         return action;
     }
 
-    public static void MovePlayer(BoxCollider2D player, Vector3 velocity, BoxCollider2D[] boxCollider2Ds)
-    {
-        if (!WillCollide(player, velocity, boxCollider2Ds)) {
-            player.transform.localPosition += velocity;
-        }
-    }
-
     public static bool WillCollide(BoxCollider2D player, Vector3 velocity, BoxCollider2D[] boxCollider2Ds)
     {
-        for (int i = 0; i <= boxCollider2Ds.Length - 1; i++) {
-            BoxCollider2D obstacle = boxCollider2Ds[i];
+        for (var i = 0; i <= boxCollider2Ds.Length - 1; i++) {
+            var obstacle = boxCollider2Ds[i];
             if (player.OverlapPoint(obstacle.transform.position - velocity))
                 return true;
         }
         return false;
+    }
+
+    // this takes into account your last step btw
+    public static (bool, CameraTransitionSquare) WillCollideCameraLocation(BoxCollider2D player, Vector3 velocity, CameraTransitionSquare[] boxCollider2Ds)
+    {
+        for (var i = 0; i <= boxCollider2Ds.Length - 1; i++) {
+            var obstacle = boxCollider2Ds[i].boxCollider;
+            if (player.OverlapPoint(obstacle.transform.position - velocity))
+                return (true, boxCollider2Ds[i]);
+        }
+        return (false, null);
     }
 
     public static void OnDayNightCycle(ref bool isDayOrNight, ref int movementCount, SpriteRenderer night)
@@ -101,7 +149,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public static void InterpolateActiveCamera(Transform cameraTransform, Dictionary<Transform, CameraState> cameraLocations, 
+    public static void InterpolateActiveCamera(Transform cameraTransform, Dictionary<CameraTransitionSquare, CameraState> cameraLocations, 
         ref float timeElapsed,
         float lerpDuration,
         Vector3 startMarkerPos, Vector3 endMarkerPos)
@@ -112,12 +160,12 @@ public class GameManager : MonoBehaviour
             {
                 if (timeElapsed < lerpDuration)
                 {
-                    cameraTransform.position = Vector3.Lerp(startMarkerPos, endMarkerPos, timeElapsed / lerpDuration);
+                    cameraTransform.transform.position = Vector3.Lerp(startMarkerPos, endMarkerPos, timeElapsed / lerpDuration);
                     timeElapsed += Time.deltaTime;
                 }
                 else
                 {
-                    cameraTransform.position = endMarkerPos;
+                    cameraTransform.transform.position = endMarkerPos;
                     timeElapsed = 0f;
                     kv.Value.IsAnimating = false;
                 }
@@ -125,15 +173,28 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public static (Vector3 startMarkerPos, Vector3 endMarkerPos) UpdateAnimationToExecute(Transform locationTransform, Transform cameraTransform, Dictionary<Transform, CameraState> cameraLocations)
+    public static (Vector3 startMarkerPos, Vector3 endMarkerPos) UpdateAnimationToExecute(CameraTransitionSquare cameraTransitionSquare, Transform cameraTransform, Dictionary<CameraTransitionSquare, CameraState> cameraLocations)
     {
         foreach (var kv in cameraLocations) {
             kv.Value.IsAnimating = false;
         }
-        cameraLocations[locationTransform].IsAnimating = true;
+        cameraLocations[cameraTransitionSquare].IsAnimating = true;
         var startMarkerPos = cameraTransform.position;
-        var endMarkerPos = locationTransform.position;
+        var endMarkerPos = cameraTransitionSquare.transform.position;
+        endMarkerPos.z = -10;   // Camera always needs to be at -10
         return (startMarkerPos, endMarkerPos);
+    }
+
+
+
+
+    public static CameraTransitionSquare[] GetCameraTransitionSquares()
+    {
+        var locationsGameObject = GameObject.Find("CameraLocations");
+        Debug.Assert(locationsGameObject != null);
+        var cameraEndLocationTransforms = locationsGameObject.GetComponentsInChildren<CameraTransitionSquare>();
+        Debug.Assert(cameraEndLocationTransforms.Any() && cameraEndLocationTransforms[0] != null);
+        return cameraEndLocationTransforms;
     }
 }
 
