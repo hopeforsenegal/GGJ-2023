@@ -1,21 +1,33 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
+    const int NumMovesInTimePeriod = 4;
+
     // inspector
     public Player player;
     public BoxCollider2D[] obstacles;
     public SpriteRenderer night;
+    public Camera mainCamera;
+    public Transform transforma;
+    public Transform transformb;
+    public Transform transformc;
 
     // private
     bool isDayOrNight;
     int movementCount;
+    Dictionary<Transform, CameraState> cameraLocations = new Dictionary<Transform, CameraState>();
 
     void Start()
     {
         player = FindObjectOfType<Player>();
         obstacles = FindObjectsOfType<BoxCollider2D>();
         night = FindObjectOfType<SpriteRenderer>();
+        
+        cameraLocations.Add(transforma, new CameraState());
+        cameraLocations.Add(transformb, new CameraState());
+        cameraLocations.Add(transformc, new CameraState());
     }
 
     void Update()
@@ -75,9 +87,9 @@ public class GameManager : MonoBehaviour
 
     public static void OnDayNightCycle(ref bool isDayOrNight, ref int movementCount, SpriteRenderer night)
     {
-        var increment = Util.IncrementLoop(ref movementCount, TestNight.NumMovesInTimePeriod);
+        var increment = Util.IncrementLoop(ref movementCount, NumMovesInTimePeriod);
         Debug.Log(increment);
-        if (increment == TestNight.NumMovesInTimePeriod)
+        if (increment == NumMovesInTimePeriod)
         {
             if (Util.Switch(ref isDayOrNight))
             {
@@ -88,6 +100,41 @@ public class GameManager : MonoBehaviour
                 night.color = Color.white;
             }
         }
+    }
+
+    public static void InterpolateActiveCamera(Transform cameraTransform, Dictionary<Transform, CameraState> cameraLocations, 
+        ref float timeElapsed,
+        float lerpDuration,
+        Vector3 startMarkerPos, Vector3 endMarkerPos)
+    {
+        foreach (var kv in cameraLocations)
+        {
+            if (kv.Value.IsAnimating)
+            {
+                if (timeElapsed < lerpDuration)
+                {
+                    cameraTransform.position = Vector3.Lerp(startMarkerPos, endMarkerPos, timeElapsed / lerpDuration);
+                    timeElapsed += Time.deltaTime;
+                }
+                else
+                {
+                    cameraTransform.position = endMarkerPos;
+                    timeElapsed = 0f;
+                    kv.Value.IsAnimating = false;
+                }
+            }
+        }
+    }
+
+    public static (Vector3 startMarkerPos, Vector3 endMarkerPos) UpdateAnimationToExecute(Transform locationTransform, Transform cameraTransform, Dictionary<Transform, CameraState> cameraLocations)
+    {
+        foreach (var kv in cameraLocations) {
+            kv.Value.IsAnimating = false;
+        }
+        cameraLocations[locationTransform].IsAnimating = true;
+        var startMarkerPos = cameraTransform.position;
+        var endMarkerPos = locationTransform.position;
+        return (startMarkerPos, endMarkerPos);
     }
 }
 

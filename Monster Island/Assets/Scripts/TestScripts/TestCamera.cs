@@ -8,61 +8,33 @@ public class TestCamera : MonoBehaviour
     public Transform transformb;
     public Transform transformc;
 
-    public class TransformState
-    {
-        public bool IsAnimating;
-    }
 
-    Dictionary<Transform, TransformState> cameraLocations = new Dictionary<Transform, TransformState>();
-    // Start is called before the first frame update
-    void Start()
-    {
-        cameraLocations.Add(transforma, new TransformState());
-        cameraLocations.Add(transformb, new TransformState());
-        cameraLocations.Add(transformc, new TransformState());
-    }
+    private const float LerpDuration = 0.5f;
     float timeElapsed;
-    float lerpDuration = 0.5f;
     private Vector3 endMarkerPos;
     private Vector3 startMarkerPos;
 
-    // Update is called once per frame
+    Dictionary<Transform, CameraState> cameraLocations = new Dictionary<Transform, CameraState>();
+    
+    void Start()
+    {
+        cameraLocations.Add(transforma, new CameraState());
+        cameraLocations.Add(transformb, new CameraState());
+        cameraLocations.Add(transformc, new CameraState());
+    }
+
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Alpha1)) {
-            Debug.Log("1");
-            UpdateAnimation(transforma);
+            (startMarkerPos, endMarkerPos) = GameManager.UpdateAnimationToExecute(transforma, mainCamera.transform, cameraLocations);
         }
         if (Input.GetKeyDown(KeyCode.Alpha2)) {
-            Debug.Log("2");
-            UpdateAnimation(transformb);
+            (startMarkerPos, endMarkerPos) = GameManager.UpdateAnimationToExecute(transformb, mainCamera.transform, cameraLocations);
         }
         if (Input.GetKeyDown(KeyCode.Alpha3)) {
-            Debug.Log("3");
-            UpdateAnimation(transformc);
+            (startMarkerPos, endMarkerPos) = GameManager.UpdateAnimationToExecute(transformc, mainCamera.transform, cameraLocations);
         }
-        foreach (var kv in cameraLocations) {
-            if (kv.Value.IsAnimating) {
-                Debug.Log("Hey");
 
-                if (timeElapsed < lerpDuration) {
-                    mainCamera.transform.position = Vector3.Lerp(startMarkerPos, endMarkerPos, timeElapsed / lerpDuration);
-                    timeElapsed += Time.deltaTime;
-                } else {
-                    mainCamera.transform.position = endMarkerPos;
-                    kv.Value.IsAnimating = false;
-                }
-            }
-        }
-    }
-
-    private void UpdateAnimation(Transform transform)
-    {
-        foreach (var kv in cameraLocations) {
-            kv.Value.IsAnimating = false;
-        }
-        cameraLocations[transform].IsAnimating = true;
-        endMarkerPos = transform.position;
-        startMarkerPos = mainCamera.transform.position;
+        GameManager.InterpolateActiveCamera(mainCamera.transform, cameraLocations, ref timeElapsed, LerpDuration, startMarkerPos, endMarkerPos);
     }
 }

@@ -5,7 +5,6 @@ public class TestNight : MonoBehaviour
     public SpriteRenderer night;
     bool isDayOrNight;
     int movementCount;
-    public const int NumMovesInTimePeriod = 4;
 
     void Update()
     {
