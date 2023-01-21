@@ -22,7 +22,7 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         player = FindObjectOfType<Player>();
-        obstacles = FindObjectsOfType<BoxCollider2D>();
+        obstacles = GameObject.Find("Obstacles").GetComponentsInChildren<BoxCollider2D>();
         night = FindObjectOfType<SpriteRenderer>();
         
         cameraLocations.Add(transforma, new CameraState());
