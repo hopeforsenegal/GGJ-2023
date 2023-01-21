@@ -10,24 +10,23 @@ public class GameManager : MonoBehaviour
     public BoxCollider2D[] obstacles;
     public DayNight night;
     public Camera mainCamera;
-    public Transform transforma;
-    public Transform transformb;
-    public Transform transformc;
+    public Transform[] cameraEndLocationTransforms;
 
     // private
     bool isDayOrNight;
     int movementCount;
-    Dictionary<Transform, CameraState> cameraLocations = new Dictionary<Transform, CameraState>();
+    Dictionary<Transform, CameraState> cameraState = new Dictionary<Transform, CameraState>();
 
     void Start()
     {
         player = FindObjectOfType<Player>();
-        obstacles = GameObject.Find("Obstacles").GetComponentsInChildren<BoxCollider2D>();
         night = FindObjectOfType<DayNight>();
-        
-        cameraLocations.Add(transforma, new CameraState());
-        cameraLocations.Add(transformb, new CameraState());
-        cameraLocations.Add(transformc, new CameraState());
+        obstacles = GameObject.Find("Obstacles").GetComponentsInChildren<BoxCollider2D>();
+        cameraEndLocationTransforms = GameObject.Find("CameraLocations").GetComponentsInChildren<Transform>();
+
+        foreach (var cT in cameraEndLocationTransforms) {
+            cameraState.Add(cT, new CameraState());
+        }
     }
 
     void Update()

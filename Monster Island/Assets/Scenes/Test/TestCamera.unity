@@ -378,9 +378,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mainCamera: {fileID: 921903985}
-  transforma: {fileID: 1223326084}
-  transformb: {fileID: 1649378810}
-  transformc: {fileID: 708487695}
+  cameraEndLocationTransforms:
+  - {fileID: 1223326084}
+  - {fileID: 1649378810}
+  - {fileID: 708487695}
 --- !u!4 &1555699684
 Transform:
   m_ObjectHideFlags: 0
