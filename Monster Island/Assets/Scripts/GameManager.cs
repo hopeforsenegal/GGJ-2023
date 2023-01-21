@@ -1,18 +1,31 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class NewBehaviourScript : MonoBehaviour
+public class GameManager : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    public Player player;
 
-    // Update is called once per frame
     void Update()
     {
-        
+        // Inputs
+        var actions = GetActions();
+        {
+            // Player updates
+            if (actions.left) {
+                transform.localPosition += Vector3.left * player.speed;
+            }
+        }
     }
+
+    Actions GetActions()
+    {
+        return new Actions
+        {
+            left = Input.GetKeyDown(KeyCode.A),
+        };
+    }
+}
+
+
+public struct Actions {
+    public bool left;
 }
