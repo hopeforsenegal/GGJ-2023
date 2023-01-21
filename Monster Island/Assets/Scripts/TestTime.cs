@@ -10,39 +10,53 @@ public class TestTime : MonoBehaviour
     public BoxCollider2D[] monsters;
     public float speed = 1;
 
-    
-    // Start is called before the first frame update
-    void Start()
-    {  
-        //timeEntities = GetComponents<TimeEntity>();
-        //Debug.Log($"initing timeEntities ${timeEntities}");
-        
-    }
-
     // Update is called once per frame
     void Update()
     {
         var v = new Vector3(0.0f, 0.0f, 0.0f);
         if(Input.GetKeyDown(KeyCode.A)){
             Move(Vector3.left * speed);
-            HandleTime(1); 
+            for (var i = 0; i <= monsters.Length - 1; i = i + 1) 
+            {
+                MonsterMove(i);
+                if(IsWithinRange(monsters[i].transform.localPosition, player.transform.localPosition, 1)){
+                    Die();
+                }
+            }
         }
         if(Input.GetKeyDown(KeyCode.W)){
             Move(Vector3.up * speed);
-            HandleTime(1);
+            for (var i = 0; i <= monsters.Length - 1; i = i + 1) 
+            {
+                MonsterMove(i);
+                if(IsWithinRange(monsters[i].transform.localPosition, player.transform.localPosition, 1)){
+                    Die();
+                }
+            }
         }
         if(Input.GetKeyDown(KeyCode.S)){
             Move(Vector3.down * speed);
-            HandleTime(1); 
+            for (var i = 0; i <= monsters.Length - 1; i = i + 1) 
+            {
+                MonsterMove(i);
+                if(IsWithinRange(monsters[i].transform.localPosition, player.transform.localPosition, 1)){
+                    Die();
+                }
+            }
         }
         if(Input.GetKeyDown(KeyCode.D)){
             Move(Vector3.right * speed);
-            HandleTime(1);
+            for (var i = 0; i <= monsters.Length - 1; i = i + 1) 
+            {
+                MonsterMove(i);
+                if(IsWithinRange(monsters[i].transform.localPosition, player.transform.localPosition, 1)){
+                    Die();
+                }
+            }
         }
         
     }
-
-    //TODO: check if box will collide with obstacle if so, dont move player or box. 
+ 
     void Move(Vector3 velocity) {
         if(!WillCollide(velocity)){
             var pushable = GetPushedBox(velocity);
@@ -137,16 +151,6 @@ public class TestTime : MonoBehaviour
             inc ++;
         }
         
-    }
-
-    void HandleTime(int delta) {
-        for (var i = 0; i <= monsters.Length - 1; i = i + 1) 
-        {
-            MonsterMove(i);
-            if(IsWithinRange(monsters[i].transform.localPosition, player.transform.localPosition, 1)){
-                Die();
-            }
-        }
     }
 
     bool IsWithinRange(Vector3 center, Vector3 point, float radius){

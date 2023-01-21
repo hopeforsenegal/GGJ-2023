@@ -45,7 +45,7 @@ public class GameManager : MonoBehaviour
             // Player updates
             if (actions.left)
             {
-                var velocity = Vector3.left * player.speed;
+                var velocity = Vector3.left * player.playerSpeed;
                 if (!WillCollide(player.boxCollider, velocity, obstacles)) {
                     var pushable = GetPushedBox(player.boxCollider, velocity, boxes);
                     if(pushable != null){
@@ -67,7 +67,7 @@ public class GameManager : MonoBehaviour
             }
             if (actions.up)
             {
-                var velocity = Vector3.up * player.speed;
+                var velocity = Vector3.up * player.playerSpeed;
                 if (!WillCollide(player.boxCollider, velocity, obstacles)) {
                     var pushable = GetPushedBox(player.boxCollider, velocity, boxes);
                     if(pushable != null){
@@ -89,7 +89,7 @@ public class GameManager : MonoBehaviour
             }
             if (actions.down)
             {
-                var velocity = Vector3.down * player.speed;
+                var velocity = Vector3.down * player.playerSpeed;
                 if (!WillCollide(player.boxCollider, velocity, obstacles)) {
                     var pushable = GetPushedBox(player.boxCollider, velocity, boxes);
                     if(pushable != null){
@@ -111,7 +111,7 @@ public class GameManager : MonoBehaviour
             }
             if (actions.right)
             {
-                var velocity = Vector3.right * player.speed;
+                var velocity = Vector3.right * player.playerSpeed;
                 if (!WillCollide(player.boxCollider, velocity, obstacles)) {
                     var pushable = GetPushedBox(player.boxCollider, velocity, boxes);
                     if(pushable != null){
