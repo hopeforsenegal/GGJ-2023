@@ -11,6 +11,13 @@ public class GameManager : MonoBehaviour
     bool isDayOrNight;
     int movementCount;
 
+    void Start()
+    {
+        player = FindObjectOfType<Player>();
+        obstacles = FindObjectsOfType<BoxCollider2D>();
+        night = FindObjectOfType<SpriteRenderer>();
+    }
+
     void Update()
     {
         // Inputs
