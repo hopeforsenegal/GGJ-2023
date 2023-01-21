@@ -6,6 +6,11 @@ public class GameManager : MonoBehaviour
 {
     const int NumMovesInTimePeriod = 4;
 
+    private static class AnimNames
+    {
+        public static readonly string idle = $"{nameof(idle)}";
+    }
+
     // inspector
     public Player player;
     public BoxCollider2D[] obstacles;
@@ -50,6 +55,8 @@ public class GameManager : MonoBehaviour
         }
 
         gameOverScreen.Visibility = false;
+
+        Util.LoopAnimation(player.spineAnimation, AnimNames.idle);
     }
 
     void Update()

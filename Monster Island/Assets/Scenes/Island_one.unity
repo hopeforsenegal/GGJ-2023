@@ -2845,6 +2845,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerSpeed: 1
   boxCollider: {fileID: 0}
+  spineAnimation: {fileID: 2096558471}
 --- !u!61 &1032427893
 BoxCollider2D:
   m_ObjectHideFlags: 0
