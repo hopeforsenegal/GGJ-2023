@@ -90,4 +90,11 @@ public class TestBoxes : MonoBehaviour
         }
         return false;
     }
+
+    // void HandleTime(int delta) {
+    //     for (int i = 0; i <= obstacles.Length - 1; i = i + 1) 
+    //     {
+    //         timeObject.HandleTime(int delta)
+    //     }
+    // }
 }
