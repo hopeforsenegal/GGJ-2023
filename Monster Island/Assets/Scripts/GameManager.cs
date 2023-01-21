@@ -8,7 +8,7 @@ public class GameManager : MonoBehaviour
     // inspector
     public Player player;
     public BoxCollider2D[] obstacles;
-    public SpriteRenderer night;
+    public DayNight night;
     public Camera mainCamera;
     public Transform transforma;
     public Transform transformb;
@@ -23,7 +23,7 @@ public class GameManager : MonoBehaviour
     {
         player = FindObjectOfType<Player>();
         obstacles = GameObject.Find("Obstacles").GetComponentsInChildren<BoxCollider2D>();
-        night = FindObjectOfType<SpriteRenderer>();
+        night = FindObjectOfType<DayNight>();
         
         cameraLocations.Add(transforma, new CameraState());
         cameraLocations.Add(transformb, new CameraState());
@@ -50,7 +50,7 @@ public class GameManager : MonoBehaviour
             }
             // night day updates
             if (actions.movement) {
-                OnDayNightCycle(ref isDayOrNight, ref movementCount, night);
+                OnDayNightCycle(ref isDayOrNight, ref movementCount, night.sprite);
             }
         }
     }
