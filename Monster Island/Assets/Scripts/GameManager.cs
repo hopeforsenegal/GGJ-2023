@@ -25,18 +25,18 @@ public class GameManager : MonoBehaviour
         {
             // Player updates
             if (actions.left) {
-                Move(Vector3.left * player.speed);
+                Move(obstacles, player.boxCollider, Vector3.left * player.speed);
             }
             if (actions.up) {
-                Move(Vector3.up * player.speed);
+                Move(obstacles, player.boxCollider, Vector3.up * player.speed);
             }
             if (actions.down) {
-                Move(Vector3.down * player.speed);
+                Move(obstacles, player.boxCollider, Vector3.down * player.speed);
             }
             if (actions.right) {
-                Move(Vector3.right * player.speed);
+                Move(obstacles, player.boxCollider, Vector3.right * player.speed);
             }
-            // night day udpates
+            // night day updates
             if (actions.movement) {
                 var v = Util.IncrementLoop(ref movementCount, 4);
                 Debug.Log(v);
@@ -47,7 +47,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    Actions GetUserActions()
+    private static Actions GetUserActions()
     {
         var action = new Actions
         {
@@ -59,21 +59,19 @@ public class GameManager : MonoBehaviour
         action.movement = action.left || action.right || action.up || action.down;
         return action;
     }
-
-
-    // TODO Delete these and make a single static function. Make the test class reference this function
-    void Move(Vector3 velocity)
+    
+    public static void Move(BoxCollider2D[] boxCollider2Ds, BoxCollider2D player1, Vector3 velocity)
     {
-        if (!WillCollide(velocity)) {
-            player.transform.localPosition += velocity;
+        if (!WillCollide(player1, boxCollider2Ds, velocity)) {
+            player1.transform.localPosition += velocity;
         }
     }
 
-    bool WillCollide(Vector3 velocity)
+    public static bool WillCollide(BoxCollider2D player1, BoxCollider2D[] boxCollider2Ds, Vector3 velocity)
     {
-        for (int i = 0; i <= obstacles.Length - 1; i = i + 1) {
-            BoxCollider2D obstacle = obstacles[i];
-            if (player.boxCollider.OverlapPoint(obstacle.transform.position - velocity))
+        for (int i = 0; i <= boxCollider2Ds.Length - 1; i = i + 1) {
+            BoxCollider2D obstacle = boxCollider2Ds[i];
+            if (player1.OverlapPoint(obstacle.transform.position - velocity))
                 return true;
         }
         return false;
