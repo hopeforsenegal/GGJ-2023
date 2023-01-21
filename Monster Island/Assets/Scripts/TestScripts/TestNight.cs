@@ -4,10 +4,10 @@ public class TestNight : MonoBehaviour
 {
     public SpriteRenderer night;
 
-    //HOURS 0- 24
-    //Start at 6 am
-    //Blobs wakup at 9am go to sleep at 10pm
-    int time = 6;
+    //HOURS 0-8
+    //Start at 0am
+    //Blobs wakup at 4  go to sleep at 8
+    int time = 1;
 
     void Start()
     {
@@ -29,8 +29,7 @@ public class TestNight : MonoBehaviour
             }
 
             // increment time
-            time += 1;
-            if (time >= 24) time = 0;
+            time = GameManager.IncrementTime(time);
         }
     }
 }

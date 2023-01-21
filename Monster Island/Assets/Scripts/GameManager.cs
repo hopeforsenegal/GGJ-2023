@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    const int NumMovesInTimePeriod = 4;
-
     private static class AnimNames
     {
         public static readonly string idle = $"{nameof(idle)}";
@@ -30,10 +28,11 @@ public class GameManager : MonoBehaviour
     private System.Action m_DeathAction;
     readonly Dictionary<CameraTransitionSquare, CameraState> cameraState = new Dictionary<CameraTransitionSquare, CameraState>();
 
-    //HOURS 0- 24
-    //Start at 6 am
-    //Blobs wakup at 9am go to sleep at 10pm
-    int time = 6;
+    //HOURS 0-8
+    //Start at 1 since we get a free move at start
+    //Blobs wakup at 4 go to sleep at 8
+    int time = 1;
+    public const int TimeInDay = 8;
 
     void Start()
     {
@@ -203,8 +202,7 @@ public class GameManager : MonoBehaviour
                 }
 
                 // increment time
-                time += 1;
-                if (time >= 24) time = 0;
+                time = IncrementTime(time);
 
                 Debug.Log($"Current time ${time}");
             }
@@ -214,6 +212,13 @@ public class GameManager : MonoBehaviour
             // Camera updates
             InterpolateActiveCamera(mainCamera.transform, cameraState, ref timeElapsed, LerpDuration, startMarkerPos, endMarkerPos);
         }
+    }
+
+    public static int IncrementTime(int time)
+    {
+        time += 1;
+        if (time >= TimeInDay) time = 0;
+        return time;
     }
 
     private static Actions GetUserActions()
@@ -274,19 +279,6 @@ public class GameManager : MonoBehaviour
                 return false;
         }
         return true;
-    }
-
-    public static void OnDayNightCycle(ref bool isDayOrNight, ref int movementCount, SpriteRenderer night)
-    {
-        var increment = Util.IncrementLoop(ref movementCount, NumMovesInTimePeriod);
-        //Debug.Log(increment);
-        if (increment == NumMovesInTimePeriod) {
-            if (Util.Switch(ref isDayOrNight)) {
-                night.color = Color.black;
-            } else {
-                night.color = Color.white;
-            }
-        }
     }
 
     public static void InterpolateActiveCamera(Transform cameraTransform,
@@ -376,7 +368,7 @@ public class GameManager : MonoBehaviour
 
     public static bool IsNightTime(int time)
     {
-        return time > 18 || time < 6;
+        return time >= (TimeInDay / 2);
     }
 
 
