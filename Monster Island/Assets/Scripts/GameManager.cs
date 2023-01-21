@@ -180,7 +180,8 @@ public class GameManager : MonoBehaviour
         }
         cameraLocations[cameraTransitionSquare].IsAnimating = true;
         var startMarkerPos = cameraTransform.position;
-        var endMarkerPos = cameraTransitionSquare.transform.position;
+        var endMarkerPos = cameraTransitionSquare.roomCenter.transform.position;
+        Debug.Log($"Room center togo ${endMarkerPos}");
         endMarkerPos.z = -10;   // Camera always needs to be at -10
         return (startMarkerPos, endMarkerPos);
     }
