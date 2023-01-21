@@ -7,7 +7,7 @@ public class GameManager : MonoBehaviour
     void Update()
     {
         // Inputs
-        var actions = GetActions();
+        var actions = GetUserActions();
         {
             // Player updates
             if (actions.left) {
@@ -16,7 +16,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    Actions GetActions()
+    Actions GetUserActions()
     {
         return new Actions
         {
