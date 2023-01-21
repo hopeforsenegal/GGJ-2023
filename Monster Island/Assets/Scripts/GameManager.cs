@@ -38,11 +38,7 @@ public class GameManager : MonoBehaviour
             }
             // night day updates
             if (actions.movement) {
-                var v = Util.IncrementLoop(ref movementCount, 4);
-                Debug.Log(v);
-                if (v == 4) {
-                    night.color = Util.Switch(ref isDayOrNight) ? Color.black : Color.white;
-                }
+                OnDayNightCycle(ref isDayOrNight, ref movementCount, night);
             }
         }
     }
@@ -69,12 +65,29 @@ public class GameManager : MonoBehaviour
 
     public static bool WillCollide(BoxCollider2D player, Vector3 velocity, BoxCollider2D[] boxCollider2Ds)
     {
-        for (int i = 0; i <= boxCollider2Ds.Length - 1; i = i + 1) {
+        for (int i = 0; i <= boxCollider2Ds.Length - 1; i++) {
             BoxCollider2D obstacle = boxCollider2Ds[i];
             if (player.OverlapPoint(obstacle.transform.position - velocity))
                 return true;
         }
         return false;
+    }
+
+    public static void OnDayNightCycle(ref bool isDayOrNight, ref int movementCount, SpriteRenderer night)
+    {
+        var increment = Util.IncrementLoop(ref movementCount, TestNight.NumMovesInTimePeriod);
+        Debug.Log(increment);
+        if (increment == TestNight.NumMovesInTimePeriod)
+        {
+            if (Util.Switch(ref isDayOrNight))
+            {
+                night.color = Color.black;
+            }
+            else
+            {
+                night.color = Color.white;
+            }
+        }
     }
 }
 
