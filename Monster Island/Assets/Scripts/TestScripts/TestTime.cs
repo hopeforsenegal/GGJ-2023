@@ -76,7 +76,8 @@ public class TestTime : MonoBehaviour
             for (var i = 0; i <= monsters.Length - 1; i += 1) {
                 GameManager.MonsterMoveRandom(player, boxes, obstacles, monsters[i]);
                 if (GameManager.IsWithinRange(monsters[i].transform.localPosition, player.transform.localPosition, 1)) {
-                    GameManager.Die();
+                    Application.Quit();
+                    EditorApplication.isPlaying = false;
                 }
             }
         }

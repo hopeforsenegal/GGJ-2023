@@ -58,8 +58,7 @@ public class GameManager : MonoBehaviour
         var actions = GetUserActions();
         {
             // Player updates
-            if (actions.left)
-            {
+            if (actions.left) {
                 //Debug.Log("left");
                 var velocity = Vector3.left * player.playerSpeed;
                 if (!WillCollide(player.boxCollider, velocity, obstacles)) {
@@ -80,8 +79,7 @@ public class GameManager : MonoBehaviour
                     (startMarkerPos, endMarkerPos) = UpdateAnimationToExecute(locationInfo, mainCamera.transform, cameraState);
                 }
             }
-            if (actions.up)
-            {
+            if (actions.up) {
                 //Debug.Log("up");
                 var velocity = Vector3.up * player.playerSpeed;
                 if (!WillCollide(player.boxCollider, velocity, obstacles)) {
@@ -102,8 +100,7 @@ public class GameManager : MonoBehaviour
                     (startMarkerPos, endMarkerPos) = UpdateAnimationToExecute(locationInfo, mainCamera.transform, cameraState);
                 }
             }
-            if (actions.down)
-            {
+            if (actions.down) {
                 //Debug.Log("down");
                 var velocity = Vector3.down * player.playerSpeed;
                 if (!WillCollide(player.boxCollider, velocity, obstacles)) {
@@ -124,8 +121,7 @@ public class GameManager : MonoBehaviour
                     (startMarkerPos, endMarkerPos) = UpdateAnimationToExecute(locationInfo, mainCamera.transform, cameraState);
                 }
             }
-            if (actions.right)
-            {
+            if (actions.right) {
                 //Debug.Log("right");
                 var velocity = Vector3.right * player.playerSpeed;
                 if (!WillCollide(player.boxCollider, velocity, obstacles)) {
@@ -155,30 +151,36 @@ public class GameManager : MonoBehaviour
                     int wakeHour = monster.data.wakeHour;
                     int sleepHour = monster.data.sleepHour;
                     int stepsToUpdate = monster.data.stepsToUpdate;
-                    
+
                     //check if monster is asleep
-                    if(time == wakeHour && wakeHour != -1)
+                    if (time == wakeHour && wakeHour != -1)
                         monster.data.isSleep = false;
-                    if(time == sleepHour && sleepHour != -1)
+                    if (time == sleepHour && sleepHour != -1)
                         monster.data.isSleep = true;
-                    if(monster.data.isSleep == true){
+                    if (monster.data.isSleep == true) {
                         Debug.Log("Monster is sleep");
                         continue;
                     }
 
                     //check if can step
                     Debug.Log($"if can step ${time % stepsToUpdate != 0}");
-                    if(time % stepsToUpdate != 0)
-                        continue;     
+                    if (time % stepsToUpdate != 0)
+                        continue;
 
                     //handle moves
-                    if(isRandom)
+                    if (isRandom)
                         MonsterMoveRandom(player.boxCollider, boxes, obstacles, monsters[i].boxCollider);
 
 
                     //Handle attack
                     if (IsWithinRange(monsters[i].boxCollider.transform.localPosition, player.transform.localPosition, killRadius)) {
-                        Die();
+                        Debug.Log("Monster can kill");
+                        m_TimerDelayShowDeath = 0.1f;
+                        m_DeathAction = () =>
+                        {
+                            gameOverScreen.Visibility = true;
+                        };
+                        return;
                     }
                 }
                 // night day updates
@@ -186,7 +188,7 @@ public class GameManager : MonoBehaviour
 
                 //increment time
                 time += 1;
-                if(time >= 24) time = 0;
+                if (time >= 24) time = 0;
                 Debug.Log($"Current time ${time}");
             }
             if (Util.HasHitTimeOnce(ref m_TimerDelayShowDeath, Time.deltaTime)) {
@@ -270,10 +272,12 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public static void InterpolateActiveCamera(Transform cameraTransform, Dictionary<CameraTransitionSquare, CameraState> cameraLocations,
-        ref float timeElapsed,
-        float lerpDuration,
-        Vector3 startMarkerPos, Vector3 endMarkerPos)
+    public static void InterpolateActiveCamera(Transform cameraTransform,
+                                               Dictionary<CameraTransitionSquare, CameraState> cameraLocations,
+                                               ref float timeElapsed,
+                                               float lerpDuration,
+                                               Vector3 startMarkerPos,
+                                               Vector3 endMarkerPos)
     {
         foreach (var kv in cameraLocations) {
             if (kv.Value.IsAnimating) {
@@ -289,7 +293,9 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public static (Vector3 startMarkerPos, Vector3 endMarkerPos) UpdateAnimationToExecute(CameraTransitionSquare cameraTransitionSquare, Transform cameraTransform, Dictionary<CameraTransitionSquare, CameraState> cameraLocations)
+    public static (Vector3 startMarkerPos, Vector3 endMarkerPos) UpdateAnimationToExecute(CameraTransitionSquare cameraTransitionSquare,
+                                                                                          Transform cameraTransform,
+                                                                                          Dictionary<CameraTransitionSquare, CameraState> cameraLocations)
     {
         foreach (var kv in cameraLocations) {
             kv.Value.IsAnimating = false;
@@ -297,18 +303,8 @@ public class GameManager : MonoBehaviour
         cameraLocations[cameraTransitionSquare].IsAnimating = true;
         var startMarkerPos = cameraTransform.position;
         var endMarkerPos = cameraTransitionSquare.roomCenter.transform.position;
-        //Debug.Log($"Room center togo ${endMarkerPos}");
         endMarkerPos.z = -10;   // Camera always needs to be at -10
         return (startMarkerPos, endMarkerPos);
-    }
-
-    public static void Die()
-    {
-        //Debug.Log("Monster can kill");
-        Application.Quit();
-        //EditorApplication.isPlaying = false;
-        UnityEditor.EditorApplication.isPlaying = false;
-
     }
 
     private static bool WillObjectCollide(BoxCollider2D box, Vector3 velocity, BoxCollider2D[] obstacleBoxCollider2Ds, BoxCollider2D[] boxBoxCollider2Ds, BoxCollider2D playerBoxCollider2D)
