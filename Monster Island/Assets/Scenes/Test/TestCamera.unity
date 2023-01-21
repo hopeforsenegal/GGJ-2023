@@ -134,7 +134,7 @@ GameObject:
   - component: {fileID: 248267792}
   - component: {fileID: 248267791}
   m_Layer: 0
-  m_Name: Square
+  m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -229,7 +229,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 708487694}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 2.76, z: 0}
+  m_LocalPosition: {x: 0, y: 2.76, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1909783383}
@@ -342,7 +342,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1223326083}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -8.1, y: 0, z: 0}
+  m_LocalPosition: {x: -8.1, y: 0, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1909783383}
@@ -378,10 +378,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mainCamera: {fileID: 921903985}
-  transforma: {fileID: 1223326084}
-  transformb: {fileID: 1649378810}
-  transformc: {fileID: 708487695}
-  interpolationFramesCount: 45
+  cameraEndLocationTransforms:
+  - {fileID: 1223326084}
+  - {fileID: 1649378810}
+  - {fileID: 708487695}
 --- !u!4 &1555699684
 Transform:
   m_ObjectHideFlags: 0
@@ -420,7 +420,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1649378809}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 7.68, y: 0, z: 0}
+  m_LocalPosition: {x: 7.68, y: 0, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1909783383}

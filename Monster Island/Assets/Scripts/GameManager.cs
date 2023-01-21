@@ -1,15 +1,33 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
+    const int NumMovesInTimePeriod = 4;
+
     // inspector
     public Player player;
     public BoxCollider2D[] obstacles;
-    public SpriteRenderer night;
+    public DayNight night;
+    public Camera mainCamera;
+    public Transform[] cameraEndLocationTransforms;
 
     // private
     bool isDayOrNight;
     int movementCount;
+    Dictionary<Transform, CameraState> cameraState = new Dictionary<Transform, CameraState>();
+
+    void Start()
+    {
+        player = FindObjectOfType<Player>();
+        night = FindObjectOfType<DayNight>();
+        obstacles = GameObject.Find("Obstacles").GetComponentsInChildren<BoxCollider2D>();
+        cameraEndLocationTransforms = GameObject.Find("CameraLocations").GetComponentsInChildren<Transform>();
+
+        foreach (var cT in cameraEndLocationTransforms) {
+            cameraState.Add(cT, new CameraState());
+        }
+    }
 
     void Update()
     {
@@ -18,29 +36,25 @@ public class GameManager : MonoBehaviour
         {
             // Player updates
             if (actions.left) {
-                Move(Vector3.left * player.speed);
+                MovePlayer(player.boxCollider, Vector3.left * player.speed, obstacles);
             }
             if (actions.up) {
-                Move(Vector3.up * player.speed);
+                MovePlayer(player.boxCollider, Vector3.up * player.speed, obstacles);
             }
             if (actions.down) {
-                Move(Vector3.down * player.speed);
+                MovePlayer(player.boxCollider, Vector3.down * player.speed, obstacles);
             }
             if (actions.right) {
-                Move(Vector3.right * player.speed);
+                MovePlayer(player.boxCollider, Vector3.right * player.speed, obstacles);
             }
-            // night day udpates
+            // night day updates
             if (actions.movement) {
-                var v = Util.IncrementLoop(ref movementCount, 4);
-                Debug.Log(v);
-                if (v == 4) {
-                    night.color = Util.Switch(ref isDayOrNight) ? Color.black : Color.white;
-                }
+                OnDayNightCycle(ref isDayOrNight, ref movementCount, night.sprite);
             }
         }
     }
 
-    Actions GetUserActions()
+    private static Actions GetUserActions()
     {
         var action = new Actions
         {
@@ -53,23 +67,73 @@ public class GameManager : MonoBehaviour
         return action;
     }
 
-
-    // TODO Delete these and make a single static function. Make the test class reference this function
-    void Move(Vector3 velocity)
+    public static void MovePlayer(BoxCollider2D player, Vector3 velocity, BoxCollider2D[] boxCollider2Ds)
     {
-        if (!WillCollide(velocity)) {
+        if (!WillCollide(player, velocity, boxCollider2Ds)) {
             player.transform.localPosition += velocity;
         }
     }
 
-    bool WillCollide(Vector3 velocity)
+    public static bool WillCollide(BoxCollider2D player, Vector3 velocity, BoxCollider2D[] boxCollider2Ds)
     {
-        for (int i = 0; i <= obstacles.Length - 1; i = i + 1) {
-            BoxCollider2D obstacle = obstacles[i];
-            if (player.boxCollider.OverlapPoint(obstacle.transform.position - velocity))
+        for (int i = 0; i <= boxCollider2Ds.Length - 1; i++) {
+            BoxCollider2D obstacle = boxCollider2Ds[i];
+            if (player.OverlapPoint(obstacle.transform.position - velocity))
                 return true;
         }
         return false;
+    }
+
+    public static void OnDayNightCycle(ref bool isDayOrNight, ref int movementCount, SpriteRenderer night)
+    {
+        var increment = Util.IncrementLoop(ref movementCount, NumMovesInTimePeriod);
+        Debug.Log(increment);
+        if (increment == NumMovesInTimePeriod)
+        {
+            if (Util.Switch(ref isDayOrNight))
+            {
+                night.color = Color.black;
+            }
+            else
+            {
+                night.color = Color.white;
+            }
+        }
+    }
+
+    public static void InterpolateActiveCamera(Transform cameraTransform, Dictionary<Transform, CameraState> cameraLocations, 
+        ref float timeElapsed,
+        float lerpDuration,
+        Vector3 startMarkerPos, Vector3 endMarkerPos)
+    {
+        foreach (var kv in cameraLocations)
+        {
+            if (kv.Value.IsAnimating)
+            {
+                if (timeElapsed < lerpDuration)
+                {
+                    cameraTransform.position = Vector3.Lerp(startMarkerPos, endMarkerPos, timeElapsed / lerpDuration);
+                    timeElapsed += Time.deltaTime;
+                }
+                else
+                {
+                    cameraTransform.position = endMarkerPos;
+                    timeElapsed = 0f;
+                    kv.Value.IsAnimating = false;
+                }
+            }
+        }
+    }
+
+    public static (Vector3 startMarkerPos, Vector3 endMarkerPos) UpdateAnimationToExecute(Transform locationTransform, Transform cameraTransform, Dictionary<Transform, CameraState> cameraLocations)
+    {
+        foreach (var kv in cameraLocations) {
+            kv.Value.IsAnimating = false;
+        }
+        cameraLocations[locationTransform].IsAnimating = true;
+        var startMarkerPos = cameraTransform.position;
+        var endMarkerPos = locationTransform.position;
+        return (startMarkerPos, endMarkerPos);
     }
 }
 
