@@ -9,11 +9,20 @@ public class TestNight : MonoBehaviour
     //Blobs wakup at 9am go to sleep at 10pm
     int time = 6;
 
+    void Start()
+    {
+        if (GameManager.IsNightTime(time)) {
+            night.color = Color.black;
+        } else {
+            night.color = Color.white;
+        }
+    }
+
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.A)) {
             // night day updates
-            if (time < 12) {
+            if (GameManager.IsNightTime(time)) {
                 night.color = Color.black;
             } else {
                 night.color = Color.white;

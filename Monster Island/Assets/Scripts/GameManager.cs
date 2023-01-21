@@ -55,6 +55,12 @@ public class GameManager : MonoBehaviour
         gameOverScreen.Visibility = false;
 
         Util.LoopAnimation(player.spineAnimation, AnimNames.idle);
+
+        if (IsNightTime(time)) {
+            night.sprite.color = Color.black;
+        } else {
+            night.sprite.color = Color.white;
+        }
     }
 
     void Update()
@@ -190,7 +196,7 @@ public class GameManager : MonoBehaviour
                 }
 
                 // night day updates
-                if (time < 12) {
+                if (IsNightTime(time)) {
                     night.sprite.color = Color.black;
                 } else {
                     night.sprite.color = Color.white;
@@ -368,6 +374,10 @@ public class GameManager : MonoBehaviour
         return false;
     }
 
+    public static bool IsNightTime(int time)
+    {
+        return time > 18 || time < 6;
+    }
 
 
 
