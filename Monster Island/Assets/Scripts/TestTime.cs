@@ -22,7 +22,7 @@ public class TestTime : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Vector3 v = new Vector3(0.0f, 0.0f, 0.0f);
+        var v = new Vector3(0.0f, 0.0f, 0.0f);
         if(Input.GetKeyDown(KeyCode.A)){
             Move(Vector3.left * speed);
             HandleTime(1); 
@@ -45,7 +45,7 @@ public class TestTime : MonoBehaviour
     //TODO: check if box will collide with obstacle if so, dont move player or box. 
     void Move(Vector3 velocity) {
         if(!WillCollide(velocity)){
-            BoxCollider2D pushable = GetPushedBox(velocity);
+            var pushable = GetPushedBox(velocity);
             if(pushable != null){
                 Debug.Log("IsPushing");
                 if(CanPushBox(pushable, velocity)){
@@ -61,9 +61,9 @@ public class TestTime : MonoBehaviour
     }
 
     BoxCollider2D GetPushedBox(Vector3 velocity){
-        for (int i = 0; i <= boxes.Length - 1; i = i + 1) 
+        for (var i = 0; i <= boxes.Length - 1; i = i + 1) 
         {
-            BoxCollider2D box = boxes[i];
+            var box = boxes[i];
             if(player.OverlapPoint(box.transform.position-velocity)){
                 return box;
             }
@@ -72,15 +72,15 @@ public class TestTime : MonoBehaviour
     }
 
     bool CanPushBox(BoxCollider2D box, Vector3 velocity) {
-        for (int i = 0; i <= obstacles.Length - 1; i = i + 1) 
+        for (var i = 0; i <= obstacles.Length - 1; i = i + 1) 
         {
-            BoxCollider2D obstacle = obstacles[i];
+            var obstacle = obstacles[i];
             if(box.OverlapPoint(obstacle.transform.position-velocity))
                 return false;
         }
-        for (int i = 0; i <= boxes.Length - 1; i = i + 1) 
+        for (var i = 0; i <= boxes.Length - 1; i = i + 1) 
         {
-            BoxCollider2D b = boxes[i];
+            var b = boxes[i];
             if(box.OverlapPoint(b.transform.position-velocity))
                 return false;
         }
@@ -88,9 +88,9 @@ public class TestTime : MonoBehaviour
     }
 
     bool WillCollide(Vector3 velocity){
-        for (int i = 0; i <= obstacles.Length - 1; i = i + 1) 
+        for (var i = 0; i <= obstacles.Length - 1; i = i + 1) 
         {
-            BoxCollider2D obstacle = obstacles[i];
+            var obstacle = obstacles[i];
             if(player.OverlapPoint(obstacle.transform.position-velocity))
                 return true;
         }
@@ -98,15 +98,15 @@ public class TestTime : MonoBehaviour
     }
 
     bool WillObjectCollide(BoxCollider2D box, Vector3 velocity){
-        for (int i = 0; i <= obstacles.Length - 1; i = i + 1) 
+        for (var i = 0; i <= obstacles.Length - 1; i = i + 1) 
         {
-            BoxCollider2D obstacle = obstacles[i];
+            var obstacle = obstacles[i];
             if(box.OverlapPoint(obstacle.transform.position-velocity) && obstacle != box)
                 return true;
         }
-        for (int i = 0; i <= boxes.Length - 1; i = i + 1) 
+        for (var i = 0; i <= boxes.Length - 1; i = i + 1) 
         {
-            BoxCollider2D b = boxes[i];
+            var b = boxes[i];
             if(box.OverlapPoint(b.transform.position-velocity) && b != box)
                 return true;
         }
@@ -123,9 +123,9 @@ public class TestTime : MonoBehaviour
             Vector3.left,
             Vector3.down
         };
-        Vector3 vel = dirs[Random.Range(1, 4)];
-        int inc = 0;
-        bool checking = true;
+        var vel = dirs[Random.Range(1, 4)];
+        var inc = 0;
+        var checking = true;
         while(checking && inc < 5){
             Debug.Log("Checking moves");
             vel = dirs[Random.Range(1, 4)];
@@ -140,7 +140,7 @@ public class TestTime : MonoBehaviour
     }
 
     void HandleTime(int delta) {
-        for (int i = 0; i <= monsters.Length - 1; i = i + 1) 
+        for (var i = 0; i <= monsters.Length - 1; i = i + 1) 
         {
             MonsterMove(i);
             if(IsWithinRange(monsters[i].transform.localPosition, player.transform.localPosition, 1)){
@@ -150,7 +150,7 @@ public class TestTime : MonoBehaviour
     }
 
     bool IsWithinRange(Vector3 center, Vector3 point, float radius){
-        Vector3 diff = center - point;
+        var diff = center - point;
         if(Mathf.Abs(diff.x) <= radius && Mathf.Abs(diff.y) <= radius)
             return true;
         return false;

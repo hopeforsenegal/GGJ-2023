@@ -9,6 +9,7 @@ public class GameManager : MonoBehaviour
     // inspector
     public Player player;
     public BoxCollider2D[] obstacles;
+    public BoxCollider2D[] boxes;
     public DayNight night;
     public Camera mainCamera;
     public CameraTransitionSquare[] cameraEndLocationTransforms;
@@ -28,7 +29,8 @@ public class GameManager : MonoBehaviour
         player = FindObjectOfType<Player>();
         night = FindObjectOfType<DayNight>();
         obstacles = GameObject.Find("Obstacles").GetComponentsInChildren<BoxCollider2D>();
-        cameraEndLocationTransforms = GameManager.GetCameraTransitionSquares();
+        boxes = GameObject.Find("Boxes").GetComponentsInChildren<BoxCollider2D>();
+        cameraEndLocationTransforms = GetCameraTransitionSquares();
 
         foreach (var cT in cameraEndLocationTransforms) {
             cameraState.Add(cT, new CameraState());
@@ -45,7 +47,17 @@ public class GameManager : MonoBehaviour
             {
                 var velocity = Vector3.left * player.speed;
                 if (!WillCollide(player.boxCollider, velocity, obstacles)) {
-                    player.boxCollider.transform.localPosition += velocity;
+                    var pushable = GetPushedBox(player.boxCollider, velocity, boxes);
+                    if(pushable != null){
+                        Debug.Log("IsPushing");
+                        if(CanPushBox(pushable, velocity, obstacles, boxes)){
+                            player.transform.localPosition += velocity;
+                            pushable.transform.localPosition += velocity;
+                        }
+                    } 
+                    else {
+                        player.transform.localPosition += velocity;
+                    }
                 }
                 var (hasCollided, locationInfo) =
                     WillCollideCameraLocation(player.boxCollider, velocity, cameraEndLocationTransforms);
@@ -57,7 +69,17 @@ public class GameManager : MonoBehaviour
             {
                 var velocity = Vector3.up * player.speed;
                 if (!WillCollide(player.boxCollider, velocity, obstacles)) {
-                    player.boxCollider.transform.localPosition += velocity;
+                    var pushable = GetPushedBox(player.boxCollider, velocity, boxes);
+                    if(pushable != null){
+                        Debug.Log("IsPushing");
+                        if(CanPushBox(pushable, velocity, obstacles, boxes)){
+                            player.transform.localPosition += velocity;
+                            pushable.transform.localPosition += velocity;
+                        }
+                    } 
+                    else {
+                        player.transform.localPosition += velocity;
+                    }
                 }
                 var (hasCollided, locationInfo) =
                     WillCollideCameraLocation(player.boxCollider, velocity, cameraEndLocationTransforms);
@@ -69,7 +91,17 @@ public class GameManager : MonoBehaviour
             {
                 var velocity = Vector3.down * player.speed;
                 if (!WillCollide(player.boxCollider, velocity, obstacles)) {
-                    player.boxCollider.transform.localPosition += velocity;
+                    var pushable = GetPushedBox(player.boxCollider, velocity, boxes);
+                    if(pushable != null){
+                        Debug.Log("IsPushing");
+                        if(CanPushBox(pushable, velocity, obstacles, boxes)){
+                            player.transform.localPosition += velocity;
+                            pushable.transform.localPosition += velocity;
+                        }
+                    } 
+                    else {
+                        player.transform.localPosition += velocity;
+                    }
                 }
                 var (hasCollided, locationInfo) =
                     WillCollideCameraLocation(player.boxCollider, velocity, cameraEndLocationTransforms);
@@ -81,7 +113,17 @@ public class GameManager : MonoBehaviour
             {
                 var velocity = Vector3.right * player.speed;
                 if (!WillCollide(player.boxCollider, velocity, obstacles)) {
-                    player.boxCollider.transform.localPosition += velocity;
+                    var pushable = GetPushedBox(player.boxCollider, velocity, boxes);
+                    if(pushable != null){
+                        Debug.Log("IsPushing");
+                        if(CanPushBox(pushable, velocity, obstacles, boxes)){
+                            player.transform.localPosition += velocity;
+                            pushable.transform.localPosition += velocity;
+                        }
+                    } 
+                    else {
+                        player.transform.localPosition += velocity;
+                    }
                 }
                 var (hasCollided, locationInfo) =
                     WillCollideCameraLocation(player.boxCollider, velocity, cameraEndLocationTransforms);
@@ -94,7 +136,7 @@ public class GameManager : MonoBehaviour
                 OnDayNightCycle(ref isDayOrNight, ref movementCount, night.sprite);
             }
             // Camera updates
-            GameManager.InterpolateActiveCamera(mainCamera.transform, cameraState, ref timeElapsed, LerpDuration, startMarkerPos, endMarkerPos);
+            InterpolateActiveCamera(mainCamera.transform, cameraState, ref timeElapsed, LerpDuration, startMarkerPos, endMarkerPos);
         }
     }
 
@@ -130,6 +172,32 @@ public class GameManager : MonoBehaviour
                 return (true, boxCollider2Ds[i]);
         }
         return (false, null);
+    }
+
+    public static BoxCollider2D GetPushedBox(BoxCollider2D player, Vector3 velocity, BoxCollider2D[] boxCollider2Ds)
+    {
+        for (var i = 0; i <= boxCollider2Ds.Length - 1; i = i + 1) {
+            var box = boxCollider2Ds[i];
+            if (player.OverlapPoint(box.transform.position - velocity)) {
+                return box;
+            }
+        }
+        return null;
+    }
+
+    public static bool CanPushBox(BoxCollider2D box, Vector3 velocity, BoxCollider2D[] obstacleBoxCollider2Ds, BoxCollider2D[] boxBoxCollider2Ds)
+    {
+        for (var i = 0; i <= obstacleBoxCollider2Ds.Length - 1; i = i + 1) {
+            var obstacle = obstacleBoxCollider2Ds[i];
+            if (box.OverlapPoint(obstacle.transform.position - velocity))
+                return false;
+        }
+        for (var i = 0; i <= boxBoxCollider2Ds.Length - 1; i = i + 1) {
+            var b = boxBoxCollider2Ds[i];
+            if (box.OverlapPoint(b.transform.position - velocity))
+                return false;
+        }
+        return true;
     }
 
     public static void OnDayNightCycle(ref bool isDayOrNight, ref int movementCount, SpriteRenderer night)
