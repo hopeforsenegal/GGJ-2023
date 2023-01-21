@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -15,6 +14,7 @@ public class GameManager : MonoBehaviour
     public DayNight night;
     public Camera mainCamera;
     public CameraTransitionSquare[] cameraEndLocationTransforms;
+    public GameOverScreen gameOverScreen;
 
     // private
     bool isDayOrNight;
@@ -23,11 +23,12 @@ public class GameManager : MonoBehaviour
     float timeElapsed;
     private Vector3 endMarkerPos;
     private Vector3 startMarkerPos;
-    Dictionary<CameraTransitionSquare, CameraState> cameraState = new Dictionary<CameraTransitionSquare, CameraState>();
+    readonly Dictionary<CameraTransitionSquare, CameraState> cameraState = new Dictionary<CameraTransitionSquare, CameraState>();
 
     void Start()
     {
         mainCamera = Camera.main;
+        gameOverScreen = FindObjectOfType<GameOverScreen>();
         player = FindObjectOfType<Player>();
         night = FindObjectOfType<DayNight>();
         obstacles = GameObject.Find("Obstacles").GetComponentsInChildren<BoxCollider2D>();
@@ -35,9 +36,13 @@ public class GameManager : MonoBehaviour
         monsters = GameObject.Find("Monsters").GetComponentsInChildren<BoxCollider2D>();
         cameraEndLocationTransforms = GetCameraTransitionSquares();
 
+        gameOverScreen.RetryEvent += MainMenu.ReLoadScene;
+        gameOverScreen.QuitEvent += MainMenu.LoadMainMenu;
         foreach (var cT in cameraEndLocationTransforms) {
             cameraState.Add(cT, new CameraState());
         }
+
+        gameOverScreen.Visibility = false;
     }
 
     void Update()
@@ -46,8 +51,7 @@ public class GameManager : MonoBehaviour
         var actions = GetUserActions();
         {
             // Player updates
-            if (actions.left)
-            {
+            if (actions.left) {
                 Debug.Log("left");
                 var velocity = Vector3.left * player.playerSpeed;
                 if (!WillCollide(player.boxCollider, velocity, obstacles)) {
@@ -68,8 +72,7 @@ public class GameManager : MonoBehaviour
                     (startMarkerPos, endMarkerPos) = UpdateAnimationToExecute(locationInfo, mainCamera.transform, cameraState);
                 }
             }
-            if (actions.up)
-            {
+            if (actions.up) {
                 Debug.Log("up");
                 var velocity = Vector3.up * player.playerSpeed;
                 if (!WillCollide(player.boxCollider, velocity, obstacles)) {
@@ -90,8 +93,7 @@ public class GameManager : MonoBehaviour
                     (startMarkerPos, endMarkerPos) = UpdateAnimationToExecute(locationInfo, mainCamera.transform, cameraState);
                 }
             }
-            if (actions.down)
-            {
+            if (actions.down) {
                 Debug.Log("down");
                 var velocity = Vector3.down * player.playerSpeed;
                 if (!WillCollide(player.boxCollider, velocity, obstacles)) {
@@ -112,8 +114,7 @@ public class GameManager : MonoBehaviour
                     (startMarkerPos, endMarkerPos) = UpdateAnimationToExecute(locationInfo, mainCamera.transform, cameraState);
                 }
             }
-            if (actions.right)
-            {
+            if (actions.right) {
                 Debug.Log("right");
                 var velocity = Vector3.right * player.playerSpeed;
                 if (!WillCollide(player.boxCollider, velocity, obstacles)) {
@@ -138,8 +139,12 @@ public class GameManager : MonoBehaviour
                 // monster updates
                 for (var i = 0; i <= monsters.Length - 1; i += 1) {
                     MonsterMoveRandom(player.boxCollider, boxes, obstacles, monsters, i);
-                    if (IsWithinRange(monsters[i].transform.localPosition, player.transform.localPosition, 1)) {
-                        Die();
+                    if (IsWithinRange(monsters[i].transform.localPosition, player.transform.localPosition, 1))
+                    {
+                        gameOverScreen.Visibility = true;
+                        Debug.Log("Monster can kill");
+
+                        return;
                     }
                 }
                 // night day updates
@@ -253,13 +258,6 @@ public class GameManager : MonoBehaviour
         Debug.Log($"Room center togo ${endMarkerPos}");
         endMarkerPos.z = -10;   // Camera always needs to be at -10
         return (startMarkerPos, endMarkerPos);
-    }
-
-    public static void Die()
-    {
-        Debug.Log("Monster can kill");
-        Application.Quit();
-        EditorApplication.isPlaying = false;
     }
 
     private static bool WillObjectCollide(BoxCollider2D box, Vector3 velocity, BoxCollider2D[] obstacleBoxCollider2Ds, BoxCollider2D[] boxBoxCollider2Ds, BoxCollider2D playerBoxCollider2D)
