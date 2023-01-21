@@ -3,6 +3,7 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     public Player player;
+    public BoxCollider2D[] obstacles;
 
     void Update()
     {
@@ -11,7 +12,7 @@ public class GameManager : MonoBehaviour
         {
             // Player updates
             if (actions.left) {
-                transform.localPosition += Vector3.left * player.speed;
+                Move(Vector3.left * player.speed);
             }
         }
     }
@@ -23,9 +24,27 @@ public class GameManager : MonoBehaviour
             left = Input.GetKeyDown(KeyCode.A),
         };
     }
+
+    void Move(Vector3 velocity)
+    {
+        if (!WillCollide(velocity)) {
+            player.transform.localPosition += velocity;
+        }
+    }
+
+    bool WillCollide(Vector3 velocity)
+    {
+        for (int i = 0; i <= obstacles.Length - 1; i = i + 1) {
+            BoxCollider2D obstacle = obstacles[i];
+            if (player.boxCollider.OverlapPoint(obstacle.transform.position - velocity))
+                return true;
+        }
+        return false;
+    }
 }
 
 
-public struct Actions {
+public struct Actions
+{
     public bool left;
 }
