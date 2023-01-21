@@ -22,8 +22,6 @@ public class GameManager : MonoBehaviour
     public GameOverScreen gameOverScreen;
 
     // private
-    bool isDayOrNight;
-    int movementCount;
     private const float LerpDuration = 0.5f;
     float timeElapsed;
     private Vector3 endMarkerPos;
@@ -190,12 +188,18 @@ public class GameManager : MonoBehaviour
                         return;
                     }
                 }
-                // night day updates
-                OnDayNightCycle(ref isDayOrNight, ref movementCount, night.sprite);
 
-                //increment time
+                // night day updates
+                if (time < 12) {
+                    night.sprite.color = Color.black;
+                } else {
+                    night.sprite.color = Color.white;
+                }
+
+                // increment time
                 time += 1;
                 if (time >= 24) time = 0;
+
                 Debug.Log($"Current time ${time}");
             }
             if (Util.HasHitTimeOnce(ref m_TimerDelayShowDeath, Time.deltaTime)) {
