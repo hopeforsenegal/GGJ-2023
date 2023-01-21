@@ -9,18 +9,17 @@ public class TestAABB : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Vector3 v = new Vector3(0.0f, 0.0f, 0.0f);
         if(Input.GetKeyDown(KeyCode.A)){
-            GameManager.Move(obstacles, player, Vector3.left * speed);    
+            GameManager.MovePlayer(player, Vector3.left * speed, obstacles);    
         }
         if(Input.GetKeyDown(KeyCode.W)){
-            GameManager.Move(obstacles, player, Vector3.up * speed);
+            GameManager.MovePlayer(player, Vector3.up * speed, obstacles);
         }
         if(Input.GetKeyDown(KeyCode.S)){
-            GameManager.Move(obstacles, player, Vector3.down * speed);
+            GameManager.MovePlayer(player, Vector3.down * speed, obstacles);
         }
         if(Input.GetKeyDown(KeyCode.D)){
-            GameManager.Move(obstacles, player, Vector3.right * speed);
+            GameManager.MovePlayer(player, Vector3.right * speed, obstacles);
         }
     }
 }

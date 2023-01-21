@@ -25,16 +25,16 @@ public class GameManager : MonoBehaviour
         {
             // Player updates
             if (actions.left) {
-                Move(obstacles, player.boxCollider, Vector3.left * player.speed);
+                MovePlayer(player.boxCollider, Vector3.left * player.speed, obstacles);
             }
             if (actions.up) {
-                Move(obstacles, player.boxCollider, Vector3.up * player.speed);
+                MovePlayer(player.boxCollider, Vector3.up * player.speed, obstacles);
             }
             if (actions.down) {
-                Move(obstacles, player.boxCollider, Vector3.down * player.speed);
+                MovePlayer(player.boxCollider, Vector3.down * player.speed, obstacles);
             }
             if (actions.right) {
-                Move(obstacles, player.boxCollider, Vector3.right * player.speed);
+                MovePlayer(player.boxCollider, Vector3.right * player.speed, obstacles);
             }
             // night day updates
             if (actions.movement) {
@@ -59,19 +59,19 @@ public class GameManager : MonoBehaviour
         action.movement = action.left || action.right || action.up || action.down;
         return action;
     }
-    
-    public static void Move(BoxCollider2D[] boxCollider2Ds, BoxCollider2D player1, Vector3 velocity)
+
+    public static void MovePlayer(BoxCollider2D player, Vector3 velocity, BoxCollider2D[] boxCollider2Ds)
     {
-        if (!WillCollide(player1, boxCollider2Ds, velocity)) {
-            player1.transform.localPosition += velocity;
+        if (!WillCollide(player, velocity, boxCollider2Ds)) {
+            player.transform.localPosition += velocity;
         }
     }
 
-    public static bool WillCollide(BoxCollider2D player1, BoxCollider2D[] boxCollider2Ds, Vector3 velocity)
+    public static bool WillCollide(BoxCollider2D player, Vector3 velocity, BoxCollider2D[] boxCollider2Ds)
     {
         for (int i = 0; i <= boxCollider2Ds.Length - 1; i = i + 1) {
             BoxCollider2D obstacle = boxCollider2Ds[i];
-            if (player1.OverlapPoint(obstacle.transform.position - velocity))
+            if (player.OverlapPoint(obstacle.transform.position - velocity))
                 return true;
         }
         return false;

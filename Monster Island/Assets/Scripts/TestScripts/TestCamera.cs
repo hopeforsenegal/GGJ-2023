@@ -21,8 +21,8 @@ public class TestCamera : MonoBehaviour
         cameraLocations.Add(transformb, new TransformState());
         cameraLocations.Add(transformc, new TransformState());
     }
-    public int interpolationFramesCount = 45; // Number of frames to completely interpolate between the 2 positions
-    int elapsedFrames = 0;
+    float timeElapsed;
+    float lerpDuration = 0.5f;
     private Vector3 endMarkerPos;
     private Vector3 startMarkerPos;
 
@@ -41,13 +41,17 @@ public class TestCamera : MonoBehaviour
             Debug.Log("3");
             UpdateAnimation(transformc);
         }
-        float interpolationRatio = (float)elapsedFrames / interpolationFramesCount;
         foreach (var kv in cameraLocations) {
             if (kv.Value.IsAnimating) {
                 Debug.Log("Hey");
 
-                // Just need to use Time.time to calculate the lerp and move the camera
-                mainCamera.transform.position = Vector3.Lerp(startMarkerPos, endMarkerPos, interpolationRatio);
+                if (timeElapsed < lerpDuration) {
+                    mainCamera.transform.position = Vector3.Lerp(startMarkerPos, endMarkerPos, timeElapsed / lerpDuration);
+                    timeElapsed += Time.deltaTime;
+                } else {
+                    mainCamera.transform.position = endMarkerPos;
+                    kv.Value.IsAnimating = false;
+                }
             }
         }
     }
