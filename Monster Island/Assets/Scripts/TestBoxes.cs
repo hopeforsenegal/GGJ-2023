@@ -36,25 +36,49 @@ public class TestBoxes : MonoBehaviour
         
     }
 
-
     //TODO: check if box will collide with obstacle if so, dont move player or box. 
     void Move(Vector3 velocity) {
         if(!WillCollide(velocity)){
-            PushBox(velocity);
-            player.transform.localPosition += velocity;
+            BoxCollider2D pushable = GetPushedBox(velocity);
+            if(pushable != null){
+                Debug.Log("IsPushing");
+                if(CanPushBox(pushable, velocity)){
+                    player.transform.localPosition += velocity;
+                    pushable.transform.localPosition += velocity;
+                }
+            } 
+            else {
+                player.transform.localPosition += velocity;
+            }
             
         }
     }
 
-    void PushBox(Vector3 velocity){
+    BoxCollider2D GetPushedBox(Vector3 velocity){
         for (int i = 0; i <= boxes.Length - 1; i = i + 1) 
         {
             BoxCollider2D box = boxes[i];
             if(player.OverlapPoint(box.transform.position-velocity)){
-                box.transform.localPosition += velocity;
-                return;
+                return box;
             }
         }
+        return null;
+    }
+
+    bool CanPushBox(BoxCollider2D box, Vector3 velocity) {
+        for (int i = 0; i <= obstacles.Length - 1; i = i + 1) 
+        {
+            BoxCollider2D obstacle = obstacles[i];
+            if(box.OverlapPoint(obstacle.transform.position-velocity))
+                return false;
+        }
+        for (int i = 0; i <= boxes.Length - 1; i = i + 1) 
+        {
+            BoxCollider2D b = boxes[i];
+            if(box.OverlapPoint(b.transform.position-velocity))
+                return false;
+        }
+        return true;
     }
 
     bool WillCollide(Vector3 velocity){
