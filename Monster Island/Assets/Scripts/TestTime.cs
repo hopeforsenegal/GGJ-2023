@@ -143,6 +143,22 @@ public class TestTime : MonoBehaviour
         for (int i = 0; i <= monsters.Length - 1; i = i + 1) 
         {
             MonsterMove(i);
+            if(IsWithinRange(monsters[i].transform.localPosition, player.transform.localPosition, 1)){
+                Die();
+            }
         }
+    }
+
+    bool IsWithinRange(Vector3 center, Vector3 point, float radius){
+        Vector3 diff = center - point;
+        if(Mathf.Abs(diff.x) <= radius && Mathf.Abs(diff.y) <= radius)
+            return true;
+        return false;
+    }
+
+    void Die() {
+        Debug.Log("Monster can kill");
+        Application.Quit();
+        UnityEditor.EditorApplication.isPlaying = false;
     }
 }
