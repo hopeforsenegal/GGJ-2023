@@ -2,8 +2,14 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
+    // inspector
     public Player player;
     public BoxCollider2D[] obstacles;
+    public SpriteRenderer night;
+
+    // private
+    bool isDayOrNight;
+    int movementCount;
 
     void Update()
     {
@@ -14,17 +20,41 @@ public class GameManager : MonoBehaviour
             if (actions.left) {
                 Move(Vector3.left * player.speed);
             }
+            if (actions.up) {
+                Move(Vector3.up * player.speed);
+            }
+            if (actions.down) {
+                Move(Vector3.down * player.speed);
+            }
+            if (actions.right) {
+                Move(Vector3.right * player.speed);
+            }
+            // night day udpates
+            if (actions.movement) {
+                var v = Util.IncrementLoop(ref movementCount, 4);
+                Debug.Log(v);
+                if (v == 4) {
+                    night.color = Util.Switch(ref isDayOrNight) ? Color.black : Color.white;
+                }
+            }
         }
     }
 
     Actions GetUserActions()
     {
-        return new Actions
+        var action = new Actions
         {
             left = Input.GetKeyDown(KeyCode.A),
+            up = Input.GetKeyDown(KeyCode.W),
+            down = Input.GetKeyDown(KeyCode.S),
+            right = Input.GetKeyDown(KeyCode.D),
         };
+        action.movement = action.left || action.right || action.up || action.down;
+        return action;
     }
 
+
+    // TODO Delete these and make a single static function. Make the test class reference this function
     void Move(Vector3 velocity)
     {
         if (!WillCollide(velocity)) {
@@ -43,8 +73,11 @@ public class GameManager : MonoBehaviour
     }
 }
 
-
 public struct Actions
 {
     public bool left;
+    public bool up;
+    public bool down;
+    public bool right;
+    public bool movement;
 }
