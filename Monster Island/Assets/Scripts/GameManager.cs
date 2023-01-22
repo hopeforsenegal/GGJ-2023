@@ -112,6 +112,7 @@ public class GameManager : MonoBehaviour
             var hasAddedToInventory = false;
             // Player updates
             if (actions.left) {
+                actions = new Actions();
                 //Debug.Log("left");
                 var velocity = Vector3.left * player.playerSpeedX;
                 if (!WillCollide(player.boxCollider, velocity, obstacles)) {
@@ -142,6 +143,7 @@ public class GameManager : MonoBehaviour
                 }
             }
             if (actions.up) {
+                actions = new Actions();
                 //Debug.Log("up");
                 var velocity = Vector3.up * player.playerSpeedY;
                 if (!WillCollide(player.boxCollider, velocity, obstacles)) {
@@ -171,6 +173,7 @@ public class GameManager : MonoBehaviour
                 }
             }
             if (actions.down) {
+                actions = new Actions();
                 //Debug.Log("down");
                 var velocity = Vector3.down * player.playerSpeedY;
                 if (!WillCollide(player.boxCollider, velocity, obstacles)) {
@@ -200,6 +203,7 @@ public class GameManager : MonoBehaviour
                 }
             }
             if (actions.right) {
+                actions = new Actions();
                 //Debug.Log("right");l
                 var velocity = Vector3.right * player.playerSpeedX;
                 if (!WillCollide(player.boxCollider, velocity, obstacles)) {
