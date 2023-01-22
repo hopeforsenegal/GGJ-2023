@@ -146,11 +146,6 @@ public class GameManager : MonoBehaviour
             if (actions.up) {
                 //Debug.Log("up");
                 var velocity = Vector3.up * player.playerSpeedY;
-                var (hasCollided, locationInfo) =
-                    WillCollideCameraLocation(player.boxCollider, velocity, cameraEndLocationTransforms);
-                if (hasCollided) {
-                    (startMarkerPos, endMarkerPos) = UpdateAnimationToExecute(locationInfo, mainCamera.transform, cameraState);
-                }
                 if (!WillCollide(player.boxCollider, velocity, obstacles)) {
                     var pushable = GetPushedBox(player.boxCollider, velocity, boxes);
                     var pushableResource = GetPushedResource(player.boxCollider, velocity, resources);
@@ -168,15 +163,15 @@ public class GameManager : MonoBehaviour
                         player.transform.localPosition += velocity;
                     }
                 }
-            }
-            if (actions.down) {
-                //Debug.Log("down");
-                var velocity = Vector3.down * player.playerSpeedY;
                 var (hasCollided, locationInfo) =
                     WillCollideCameraLocation(player.boxCollider, velocity, cameraEndLocationTransforms);
                 if (hasCollided) {
                     (startMarkerPos, endMarkerPos) = UpdateAnimationToExecute(locationInfo, mainCamera.transform, cameraState);
                 }
+            }
+            if (actions.down) {
+                //Debug.Log("down");
+                var velocity = Vector3.down * player.playerSpeedY;
                 if (!WillCollide(player.boxCollider, velocity, obstacles)) {
                     var pushable = GetPushedBox(player.boxCollider, velocity, boxes);
                     var pushableResource = GetPushedResource(player.boxCollider, velocity, resources);
@@ -193,6 +188,11 @@ public class GameManager : MonoBehaviour
                     } else {
                         player.transform.localPosition += velocity;
                     }
+                }
+                var (hasCollided, locationInfo) =
+                    WillCollideCameraLocation(player.boxCollider, velocity, cameraEndLocationTransforms);
+                if (hasCollided) {
+                    (startMarkerPos, endMarkerPos) = UpdateAnimationToExecute(locationInfo, mainCamera.transform, cameraState);
                 }
             }
             if (actions.right) {
