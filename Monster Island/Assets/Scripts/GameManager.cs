@@ -109,7 +109,13 @@ public class GameManager : MonoBehaviour
                     var pushableResource = GetPushedResource(player.boxCollider, velocity, resources);
                     if (pushable != null) {
                         //Debug.Log("IsPushing");
-                        if (CanPushBox(pushable, velocity, obstacles, boxes, monsters)) {
+                        var thingsThatBlockBoxes = new List<BoxCollider2D>();
+                        thingsThatBlockBoxes.AddRange(obstacles);
+                        thingsThatBlockBoxes.AddRange(boxes);
+                        thingsThatBlockBoxes.AddRange(resources);
+                        thingsThatBlockBoxes.AddRange(Monster.AsBoxColliderArray(monsters));
+                        thingsThatBlockBoxes.Add(objective);
+                        if (CanPushBox(pushable, velocity, thingsThatBlockBoxes)) {
                             player.transform.localPosition += velocity;
                             pushable.transform.localPosition += velocity;
                         }
@@ -138,8 +144,14 @@ public class GameManager : MonoBehaviour
                     var pushable = GetPushedBox(player.boxCollider, velocity, boxes);
                     var pushableResource = GetPushedResource(player.boxCollider, velocity, resources);
                     if (pushable != null) {
-                        Debug.Log("IsPushing");
-                        if (CanPushBox(pushable, velocity, obstacles, boxes, monsters)) {
+                        //Debug.Log("IsPushing");
+                        var thingsThatBlockBoxes = new List<BoxCollider2D>();
+                        thingsThatBlockBoxes.AddRange(obstacles);
+                        thingsThatBlockBoxes.AddRange(boxes);
+                        thingsThatBlockBoxes.AddRange(resources);
+                        thingsThatBlockBoxes.AddRange(Monster.AsBoxColliderArray(monsters));
+                        thingsThatBlockBoxes.Add(objective);
+                        if (CanPushBox(pushable, velocity, thingsThatBlockBoxes)) {
                             player.transform.localPosition += velocity;
                             pushable.transform.localPosition += velocity;
                         }
@@ -167,7 +179,13 @@ public class GameManager : MonoBehaviour
                     var pushableResource = GetPushedResource(player.boxCollider, velocity, resources);
                     if (pushable != null) {
                         //Debug.Log("IsPushing");
-                        if (CanPushBox(pushable, velocity, obstacles, boxes, monsters)) {
+                        var thingsThatBlockBoxes = new List<BoxCollider2D>();
+                        thingsThatBlockBoxes.AddRange(obstacles);
+                        thingsThatBlockBoxes.AddRange(boxes);
+                        thingsThatBlockBoxes.AddRange(resources);
+                        thingsThatBlockBoxes.AddRange(Monster.AsBoxColliderArray(monsters));
+                        thingsThatBlockBoxes.Add(objective);
+                        if (CanPushBox(pushable, velocity, thingsThatBlockBoxes)) {
                             player.transform.localPosition += velocity;
                             pushable.transform.localPosition += velocity;
                         }
@@ -195,7 +213,13 @@ public class GameManager : MonoBehaviour
                     var pushableResource = GetPushedResource(player.boxCollider, velocity, resources);
                     if (pushable != null) {
                         //Debug.Log("IsPushing");
-                        if (CanPushBox(pushable, velocity, obstacles, boxes, monsters)) {
+                        var thingsThatBlockBoxes = new List<BoxCollider2D>();
+                        thingsThatBlockBoxes.AddRange(obstacles);
+                        thingsThatBlockBoxes.AddRange(boxes);
+                        thingsThatBlockBoxes.AddRange(resources);
+                        thingsThatBlockBoxes.AddRange(Monster.AsBoxColliderArray(monsters));
+                        thingsThatBlockBoxes.Add(objective);
+                        if (CanPushBox(pushable, velocity, thingsThatBlockBoxes)) {
                             player.transform.localPosition += velocity;
                             pushable.transform.localPosition += velocity;
                         }
@@ -408,21 +432,10 @@ public class GameManager : MonoBehaviour
         return null;
     }
 
-    public static bool CanPushBox(BoxCollider2D box, Vector3 velocity, BoxCollider2D[] obstacleBoxCollider2Ds, BoxCollider2D[] boxBoxCollider2Ds, Monster[] monsters)
+    public static bool CanPushBox(BoxCollider2D boxCollider, Vector3 velocity, IEnumerable<BoxCollider2D> collidersThatStopBoxMovement)
     {
-        for (var i = 0; i <= obstacleBoxCollider2Ds.Length - 1; i++) {
-            var obstacle = obstacleBoxCollider2Ds[i];
-            if (box.OverlapPoint(obstacle.transform.position - velocity))
-                return false;
-        }
-        for (var i = 0; i <= boxBoxCollider2Ds.Length - 1; i++) {
-            var b = boxBoxCollider2Ds[i];
-            if (box.OverlapPoint(b.transform.position - velocity))
-                return false;
-        }
-        for (var i = 0; i <= monsters.Length - 1; i++) {
-            var b = monsters[i].boxCollider;
-            if (box.OverlapPoint(b.transform.position - velocity))
+        foreach (var stoppingCollider in collidersThatStopBoxMovement) {
+            if (boxCollider.OverlapPoint(stoppingCollider.transform.position - velocity))
                 return false;
         }
         return true;
@@ -479,7 +492,6 @@ public class GameManager : MonoBehaviour
                                                                                           Transform cameraTransform,
                                                                                           Dictionary<CameraTransitionSquare, CameraState> cameraLocations)
     {
-        //Debug.Log($"UpdateAnimationToExecute {cameraTransitionSquare.name} to {cameraTransitionSquare.roomCenter.name}");
         foreach (var kv in cameraLocations) {
             kv.Value.IsAnimating = false;
         }
@@ -554,7 +566,6 @@ public class GameManager : MonoBehaviour
             }
             inc++;
         }
-
     }
 
     public static void MonsterMoveCircular(BoxCollider2D playerBoxCollider2D, BoxCollider2D[] boxBoxCollider2Ds, BoxCollider2D[] obstacleBoxCollider2Ds, Monster monster)
@@ -572,7 +583,6 @@ public class GameManager : MonoBehaviour
             monster.transform.localPosition += vel;
             monster.lastDirectionMovedIndex = inc;
         }
-
     }
 
     public static void MonsterMoveHorizontal(BoxCollider2D playerBoxCollider2D, BoxCollider2D[] boxBoxCollider2Ds, BoxCollider2D[] obstacleBoxCollider2Ds, Monster monster)
@@ -593,7 +603,6 @@ public class GameManager : MonoBehaviour
             }
             inc++;
         }
-
     }
 
     public static void MonsterMoveVertical(BoxCollider2D playerBoxCollider2D, BoxCollider2D[] boxBoxCollider2Ds, BoxCollider2D[] obstacleBoxCollider2Ds, Monster monster)

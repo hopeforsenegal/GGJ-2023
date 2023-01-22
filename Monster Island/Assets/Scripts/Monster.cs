@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(BoxCollider2D))]
@@ -16,5 +17,14 @@ public class Monster : MonoBehaviour
     protected void Awake()
     {
         boxCollider = GetComponent<BoxCollider2D>();
+    }
+
+    public static BoxCollider2D[] AsBoxColliderArray(Monster[] array)
+    {
+        var colliders = new List<BoxCollider2D>();
+        foreach (var square in array) {
+            colliders.Add(square.boxCollider);
+        }
+        return colliders.ToArray();
     }
 }
