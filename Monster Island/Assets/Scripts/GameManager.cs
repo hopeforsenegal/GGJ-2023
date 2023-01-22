@@ -378,18 +378,18 @@ public class GameManager : MonoBehaviour
         return true;
     }
 
-    public static void OnDayNightCycle(ref bool isDayOrNight, ref int movementCount, SpriteRenderer night)
-    {
-        var increment = Util.IncrementLoop(ref movementCount, NumMovesInTimePeriod);
-        //Debug.Log(increment);
-        if (increment == NumMovesInTimePeriod) {
-            if (Util.Switch(ref isDayOrNight)) {
-                night.color = Color.black;
-            } else {
-                night.color = Color.white;
-            }
-        }
-    }
+    // public static void OnDayNightCycle(ref bool isDayOrNight, ref int movementCount, SpriteRenderer night)
+    // {
+    //     var increment = Util.IncrementLoop(ref movementCount, NumMovesInTimePeriod);
+    //     //Debug.Log(increment);
+    //     if (increment == NumMovesInTimePeriod) {
+    //         if (Util.Switch(ref isDayOrNight)) {
+    //             night.color = Color.black;
+    //         } else {
+    //             night.color = Color.white;
+    //         }
+    //     }
+    // }
 
     public static void InterpolateActiveCamera(Transform cameraTransform, Dictionary<CameraTransitionSquare, CameraState> cameraLocations,
         ref float timeElapsed,
