@@ -1,0 +1,13 @@
+evilrockbits.png
+size:512,256
+filter:Linear,Linear
+pma:true
+Layer 96
+bounds:2,4,76,190
+rotate:90
+bottom
+bounds:203,2,205,105
+teeth
+bounds:203,109,199,145
+top
+bounds:2,82,199,172

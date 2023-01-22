@@ -7,7 +7,6 @@ public class MonsterData : ScriptableObject
     public int stepsToUpdate;
     public int sleepHour;
     public int wakeHour;
-    public int speed;
     public string attack;
     public string moveUpDown;
     public string moveLeftRight;

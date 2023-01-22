@@ -68,7 +68,6 @@ public class StandardAnimator : MonoBehaviour
     public void Loop(string skin, string loop)
     {
         if (m_CurrentAnimation != loop) {
-            Debug.Log($"[StandardAnimator::Loop] skin:'{skin}' loop:'{loop}'");
 
             if (!string.IsNullOrWhiteSpace(skin)) {
                 Skin = skin;

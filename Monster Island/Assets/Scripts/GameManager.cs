@@ -99,7 +99,6 @@ public class GameManager : MonoBehaviour
         {
             // Check if we died/won before processing any more logic
             if (Util.HasHitTimeOnce(ref m_TimerDelayShowGameOver, Time.deltaTime)) {
-                Debug.Log("Hey!!!");
                 m_GameOverAction?.Invoke();
             }
             if (m_IsGameOver)
@@ -269,7 +268,7 @@ public class GameManager : MonoBehaviour
                             player.transform.position = center.position;
                         }
                         if (los != LineOfSight.None) {
-                            Debug.Log($"Clamped to {center.name} because LOS {los}. New position {player.transform.position} based off of {center.position}");
+                            //Debug.Log($"Clamped to {center.name} because LOS {los}. New position {player.transform.position} based off of {center.position}");
                         }
                         break;
                     }
@@ -320,11 +319,9 @@ public class GameManager : MonoBehaviour
                         clipName = string.IsNullOrWhiteSpace(clipName) ? MonsterAnim.explode : clipName;
                         monsters[i].spineAnimation.Play(SkinsNames.@default, clipName).setOnAnimationEnd(() =>
                         {
-                            Debug.Log("Hello");
                             m_TimerDelayShowGameOver = 0.1f;
                             m_GameOverAction = () =>
                             {
-                                Debug.Log("Where are we?");
                                 gameOverScreen.Visibility = true;
                             };
                         });
@@ -366,11 +363,9 @@ public class GameManager : MonoBehaviour
                         clipName = string.IsNullOrWhiteSpace(clipName) ? MonsterAnim.explode : clipName;
                         monsters[i].spineAnimation.Play(SkinsNames.@default, clipName).setOnAnimationEnd(() =>
                         {
-                            Debug.Log("Hello");
                             m_TimerDelayShowGameOver = 0.1f;
                             m_GameOverAction = () =>
                             {
-                                Debug.Log("Where are we?");
                                 gameOverScreen.Visibility = true;
                             };
                         });
@@ -610,6 +605,7 @@ public class GameManager : MonoBehaviour
 
     public static Direction MonsterMoveRandom(BoxCollider2D playerBoxCollider2D, BoxCollider2D[] boxBoxCollider2Ds, BoxCollider2D[] obstacleBoxCollider2Ds, Monster monster)
     {
+        Debug.Log("MonsterMoveRandom moves");
         Vector3[] dirs = {
             Vector3.up,
             Vector3.right,
@@ -618,10 +614,11 @@ public class GameManager : MonoBehaviour
         };
         var inc = 0;
         while (inc < 5) {
-            //Debug.Log("Checking moves");
+            Debug.Log("Checking moves");
             var vel = dirs[Random.Range(1, 4)];
+            vel = new Vector3(monster.SpeedX * vel.x, monster.SpeedY * vel.y);
             if (!WillObjectCollide(monster.boxCollider, vel, obstacleBoxCollider2Ds, boxBoxCollider2Ds, playerBoxCollider2D)) {
-                monster.transform.localPosition += vel * monster.data.speed;
+                monster.transform.localPosition += vel;
                 return vel.x > 0 ? Direction.Horizontal : Direction.Vertical;
             }
             inc++;
@@ -747,11 +744,11 @@ public class GameManager : MonoBehaviour
 
     public static bool IsWithinRange(Vector3 center, Vector3 point, float radius, float SpeedX, float SpeedY)
     {
-        Debug.Log($"IsWithinRange");
+        //Debug.Log($"IsWithinRange");
 
         var diff = center - point;
         //log diff.x and diff.y to see if they are almost 0
-        Debug.Log($"IsWithinRange diff.x {diff.x} diff.y {diff.y}");
+      //  Debug.Log($"IsWithinRange diff.x {diff.x} diff.y {diff.y}");
         //if radius is 0 just check if they are on the same spot by checking if diff is almost 0
         if (radius == 0) {
             return Mathf.Abs(diff.x) <= 0.5 && Mathf.Abs(diff.y) <= 0.5;
@@ -764,7 +761,7 @@ public class GameManager : MonoBehaviour
 
         //check if on the same column by checking if diff.x is almost 0
         if (Mathf.Abs(diff.x) <= 0.5) {
-            Debug.Log($"IsWithinRange radius * SpeedY {radius * SpeedY}  SpeedY {SpeedY}    radius: {radius} diff.y {diff.y} abs {Mathf.Abs(diff.y)}");
+            //Debug.Log($"IsWithinRange radius * SpeedY {radius * SpeedY}  SpeedY {SpeedY}    radius: {radius} diff.y {diff.y} abs {Mathf.Abs(diff.y)}");
             return Mathf.Abs(diff.y) <= (radius * SpeedY);
         }
 
