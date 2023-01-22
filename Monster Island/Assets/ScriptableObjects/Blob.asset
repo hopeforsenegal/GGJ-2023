@@ -17,4 +17,7 @@ MonoBehaviour:
   sleepHour: 4
   wakeHour: 0
   speed: 0
+  attack: 
+  moveUpDown: 
+  moveLeftRight: 
   navigationType: 0
