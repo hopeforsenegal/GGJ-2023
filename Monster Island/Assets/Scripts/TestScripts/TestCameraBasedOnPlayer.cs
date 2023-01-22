@@ -29,36 +29,36 @@ public class TestCameraBasedOnPlayer : MonoBehaviour
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.A)) {
-            player.transform.localPosition += Vector3.left * speed;
             var (hasCollided, locationInfo) =
                 GameManager.WillCollideCameraLocation(player, Vector3.left * speed, cameraEndLocationTransforms);
             if (hasCollided) {
                 (startMarkerPos, endMarkerPos) = GameManager.UpdateAnimationToExecute(locationInfo, mainCamera.transform, cameraState);
             }
+            player.transform.localPosition += Vector3.left * speed;
         }
         if (Input.GetKeyDown(KeyCode.D)) {
-            player.transform.localPosition += Vector3.right * speed;
             var (hasCollided, locationInfo) =
                 GameManager.WillCollideCameraLocation(player, Vector3.left * speed, cameraEndLocationTransforms);
             if (hasCollided) {
                 (startMarkerPos, endMarkerPos) = GameManager.UpdateAnimationToExecute(locationInfo, mainCamera.transform, cameraState);
             }
+            player.transform.localPosition += Vector3.right * speed;
         }
         if (Input.GetKeyDown(KeyCode.S)) {
-            player.transform.localPosition += Vector3.down * speed;
             var (hasCollided, locationInfo) =
                 GameManager.WillCollideCameraLocation(player, Vector3.left * speed, cameraEndLocationTransforms);
             if (hasCollided) {
                 (startMarkerPos, endMarkerPos) = GameManager.UpdateAnimationToExecute(locationInfo, mainCamera.transform, cameraState);
             }
+            player.transform.localPosition += Vector3.down * speed;
         }
         if (Input.GetKeyDown(KeyCode.W)) {
-            player.transform.localPosition += Vector3.up * speed;
             var (hasCollided, locationInfo) =
                 GameManager.WillCollideCameraLocation(player, Vector3.left * speed, cameraEndLocationTransforms);
             if (hasCollided) {
                 (startMarkerPos, endMarkerPos) = GameManager.UpdateAnimationToExecute(locationInfo, mainCamera.transform, cameraState);
             }
+            player.transform.localPosition += Vector3.up * speed;
         }
 
         GameManager.InterpolateActiveCamera(mainCamera.transform, cameraState, ref timeElapsed, LerpDuration, startMarkerPos, endMarkerPos);
