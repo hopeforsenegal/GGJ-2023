@@ -9,16 +9,20 @@ public class GameManager : MonoBehaviour
         public static readonly Vector3 Left = Vector3.one;
         public static readonly Vector3 Right = new Vector3(-1, 1, 1);
     }
+
     private static class MonsterAnim
     {
         public static readonly string awake = $"{nameof(awake)}";
+        public static readonly string explode = $"{nameof(explode)}";
     }
+
     private static class PlayerAnim
     {
         public static readonly string idle = $"{nameof(idle)}";
         public static readonly string move = $"{nameof(move)}";
         public static readonly string hit = $"{nameof(hit)}";
     }
+
     private static class SkinsNames
     {
         public static readonly string @default = $"{nameof(@default)}";
@@ -42,7 +46,6 @@ public class GameManager : MonoBehaviour
     private Vector3 endMarkerPos;
     private Vector3 startMarkerPos;
     private float m_TimerDelayShowDeath;
-    private System.Action m_BackToIdle;
     private System.Action m_DeathAction;
     readonly Dictionary<CameraTransitionSquare, CameraState> cameraState = new Dictionary<CameraTransitionSquare, CameraState>();
     int points = 0;
@@ -51,6 +54,7 @@ public class GameManager : MonoBehaviour
     //Start at 1 since we get a free move at start
     //Blobs wakup at 4 go to sleep at 8
     int time = 1;
+    private bool m_IsDead;
     public const int TimeInDay = 8;
 
     void Start()
@@ -90,6 +94,14 @@ public class GameManager : MonoBehaviour
     {
         // Inputs
         var actions = GetUserActions();
+
+        {   // Check if we died before processing any more logic
+            if (Util.HasHitTimeOnce(ref m_TimerDelayShowDeath, Time.deltaTime)) {
+                m_DeathAction?.Invoke();
+            }
+            if (m_IsDead)
+                return;
+        }
         {
             // Player updates
             if (actions.left) {
@@ -229,7 +241,8 @@ public class GameManager : MonoBehaviour
                     if (IsWithinRange(monsters[i].boxCollider.transform.position, player.transform.position, killRadius)) {
                         Debug.Log("Monster can kill");
 
-                        player.spineAnimation.Play(SkinsNames.@default, PlayerAnim.hit, string.Empty, () =>
+                        m_IsDead = true;
+                        monsters[i].spineAnimation.Play(SkinsNames.@default, MonsterAnim.explode, string.Empty, () =>
                         {
                             m_TimerDelayShowDeath = 0.1f;
                             m_DeathAction = () =>
@@ -237,6 +250,7 @@ public class GameManager : MonoBehaviour
                                 gameOverScreen.Visibility = true;
                             };
                         });
+                        player.spineAnimation.Play(SkinsNames.@default, PlayerAnim.hit);
                         return;
                     }
 
@@ -266,10 +280,6 @@ public class GameManager : MonoBehaviour
                 Debug.Log($"Current time ${time}");
                 CheckPoints(resources, objective, ref points);
             }
-            if (Util.HasHitTimeOnce(ref m_TimerDelayShowDeath, Time.deltaTime)) {
-                m_DeathAction?.Invoke();
-            }
-            m_BackToIdle?.Invoke();
             // Camera updates
             InterpolateActiveCamera(mainCamera.transform, cameraState, ref timeElapsed, LerpDuration, startMarkerPos, endMarkerPos);
         }
