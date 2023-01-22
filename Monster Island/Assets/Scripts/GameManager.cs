@@ -259,7 +259,7 @@ public class GameManager : MonoBehaviour
                     }
 
                     //check if can step
-                    Debug.Log($"if can step ${time % stepsToUpdate != 0}");
+                    //Debug.Log($"if can step ${time % stepsToUpdate != 0}");
                     if (time % stepsToUpdate != 0)
                         continue;
 
@@ -281,7 +281,7 @@ public class GameManager : MonoBehaviour
 
                 player.spineAnimation.Play(SkinsNames.@default, PlayerAnim.move, PlayerAnim.idle);
 
-                Debug.Log($"Current time ${time}");
+                //Debug.Log($"Current time ${time}");
                 CheckPoints(resources, objective, ref points);
             }
             // Camera updates
@@ -410,10 +410,12 @@ public class GameManager : MonoBehaviour
         return true;
     }
 
-    public static void InterpolateActiveCamera(Transform cameraTransform, Dictionary<CameraTransitionSquare, CameraState> cameraLocations,
-        ref float timeElapsed,
-        float lerpDuration,
-        Vector3 startMarkerPos, Vector3 endMarkerPos)
+    public static void InterpolateActiveCamera(Transform cameraTransform,
+                                               Dictionary<CameraTransitionSquare, CameraState> cameraLocations,
+                                               ref float timeElapsed,
+                                               float lerpDuration,
+                                               Vector3 startMarkerPos,
+                                               Vector3 endMarkerPos)
     {
         foreach (var kv in cameraLocations) {
             if (kv.Value.IsAnimating) {
@@ -433,7 +435,7 @@ public class GameManager : MonoBehaviour
                                                                                           Transform cameraTransform,
                                                                                           Dictionary<CameraTransitionSquare, CameraState> cameraLocations)
     {
-        Debug.Log($"UpdateAnimationToExecute {cameraTransitionSquare.name}");
+        Debug.Log($"UpdateAnimationToExecute {cameraTransitionSquare.name} to {cameraTransitionSquare.roomCenter.name}");
         foreach (var kv in cameraLocations) {
             kv.Value.IsAnimating = false;
         }
