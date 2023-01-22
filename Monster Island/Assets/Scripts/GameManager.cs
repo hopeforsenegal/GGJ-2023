@@ -4,6 +4,11 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
+    private static class PlayerScale
+    {
+        public static readonly Vector3 Left = Vector3.one;
+        public static readonly Vector3 Right = new Vector3(-1, 1, 1);
+    }
     private static class MonsterAnim
     {
         public static readonly string awake = $"{nameof(awake)}";
@@ -108,6 +113,7 @@ public class GameManager : MonoBehaviour
                     } else {
                         player.transform.localPosition += velocity;
                     }
+                    player.transform.localScale = PlayerScale.Left;
                 }
                 var (hasCollided, locationInfo) =
                     WillCollideCameraLocation(player.boxCollider, velocity, cameraEndLocationTransforms);
@@ -191,6 +197,7 @@ public class GameManager : MonoBehaviour
                     } else {
                         player.transform.localPosition += velocity;
                     }
+                    player.transform.localScale = PlayerScale.Right;
                 }
                 var (hasCollided, locationInfo) =
                     WillCollideCameraLocation(player.boxCollider, velocity, cameraEndLocationTransforms);
