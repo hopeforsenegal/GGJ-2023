@@ -242,6 +242,14 @@ public class GameManager : MonoBehaviour
                     int sleepHour = monster.data.sleepHour;
                     int stepsToUpdate = monster.data.stepsToUpdate;
 
+                    //check if monster is ABOUT to sleep or wakeup
+                    if (time == wakeHour - 1 || (time == TimeInDay - 1 && wakeHour == 0) && wakeHour != -1)
+                        monster.spriteRenderer.enabled = true;
+                    else if (time == sleepHour - 1 || (time == TimeInDay - 1 && sleepHour == 0) && sleepHour != -1)
+                        monster.spriteRenderer.enabled = true;
+                    else
+                        monster.spriteRenderer.enabled = false;
+
                     //check if monster is asleep
                     if (time == wakeHour && wakeHour != -1)
                         monster.isSleep = false;

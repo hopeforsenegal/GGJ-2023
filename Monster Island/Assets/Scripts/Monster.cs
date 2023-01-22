@@ -4,10 +4,11 @@ using UnityEngine;
 public class Monster : MonoBehaviour
 {
     public MonsterData data;
-    public int lastDirectionMovedIndex;
 
     public BoxCollider2D boxCollider;
     public StandardAnimator spineAnimation;
+    public SpriteRenderer spriteRenderer;
+    public int lastDirectionMovedIndex;
     public bool isSleep;
 
     protected void Awake()
