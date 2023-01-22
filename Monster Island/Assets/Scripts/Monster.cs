@@ -6,6 +6,7 @@ using UnityEngine;
 public class Monster : MonoBehaviour
 {
     public MonsterData data;
+    public int lastDirectionMovedIndex;
 
     public BoxCollider2D boxCollider;
 

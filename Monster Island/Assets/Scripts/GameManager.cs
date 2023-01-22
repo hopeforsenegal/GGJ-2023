@@ -199,7 +199,12 @@ public class GameManager : MonoBehaviour
                 // monster updates
                 for (var i = 0; i <= monsters.Length - 1; i += 1) {
                     Monster monster = monsters[i];
-                    bool isRandom = monster.data.isRandom;
+
+                    bool isRandom = monster.data.navigationType == MonsterData.NavigationType.Random;
+                    bool isCircular = monster.data.navigationType == MonsterData.NavigationType.Circular;
+                    bool isHorizontal = monster.data.navigationType == MonsterData.NavigationType.Horizontal;
+                    bool isVertical = monster.data.navigationType == MonsterData.NavigationType.Vertical;
+
                     int killRadius = monster.data.killRadius;
                     int wakeHour = monster.data.wakeHour;
                     int sleepHour = monster.data.sleepHour;
@@ -222,7 +227,13 @@ public class GameManager : MonoBehaviour
 
                     //handle moves
                     if (isRandom)
-                        MonsterMoveRandom(player.boxCollider, boxes, obstacles, monsters[i].boxCollider);
+                        MonsterMoveRandom(player.boxCollider, boxes, obstacles, monsters[i]);
+                    if (isCircular)
+                        MonsterMoveCircular(player.boxCollider, boxes, obstacles, monsters[i]);
+                    if (isHorizontal)
+                        MonsterMoveHorizontal(player.boxCollider, boxes, obstacles, monsters[i]);
+                    if (isVertical)
+                        MonsterMoveVertical(player.boxCollider, boxes, obstacles, monsters[i]);
 
 
                     //Handle attack
@@ -466,7 +477,7 @@ public class GameManager : MonoBehaviour
         return false;
     }
 
-    public static void MonsterMoveRandom(BoxCollider2D playerBoxCollider2D, BoxCollider2D[] boxBoxCollider2Ds, BoxCollider2D[] obstacleBoxCollider2Ds, BoxCollider2D monster)
+    public static void MonsterMoveRandom(BoxCollider2D playerBoxCollider2D, BoxCollider2D[] boxBoxCollider2Ds, BoxCollider2D[] obstacleBoxCollider2Ds, Monster monster)
     {
         Vector3[] dirs = {
             Vector3.up,
@@ -479,7 +490,69 @@ public class GameManager : MonoBehaviour
         while (checking && inc < 5) {
             //Debug.Log("Checking moves");
             var vel = dirs[Random.Range(1, 4)];
-            if (!WillObjectCollide(monster, vel, obstacleBoxCollider2Ds, boxBoxCollider2Ds, playerBoxCollider2D)) {
+            if (!WillObjectCollide(monster.boxCollider, vel, obstacleBoxCollider2Ds, boxBoxCollider2Ds, playerBoxCollider2D)) {
+                monster.transform.localPosition += vel;
+                //Debug.Log($"moving monster {monster.transform.localPosition}");
+                checking = false;
+            }
+            inc++;
+        }
+
+    }
+
+    public static void MonsterMoveCircular(BoxCollider2D playerBoxCollider2D, BoxCollider2D[] boxBoxCollider2Ds, BoxCollider2D[] obstacleBoxCollider2Ds, Monster monster)
+    {
+        Vector3[] dirs = {
+            Vector3.up,
+            Vector3.right,
+            Vector3.left,
+            Vector3.down
+        };
+        
+        var inc = monster.lastDirectionMovedIndex != null ? (monster.lastDirectionMovedIndex + 1) % dirs.Length-1: 0;
+        var vel = dirs[inc];
+        if (!WillObjectCollide(monster.boxCollider, vel, obstacleBoxCollider2Ds, boxBoxCollider2Ds, playerBoxCollider2D)) {
+            monster.transform.localPosition += vel;
+            monster.lastDirectionMovedIndex = inc;
+        }
+
+    }
+
+    //Move monster Horizontal
+    public static void MonsterMoveHorizontal(BoxCollider2D playerBoxCollider2D, BoxCollider2D[] boxBoxCollider2Ds, BoxCollider2D[] obstacleBoxCollider2Ds, Monster monster)
+    {
+        Vector3[] dirs = {
+            Vector3.right,
+            Vector3.left
+        };
+        var inc = 0;
+        var checking = true;
+        while (checking && inc < 5) {
+            //Debug.Log("Checking moves");
+            var vel = dirs[Random.Range(1, 2)];
+            if (!WillObjectCollide(monster.boxCollider, vel, obstacleBoxCollider2Ds, boxBoxCollider2Ds, playerBoxCollider2D)) {
+                monster.transform.localPosition += vel;
+                //Debug.Log($"moving monster {monster.transform.localPosition}");
+                checking = false;
+            }
+            inc++;
+        }
+
+    }
+
+    //Move monster Vertical
+    public static void MonsterMoveVertical(BoxCollider2D playerBoxCollider2D, BoxCollider2D[] boxBoxCollider2Ds, BoxCollider2D[] obstacleBoxCollider2Ds, Monster monster)
+    {
+        Vector3[] dirs = {
+            Vector3.up,
+            Vector3.down
+        };
+        var inc = 0;
+        var checking = true;
+        while (checking && inc < 5) {
+            //Debug.Log("Checking moves");
+            var vel = dirs[Random.Range(1, 2)];
+            if (!WillObjectCollide(monster.boxCollider, vel, obstacleBoxCollider2Ds, boxBoxCollider2Ds, playerBoxCollider2D)) {
                 monster.transform.localPosition += vel;
                 //Debug.Log($"moving monster {monster.transform.localPosition}");
                 checking = false;

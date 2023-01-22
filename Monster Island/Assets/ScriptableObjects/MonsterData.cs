@@ -9,8 +9,20 @@ public class MonsterData : ScriptableObject
     public int stepsToUpdate;
     public int sleepHour;
     public int wakeHour;
-    public bool isRandom;
 
     public bool isSleep;
 
+
+    //create selection list for types of navigation
+    public enum NavigationType
+    {
+        Random = 0,
+        Circular = 1,
+        Horizontal = 2,
+        Vertical = 3
+    }
+
+    public NavigationType navigationType;
+
+    public int patrolRadius;
 }
