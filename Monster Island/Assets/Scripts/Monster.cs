@@ -13,7 +13,7 @@ public class Monster : MonoBehaviour
     public bool isSleep;
     public bool hasSeenPlayer;
     public float SpeedX = 2.2f;
-    public float SpeedY = 2;
+    public float SpeedY = 2.2f;
 
     protected void Awake()
     {
