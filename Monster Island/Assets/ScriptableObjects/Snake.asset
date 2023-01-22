@@ -14,9 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   killRadius: 2
   stepsToUpdate: 1
-  sleepHour: 0
-  wakeHour: 4
-  isSleep: 0
-  navigationType: 4
-  lineOfSightDirection: 1
-  patrolRadius: 1
+  sleepHour: -1
+  wakeHour: -1
+  speed: 0
+  attack: move2
+  moveUpDown: move
+  moveLeftRight: move
+  navigationType: 5
