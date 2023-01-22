@@ -9305,7 +9305,7 @@ GameObject:
   - component: {fileID: 1155001874}
   - component: {fileID: 1155001873}
   m_Layer: 5
-  m_Name: Sundial (1)
+  m_Name: PointsBackground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
