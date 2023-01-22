@@ -1,6 +1,6 @@
 {
 "skeleton": {
-	"hash": "DdL1S0DBSvs",
+	"hash": "1fF/gAS8B+Y",
 	"spine": "4.1.18",
 	"x": -124.61,
 	"y": -7.11,
@@ -124,6 +124,27 @@
 "animations": {
 	"awake": {
 		"slots": {
+			"eyes": {
+				"attachment": [
+					{ "name": "eyes" },
+					{ "time": 2, "name": "eyes" }
+				]
+			},
+			"Layer 2": {
+				"attachment": [
+					{}
+				]
+			},
+			"mouth": {
+				"attachment": [
+					{}
+				]
+			},
+			"x1": {
+				"attachment": [
+					{}
+				]
+			},
 			"z": {
 				"rgba": [
 					{ "color": "ffffff00" }
@@ -137,6 +158,11 @@
 			"z3": {
 				"rgba": [
 					{ "color": "ffffff00" }
+				]
+			},
+			"zface": {
+				"attachment": [
+					{}
 				]
 			}
 		},
@@ -185,10 +211,31 @@
 				"scale": [
 					{ "x": 0.5, "y": 0.5 }
 				]
+			},
+			"eyes": {
+				"translate": [
+					{ "x": -68.77 },
+					{ "time": 1.2667, "x": -66.3, "curve": "stepped" },
+					{ "time": 1.5, "x": -66.3 },
+					{ "time": 2, "x": -68.77 }
+				],
+				"scale": [
+					{ "time": 1.1667 },
+					{ "time": 1.2667, "x": 0.016 },
+					{ "time": 1.4 },
+					{ "time": 1.5, "x": 0.016 },
+					{ "time": 1.6333 }
+				]
 			}
 		},
 		"drawOrder": [
 			{
+				"offsets": [
+					{ "slot": "blob", "offset": 3 }
+				]
+			},
+			{
+				"time": 2,
 				"offsets": [
 					{ "slot": "blob", "offset": 3 }
 				]
@@ -204,7 +251,7 @@
 			},
 			"eyes": {
 				"attachment": [
-					{},
+					{ "name": "eyes" },
 					{ "time": 0.1667, "name": "eyes" },
 					{ "time": 1.0333 }
 				]
@@ -302,6 +349,7 @@
 			},
 			"zface": {
 				"attachment": [
+					{},
 					{ "time": 0.1667 }
 				]
 			}
@@ -339,11 +387,12 @@
 			},
 			"eyes": {
 				"translate": [
-					{ "x": -15.51, "y": -3.88 },
+					{ "x": -71.18, "y": -8.35, "curve": "stepped" },
 					{ "time": 0.1667, "x": -71.18, "y": -8.35 },
 					{ "time": 1, "x": -48.99, "y": -12.56 }
 				],
 				"scale": [
+					{ "x": 0.447 },
 					{ "time": 0.1667, "x": 0.051, "y": 0.861 },
 					{ "time": 1 }
 				]
@@ -357,6 +406,26 @@
 	},
 	"sleep": {
 		"slots": {
+			"eyes": {
+				"attachment": [
+					{}
+				]
+			},
+			"Layer 2": {
+				"attachment": [
+					{}
+				]
+			},
+			"mouth": {
+				"attachment": [
+					{}
+				]
+			},
+			"x1": {
+				"attachment": [
+					{}
+				]
+			},
 			"z": {
 				"rgba": [
 					{ "color": "ffffff00", "curve": "stepped" },
@@ -435,6 +504,11 @@
 				],
 				"scale": [
 					{ "x": 0.5, "y": 0.5 }
+				]
+			},
+			"eyes": {
+				"scale": [
+					{ "x": 1.019, "y": 1.019 }
 				]
 			}
 		},
