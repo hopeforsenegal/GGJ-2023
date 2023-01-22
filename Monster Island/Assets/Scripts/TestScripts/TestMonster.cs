@@ -1,11 +1,11 @@
 using UnityEngine;
 
-public class TestTime : MonoBehaviour
+public class TestMonster : MonoBehaviour
 {
     public BoxCollider2D player;
     public BoxCollider2D[] obstacles;
     public BoxCollider2D[] boxes;
-    public BoxCollider2D[] monsters;
+    public Monster[] monsters;
     public float speed = 1;
 
     void Update()
@@ -73,8 +73,8 @@ public class TestTime : MonoBehaviour
 
         if (Input.anyKeyDown) {
             for (var i = 0; i <= monsters.Length - 1; i += 1) {
-                GameManager.MonsterMoveRandom(player, boxes, obstacles, monsters[i]);
-                if (GameManager.IsWithinRange(monsters[i].transform.localPosition, player.transform.localPosition, 1)) {
+                GameManager.MonsterMoveRandom(player, boxes, obstacles, monsters[i].boxCollider);
+                if (GameManager.IsWithinRange(monsters[i].boxCollider.transform.localPosition, player.transform.localPosition, 1)) {
                     GameManager.Die();
                 }
             }

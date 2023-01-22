@@ -6,8 +6,11 @@ using UnityEngine;
 public class MonsterData : ScriptableObject
 {
     public int killRadius;
-    public int speed;
+    public int stepsToUpdate;
     public int sleepHour;
     public int wakeHour;
+    public bool isRandom;
+
+    public bool isSleep;
 
 }
