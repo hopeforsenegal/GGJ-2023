@@ -378,14 +378,13 @@ public class GameManager : MonoBehaviour
     }
 
     // this takes into account your last step btw
-    public static (bool, CameraTransitionSquare) WillCollideCameraLocation(BoxCollider2D player,
+    public static (bool, CameraTransitionSquare) WillCollideCameraLocation(BoxCollider2D playerCollider,
                                                                            Vector3 velocity,
                                                                            CameraTransitionSquare[] cameraSquares)
     {
-        for (var i = 0; i <= cameraSquares.Length - 1; i++) {
-            var obstacle = cameraSquares[i];
-            if (player.OverlapPoint(obstacle.transform.position - velocity))
-                return (true, cameraSquares[i]);
+        foreach (var cameraSquare in cameraSquares) {
+            if (playerCollider.OverlapPoint(cameraSquare.transform.position - velocity))
+                return (true, cameraSquare);
         }
         return (false, null);
     }
@@ -489,7 +488,7 @@ public class GameManager : MonoBehaviour
         }
         cameraLocations[cameraTransitionSquare].IsAnimating = true;
         var startMarkerPos = cameraTransform.position;
-        var endMarkerPos = cameraTransitionSquare.roomCenter.transform.position;
+        var endMarkerPos = cameraTransitionSquare.roomCenter.position;
         endMarkerPos.z = -10;   // Camera always needs to be at -10
         return (startMarkerPos, endMarkerPos);
     }
