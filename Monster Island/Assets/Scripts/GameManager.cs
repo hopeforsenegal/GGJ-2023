@@ -44,7 +44,6 @@ public class GameManager : MonoBehaviour
     //Start at 1 since we get a free move at start
     //Blobs wakeup at 4 go to sleep at 8
     private int time = 1;
-    private System.Action m_LoopNextFrame;
 
     private void Start()
     {
@@ -97,7 +96,6 @@ public class GameManager : MonoBehaviour
         var actions = GetUserActions();
 
         {
-            m_LoopNextFrame?.Invoke();
             // Check if we died/won before processing any more logic
             if (Util.HasHitTimeOnce(ref m_TimerDelayShowGameOver, Time.deltaTime)) {
                 Debug.Log("Hey!!!");
@@ -329,6 +327,7 @@ public class GameManager : MonoBehaviour
                                 gameOverScreen.Visibility = true;
                             };
                         });
+                        player.spineAnimation.Clear(true);
                         player.spineAnimation.Play(SkinsNames.@default, PlayerAnim.hit);
                         return;
                     }
@@ -391,10 +390,7 @@ public class GameManager : MonoBehaviour
                 time = IncrementTime(time);
                 player.spineAnimation.Play(SkinsNames.@default, hasAddedToInventory ? PlayerAnim.item_collect : PlayerAnim.move).setOnAnimationEnd(() =>
                 {
-                    //m_LoopNextFrame = () =>
-                    {
-                        player.spineAnimation.Loop(SkinsNames.@default, PlayerAnim.idle);
-                    };
+                    player.spineAnimation.Loop(SkinsNames.@default, PlayerAnim.idle);
                 });
 
                 //Debug.Log($"Current time ${time}");
