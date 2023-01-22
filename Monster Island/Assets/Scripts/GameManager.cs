@@ -306,7 +306,7 @@ public class GameManager : MonoBehaviour
     {
         //Debug.Log("Monster can kill");
         Application.Quit();
-        EditorApplication.isPlaying = false;
+        //EditorApplication.isPlaying = false;
     }
 
     private static bool WillObjectCollide(BoxCollider2D box, Vector3 velocity, BoxCollider2D[] obstacleBoxCollider2Ds, BoxCollider2D[] boxBoxCollider2Ds, BoxCollider2D playerBoxCollider2D)

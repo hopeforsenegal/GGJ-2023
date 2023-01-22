@@ -12,8 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a92c2714f0fb51146850181cc28af0fe, type: 3}
   m_Name: Blob
   m_EditorClassIdentifier: 
-  killRadius: 2
-  updateStep: 0
-  sleepHour: 4
-  wakeHour: 0
-  isRandom: 0
+  killRadius: 1
+  stepsToUpdate: 1
+  sleepHour: 22
+  wakeHour: 9
+  isRandom: 1
+  isSleep: 0
