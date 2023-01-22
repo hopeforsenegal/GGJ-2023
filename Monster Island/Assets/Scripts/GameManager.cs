@@ -365,12 +365,14 @@ public class GameManager : MonoBehaviour
     }
 
     // this takes into account your last step btw
-    public static (bool, CameraTransitionSquare) WillCollideCameraLocation(BoxCollider2D player, Vector3 velocity, CameraTransitionSquare[] boxCollider2Ds)
+    public static (bool, CameraTransitionSquare) WillCollideCameraLocation(BoxCollider2D player,
+                                                                           Vector3 velocity,
+                                                                           CameraTransitionSquare[] cameraSquares)
     {
-        for (var i = 0; i <= boxCollider2Ds.Length - 1; i++) {
-            var obstacle = boxCollider2Ds[i].boxCollider;
-            if (player.OverlapPoint(obstacle.transform.position))
-                return (true, boxCollider2Ds[i]);
+        for (var i = 0; i <= cameraSquares.Length - 1; i++) {
+            var obstacle = cameraSquares[i];
+            if (player.OverlapPoint(obstacle.transform.position - velocity))
+                return (true, cameraSquares[i]);
         }
         return (false, null);
     }

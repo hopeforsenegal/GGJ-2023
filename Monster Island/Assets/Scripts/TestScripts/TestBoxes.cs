@@ -33,15 +33,14 @@ public class TestBoxes : MonoBehaviour
                 var pushable = GameManager.GetPushedBox(player, velocity, boxes);
                 if(pushable != null){
                     Debug.Log("IsPushing");
-                    // if(GameManager.CanPushBox(pushable, velocity, obstacles, boxes)){
-                    //     player.transform.localPosition += velocity;
-                    //     pushable.transform.localPosition += velocity;
-                    // }
+                    //if(GameManager.CanPushBox(pushable, velocity, obstacles, boxes)){
+                    //    player.transform.localPosition += velocity;
+                    //    pushable.transform.localPosition += velocity;
+                    //}
                 } 
                 else {
                     player.transform.localPosition += velocity;
-                }
-            
+                }            
             }
         }
         if(Input.GetKeyDown(KeyCode.S))
