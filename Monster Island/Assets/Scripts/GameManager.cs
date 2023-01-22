@@ -10,6 +10,8 @@ public class GameManager : MonoBehaviour
     public Player player;
     public BoxCollider2D[] obstacles;
     public BoxCollider2D[] boxes;
+    public BoxCollider2D[] resources;
+    public BoxCollider2D objective;
     public Monster[] monsters;
     public DayNight night;
     public Camera mainCamera;
@@ -26,6 +28,7 @@ public class GameManager : MonoBehaviour
     private float m_TimerDelayShowDeath;
     private System.Action m_DeathAction;
     readonly Dictionary<CameraTransitionSquare, CameraState> cameraState = new Dictionary<CameraTransitionSquare, CameraState>();
+    int points = 0;
 
     //HOURS 0- 24
     //Start at 6 am
@@ -41,7 +44,11 @@ public class GameManager : MonoBehaviour
         obstacles = GameObject.Find("Obstacles").GetComponentsInChildren<BoxCollider2D>();
         boxes = GameObject.Find("Boxes").GetComponentsInChildren<BoxCollider2D>();
         monsters = GameObject.Find("Monsters").GetComponentsInChildren<Monster>();
+        resources = GameObject.Find("Resources").GetComponentsInChildren<BoxCollider2D>();
+        objective = GameObject.Find("Objective").GetComponent<BoxCollider2D>();
         cameraEndLocationTransforms = GetCameraTransitionSquares();
+
+        Debug.Log($"resources: {resources.Length}");
 
         gameOverScreen.RetryEvent += MainMenu.ReLoadScene;
         gameOverScreen.QuitEvent += MainMenu.LoadMainMenu;
@@ -64,13 +71,22 @@ public class GameManager : MonoBehaviour
                 var velocity = Vector3.left * player.playerSpeed;
                 if (!WillCollide(player.boxCollider, velocity, obstacles)) {
                     var pushable = GetPushedBox(player.boxCollider, velocity, boxes);
+                    var pushableResource = GetPushedResource(player.boxCollider, velocity, resources);
                     if (pushable != null) {
                         Debug.Log("IsPushing");
                         if (CanPushBox(pushable, velocity, obstacles, boxes)) {
                             player.transform.localPosition += velocity;
                             pushable.transform.localPosition += velocity;
                         }
-                    } else {
+                        
+                    } 
+                    else if (pushableResource != null) {
+                        if (CanPushResource(pushableResource, velocity, obstacles, boxes, monsters, resources)) {
+                            player.transform.localPosition += velocity;
+                            pushableResource.transform.localPosition += velocity;
+                        }
+                    }
+                    else {
                         player.transform.localPosition += velocity;
                     }
                 }
@@ -86,13 +102,22 @@ public class GameManager : MonoBehaviour
                 var velocity = Vector3.up * player.playerSpeed;
                 if (!WillCollide(player.boxCollider, velocity, obstacles)) {
                     var pushable = GetPushedBox(player.boxCollider, velocity, boxes);
+                    var pushableResource = GetPushedResource(player.boxCollider, velocity, resources);
                     if (pushable != null) {
                         Debug.Log("IsPushing");
                         if (CanPushBox(pushable, velocity, obstacles, boxes)) {
                             player.transform.localPosition += velocity;
                             pushable.transform.localPosition += velocity;
                         }
-                    } else {
+                        
+                    } 
+                    else if(pushableResource != null){
+                        if (CanPushResource(pushableResource, velocity, obstacles, boxes, monsters, resources)) {
+                            player.transform.localPosition += velocity;
+                            pushableResource.transform.localPosition += velocity;
+                        }
+                    }
+                    else {
                         player.transform.localPosition += velocity;
                     }
                 }
@@ -108,13 +133,22 @@ public class GameManager : MonoBehaviour
                 var velocity = Vector3.down * player.playerSpeed;
                 if (!WillCollide(player.boxCollider, velocity, obstacles)) {
                     var pushable = GetPushedBox(player.boxCollider, velocity, boxes);
+                    var pushableResource = GetPushedResource(player.boxCollider, velocity, resources);
                     if (pushable != null) {
                         //Debug.Log("IsPushing");
                         if (CanPushBox(pushable, velocity, obstacles, boxes)) {
                             player.transform.localPosition += velocity;
                             pushable.transform.localPosition += velocity;
                         }
-                    } else {
+                        
+                    } 
+                    else if(pushableResource != null){
+                        if (CanPushResource(pushableResource, velocity, obstacles, boxes, monsters, resources)) {
+                            player.transform.localPosition += velocity;
+                            pushableResource.transform.localPosition += velocity;
+                        }
+                    }
+                    else {
                         player.transform.localPosition += velocity;
                     }
                 }
@@ -126,17 +160,25 @@ public class GameManager : MonoBehaviour
             }
             if (actions.right)
             {
-                //Debug.Log("right");
+                //Debug.Log("right");l
                 var velocity = Vector3.right * player.playerSpeed;
                 if (!WillCollide(player.boxCollider, velocity, obstacles)) {
                     var pushable = GetPushedBox(player.boxCollider, velocity, boxes);
+                    var pushableResource = GetPushedResource(player.boxCollider, velocity, resources);
                     if (pushable != null) {
                         //Debug.Log("IsPushing");
                         if (CanPushBox(pushable, velocity, obstacles, boxes)) {
                             player.transform.localPosition += velocity;
                             pushable.transform.localPosition += velocity;
                         }
-                    } else {
+                    } 
+                    else if(pushableResource != null){
+                        if (CanPushResource(pushableResource, velocity, obstacles, boxes, monsters, resources)) {
+                            player.transform.localPosition += velocity;
+                            pushableResource.transform.localPosition += velocity;
+                        }
+                    }
+                    else {
                         player.transform.localPosition += velocity;
                     }
                 }
@@ -188,6 +230,7 @@ public class GameManager : MonoBehaviour
                 time += 1;
                 if(time >= 24) time = 0;
                 Debug.Log($"Current time ${time}");
+                CheckPoints(resources, objective, ref points);
             }
             if (Util.HasHitTimeOnce(ref m_TimerDelayShowDeath, Time.deltaTime)) {
                 m_DeathAction?.Invoke();
@@ -195,6 +238,22 @@ public class GameManager : MonoBehaviour
             // Camera updates
             InterpolateActiveCamera(mainCamera.transform, cameraState, ref timeElapsed, LerpDuration, startMarkerPos, endMarkerPos);
         }
+    }
+
+    public static void CheckPoints(BoxCollider2D[] resources, BoxCollider2D objective, ref int points){
+        for(var i = 0;  i <= resources.Length - 1; i++){
+            if(IsOverlapping(resources[i], objective) && resources[i].enabled == true){
+                //remove resource
+                resources[i].gameObject.SetActive(false);
+                //and its collider
+                resources[i].enabled = false;
+                //remove from array
+                resources = resources.Where((source, index) => index != i).ToArray();
+                //add points
+                points += 1;
+            }
+        }
+        Debug.Log($"Current points ${points}");
     }
 
     private static Actions GetUserActions()
@@ -242,6 +301,17 @@ public class GameManager : MonoBehaviour
         return null;
     }
 
+    public static BoxCollider2D GetPushedResource(BoxCollider2D player, Vector3 velocity, BoxCollider2D[] resources)
+    {
+        for (var i = 0; i <= resources.Length - 1; i = i + 1) {
+            var box = resources[i];
+            if (player.OverlapPoint(box.transform.position - velocity) && box.enabled == true) {
+                return box;
+            }
+        }
+        return null;
+    }
+
     public static bool CanPushBox(BoxCollider2D box, Vector3 velocity, BoxCollider2D[] obstacleBoxCollider2Ds, BoxCollider2D[] boxBoxCollider2Ds)
     {
         for (var i = 0; i <= obstacleBoxCollider2Ds.Length - 1; i = i + 1) {
@@ -252,6 +322,32 @@ public class GameManager : MonoBehaviour
         for (var i = 0; i <= boxBoxCollider2Ds.Length - 1; i = i + 1) {
             var b = boxBoxCollider2Ds[i];
             if (box.OverlapPoint(b.transform.position - velocity))
+                return false;
+        }
+        return true;
+    }
+
+    public static bool CanPushResource(BoxCollider2D resource, Vector3 velocity, BoxCollider2D[] obstacles , BoxCollider2D[] boxes, Monster[] monsters, BoxCollider2D[] resources)
+    {
+        for (var i = 0; i <= obstacles.Length - 1; i = i + 1) {
+            var obstacle = obstacles[i];
+            if (resource.OverlapPoint(obstacle.transform.position - velocity))
+                return false;
+        }
+        for (var i = 0; i <= boxes.Length - 1; i = i + 1) {
+            var b = boxes[i];
+            if (resource.OverlapPoint(b.transform.position - velocity))
+                return false;
+        }
+        for (var i = 0; i <= monsters.Length - 1; i = i + 1) {
+            var b = monsters[i];
+            if (resource.OverlapPoint(b.transform.position - velocity))
+                return false;
+        }
+
+        for (var i = 0; i <= resources.Length - 1; i = i + 1) {
+            var b = resources[i];
+            if (resource.OverlapPoint(b.transform.position - velocity) && resource != b && b.enabled == true)
                 return false;
         }
         return true;
@@ -311,6 +407,11 @@ public class GameManager : MonoBehaviour
 
     }
 
+    public static void Win(){
+        Application.Quit();
+        UnityEditor.EditorApplication.isPlaying = false;
+    }
+
     private static bool WillObjectCollide(BoxCollider2D box, Vector3 velocity, BoxCollider2D[] obstacleBoxCollider2Ds, BoxCollider2D[] boxBoxCollider2Ds, BoxCollider2D playerBoxCollider2D)
     {
         for (var i = 0; i <= obstacleBoxCollider2Ds.Length - 1; i += 1) {
@@ -327,6 +428,15 @@ public class GameManager : MonoBehaviour
         if (box.OverlapPoint(playerBoxCollider2D.transform.position - velocity))
             return true;
 
+        return false;
+    }
+
+    private static bool IsOverlapping(BoxCollider2D b1, BoxCollider2D b2)
+    {
+        if (b1.OverlapPoint(b2.transform.position))
+            return true;
+        if (b2.OverlapPoint(b1.transform.position))
+            return true;
         return false;
     }
 
