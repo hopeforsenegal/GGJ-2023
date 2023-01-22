@@ -278,7 +278,7 @@ MonoBehaviour:
   gameOverScreen: {fileID: 0}
   winScreen: {fileID: 0}
   sundial: {fileID: 1939692807}
-  sundialData: {fileID: 11400000, guid: 8b93bd387016a492e8c553462b24d64e, type: 2}
+  settingsData: {fileID: 11400000, guid: 8b93bd387016a492e8c553462b24d64e, type: 2}
 --- !u!4 &76193901
 Transform:
   m_ObjectHideFlags: 0
@@ -1078,6 +1078,7 @@ MonoBehaviour:
   spriteRenderer: {fileID: 1192215715}
   lastDirectionMovedIndex: 0
   isSleep: 0
+  hasSeenPlayer: 0
   SpeedX: 2.2
   SpeedY: 2
 --- !u!61 &224342896
@@ -3458,12 +3459,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 365f3927ebdce8b49b172d1fbbf23f2c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  data: {fileID: 11400000, guid: 169c3e82bfd315a429fba00435c62d39, type: 2}
+  data: {fileID: 11400000, guid: 25d3f247a7eeb8249ab74845e849b2a5, type: 2}
   boxCollider: {fileID: 0}
   spineAnimation: {fileID: 1401929429}
   spriteRenderer: {fileID: 139849440}
   lastDirectionMovedIndex: 0
   isSleep: 0
+  hasSeenPlayer: 0
   SpeedX: 2.2
   SpeedY: 2
 --- !u!61 &962955551

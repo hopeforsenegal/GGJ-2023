@@ -56,8 +56,6 @@ public class GameManager : MonoBehaviour
         objective = GameObject.Find("Objective").GetComponent<BoxCollider2D>();
         cameraEndLocationTransforms = GetCameraTransitionSquares();
 
-        Debug.Assert(POINTS_TO_WIN == resources.Length);
-
         winScreen.ExitApplicationEvent += MainMenu.ExitApplication;
         winScreen.ReturnToMenuEvent += MainMenu.LoadMainMenu;
         gameOverScreen.RetryEvent += MainMenu.ReloadScene;
@@ -80,6 +78,8 @@ public class GameManager : MonoBehaviour
             night.sprite.color = Color.white;
         }
         sundial.sprite = settingsData.sundialSprites[time - 1];
+
+        Debug.Assert(POINTS_TO_WIN == resources.Length);
     }
 
     private void Update()
@@ -508,19 +508,14 @@ public class GameManager : MonoBehaviour
         return false;
     }
 
-    private static bool WillMonsterCollide(BoxCollider2D box, Vector3 velocity, BoxCollider2D[] obstacleBoxCollider2Ds, BoxCollider2D[] boxBoxCollider2Ds, BoxCollider2D playerBoxCollider2D)
+    private static bool WillMonsterCollide(BoxCollider2D monsterCollider, Vector3 velocity, params IEnumerable<BoxCollider2D>[] colliderListsThatInteractWithMonster)
     {
-        for (var i = 0; i <= obstacleBoxCollider2Ds.Length - 1; i++) {
-            var obstacle = obstacleBoxCollider2Ds[i];
-            if (box.OverlapPoint(obstacle.transform.position - velocity) && obstacle != box)
-                return true;
+        foreach (var interactableColliderList in colliderListsThatInteractWithMonster) {
+            foreach (var interactingCollider in interactableColliderList) {
+                if (monsterCollider.OverlapPoint(interactingCollider.transform.position - velocity) && interactingCollider != monsterCollider)
+                    return true;
+            }
         }
-        for (var i = 0; i <= boxBoxCollider2Ds.Length - 1; i++) {
-            var b = boxBoxCollider2Ds[i];
-            if (box.OverlapPoint(b.transform.position - velocity) && b != box)
-                return true;
-        }
-
         return false;
     }
 
@@ -642,7 +637,9 @@ public class GameManager : MonoBehaviour
 
         //Debug.Log($"line of sight vel ${vel}");
 
-        if (!WillMonsterCollide(monster.boxCollider, vel, obstacleBoxCollider2Ds, boxBoxCollider2Ds, playerBoxCollider2D)) {
+        if (!WillMonsterCollide(monster.boxCollider, vel, obstacleBoxCollider2Ds, boxBoxCollider2Ds, new BoxCollider2D[] { playerBoxCollider2D })) {
+            Debug.Log("Not looking at wall");
+            Debug.Log("But looking at player");
             monster.transform.localPosition += vel;
         }
     }
