@@ -147,11 +147,6 @@ public class GameManager : MonoBehaviour
             if (actions.up) {
                 //Debug.Log("up");
                 var velocity = Vector3.up * player.playerSpeedY;
-                var (hasCollided, locationInfo) =
-                    WillCollideCameraLocation(player.boxCollider, velocity, cameraEndLocationTransforms);
-                if (hasCollided) {
-                    (startMarkerPos, endMarkerPos) = UpdateAnimationToExecute(locationInfo, mainCamera.transform, cameraState);
-                }
                 if (!WillCollide(player.boxCollider, velocity, obstacles)) {
                     var pushable = GetPushedBox(player.boxCollider, velocity, boxes);
                     var pushableResource = GetPushedResource(player.boxCollider, velocity, resources);
@@ -169,15 +164,15 @@ public class GameManager : MonoBehaviour
                         player.transform.localPosition += velocity;
                     }
                 }
-            }
-            if (actions.down) {
-                //Debug.Log("down");
-                var velocity = Vector3.down * player.playerSpeedY;
                 var (hasCollided, locationInfo) =
                     WillCollideCameraLocation(player.boxCollider, velocity, cameraEndLocationTransforms);
                 if (hasCollided) {
                     (startMarkerPos, endMarkerPos) = UpdateAnimationToExecute(locationInfo, mainCamera.transform, cameraState);
                 }
+            }
+            if (actions.down) {
+                //Debug.Log("down");
+                var velocity = Vector3.down * player.playerSpeedY;
                 if (!WillCollide(player.boxCollider, velocity, obstacles)) {
                     var pushable = GetPushedBox(player.boxCollider, velocity, boxes);
                     var pushableResource = GetPushedResource(player.boxCollider, velocity, resources);
@@ -194,6 +189,11 @@ public class GameManager : MonoBehaviour
                     } else {
                         player.transform.localPosition += velocity;
                     }
+                }
+                var (hasCollided, locationInfo) =
+                    WillCollideCameraLocation(player.boxCollider, velocity, cameraEndLocationTransforms);
+                if (hasCollided) {
+                    (startMarkerPos, endMarkerPos) = UpdateAnimationToExecute(locationInfo, mainCamera.transform, cameraState);
                 }
             }
             if (actions.right) {
@@ -337,10 +337,10 @@ public class GameManager : MonoBehaviour
     {
         var action = new Actions
         {
-            left = Input.GetKeyDown(KeyCode.A),
-            up = Input.GetKeyDown(KeyCode.W),
-            down = Input.GetKeyDown(KeyCode.S),
-            right = Input.GetKeyDown(KeyCode.D),
+            left = Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow),
+            up = Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow),
+            down = Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow),
+            right = Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow),
         };
         action.movement = action.left || action.right || action.up || action.down;
         return action;
@@ -357,12 +357,14 @@ public class GameManager : MonoBehaviour
     }
 
     // this takes into account your last step btw
-    public static (bool, CameraTransitionSquare) WillCollideCameraLocation(BoxCollider2D player, Vector3 velocity, CameraTransitionSquare[] boxCollider2Ds)
+    public static (bool, CameraTransitionSquare) WillCollideCameraLocation(BoxCollider2D player,
+                                                                           Vector3 velocity,
+                                                                           CameraTransitionSquare[] cameraSquares)
     {
-        for (var i = 0; i <= boxCollider2Ds.Length - 1; i++) {
-            var obstacle = boxCollider2Ds[i].boxCollider;
-            if (player.OverlapPoint(obstacle.transform.position))
-                return (true, boxCollider2Ds[i]);
+        for (var i = 0; i <= cameraSquares.Length - 1; i++) {
+            var obstacle = cameraSquares[i];
+            if (player.OverlapPoint(obstacle.transform.position - velocity))
+                return (true, cameraSquares[i]);
         }
         return (false, null);
     }
