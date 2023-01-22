@@ -35,7 +35,6 @@ public class GameManager : MonoBehaviour
     private System.Action m_WinAction;
     private readonly Dictionary<CameraTransitionSquare, CameraState> cameraState = new Dictionary<CameraTransitionSquare, CameraState>();
     private int points = 0;
-    private int POINTS_TO_WIN = 2;
 
     //HOURS 0-8
     //Start at 1 since we get a free move at start
@@ -78,8 +77,6 @@ public class GameManager : MonoBehaviour
             night.sprite.color = Color.white;
         }
         sundial.sprite = settingsData.sundialSprites[time - 1];
-
-        Debug.Assert(POINTS_TO_WIN == resources.Length);
     }
 
     private void Update()
@@ -325,7 +322,8 @@ public class GameManager : MonoBehaviour
                 //Debug.Log($"Current time ${time}");
 
                 // Determine if they won
-                if (IsOverlapping(player.boxCollider, objective) && points >= POINTS_TO_WIN) {
+                var pointsNeededToWin = resources.Length;
+                if (IsOverlapping(player.boxCollider, objective) && points >= pointsNeededToWin) {
                     Debug.Log("Win");
                     m_IsWon = true;
                     player.spineAnimation.Play(SkinsNames.@default, PlayerAnim.victory, string.Empty, () =>
