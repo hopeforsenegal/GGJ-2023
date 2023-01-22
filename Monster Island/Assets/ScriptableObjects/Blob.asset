@@ -17,4 +17,4 @@ MonoBehaviour:
   sleepHour: 22
   wakeHour: 9
   isRandom: 1
-  isSleep: 0
+  isSleep: 1
