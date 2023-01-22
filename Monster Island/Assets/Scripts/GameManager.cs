@@ -14,6 +14,7 @@ public class GameManager : MonoBehaviour
     {
         public static readonly string awake = $"{nameof(awake)}";
         public static readonly string explode = $"{nameof(explode)}";
+        public static readonly string sleep = $"{nameof(sleep)}";
     }
 
     private static class PlayerAnim
@@ -220,7 +221,7 @@ public class GameManager : MonoBehaviour
             if (actions.movement) {
                 // monster updates
                 for (var i = 0; i <= monsters.Length - 1; i += 1) {
-                    Monster monster = monsters[i];
+                    var monster = monsters[i];
                     bool isRandom = monster.data.isRandom;
                     int killRadius = monster.data.killRadius;
                     int wakeHour = monster.data.wakeHour;
@@ -232,6 +233,9 @@ public class GameManager : MonoBehaviour
                         monster.isSleep = false;
                     if (time == sleepHour && sleepHour != -1)
                         monster.isSleep = true;
+
+                    monster.spineAnimation.Loop(SkinsNames.@default, monster.isSleep ? MonsterAnim.sleep : MonsterAnim.awake);
+
                     if (monster.isSleep == true) {
                         //Debug.Log("Monster is sleep");
                         continue;   // break out if sleeping
