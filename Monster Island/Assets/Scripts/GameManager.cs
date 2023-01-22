@@ -215,16 +215,6 @@ public class GameManager : MonoBehaviour
                         continue;   // break out if sleeping
                     }
 
-                    //check if can step
-                    Debug.Log($"if can step ${time % stepsToUpdate != 0}");
-                    if (time % stepsToUpdate != 0)
-                        continue;
-
-                    //handle moves
-                    if (isRandom)
-                        MonsterMoveRandom(player.boxCollider, boxes, obstacles, monsters[i].boxCollider);
-
-
                     //Handle attack
                     if (IsWithinRange(monsters[i].boxCollider.transform.localPosition, player.transform.localPosition, killRadius)) {
                         Debug.Log("Monster can kill");
@@ -235,6 +225,15 @@ public class GameManager : MonoBehaviour
                         };
                         return;
                     }
+
+                    //check if can step
+                    Debug.Log($"if can step ${time % stepsToUpdate != 0}");
+                    if (time % stepsToUpdate != 0)
+                        continue;
+
+                    //handle moves
+                    if (isRandom)
+                        MonsterMoveRandom(player.boxCollider, boxes, obstacles, monsters[i].boxCollider);
                 }
 
                 // night day updates
