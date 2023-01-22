@@ -1,4 +1,3 @@
-using MoonlitSystem.Animators;
 using UnityEngine;
 
 [RequireComponent(typeof(BoxCollider2D))]

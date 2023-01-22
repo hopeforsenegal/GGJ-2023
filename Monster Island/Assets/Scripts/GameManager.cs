@@ -4,33 +4,6 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    private static class PlayerScale
-    {
-        public static readonly Vector3 Left = Vector3.one;
-        public static readonly Vector3 Right = new Vector3(-1, 1, 1);
-    }
-
-    private static class MonsterAnim
-    {
-        public static readonly string awake = $"{nameof(awake)}";
-        public static readonly string explode = $"{nameof(explode)}";
-        public static readonly string sleep = $"{nameof(sleep)}";
-    }
-
-    private static class PlayerAnim
-    {
-        public static readonly string idle = $"{nameof(idle)}";
-        public static readonly string move = $"{nameof(move)}";
-        public static readonly string hit = $"{nameof(hit)}";
-        public static readonly string victory = $"{nameof(victory)}";
-        public static readonly string item_collect = $"{nameof(item_collect)}";
-    }
-
-    private static class SkinsNames
-    {
-        public static readonly string @default = $"{nameof(@default)}";
-    }
-
     // inspector
     public float SpeedX = 2.2f;
     public float SpeedY = 2;
@@ -416,7 +389,7 @@ public class GameManager : MonoBehaviour
 
     public static BoxCollider2D GetPushedResource(BoxCollider2D player, Vector3 velocity, BoxCollider2D[] resources)
     {
-        for (var i = 0; i <= resources.Length - 1; i = i + 1) {
+        for (var i = 0; i <= resources.Length - 1; i++) {
             var box = resources[i];
             if (player.OverlapPoint(box.transform.position - velocity) && box.enabled == true) {
                 return box;
@@ -427,17 +400,17 @@ public class GameManager : MonoBehaviour
 
     public static bool CanPushBox(BoxCollider2D box, Vector3 velocity, BoxCollider2D[] obstacleBoxCollider2Ds, BoxCollider2D[] boxBoxCollider2Ds, Monster[] monsters)
     {
-        for (var i = 0; i <= obstacleBoxCollider2Ds.Length - 1; i = i + 1) {
+        for (var i = 0; i <= obstacleBoxCollider2Ds.Length - 1; i++) {
             var obstacle = obstacleBoxCollider2Ds[i];
             if (box.OverlapPoint(obstacle.transform.position - velocity))
                 return false;
         }
-        for (var i = 0; i <= boxBoxCollider2Ds.Length - 1; i = i + 1) {
+        for (var i = 0; i <= boxBoxCollider2Ds.Length - 1; i++) {
             var b = boxBoxCollider2Ds[i];
             if (box.OverlapPoint(b.transform.position - velocity))
                 return false;
         }
-        for (var i = 0; i <= monsters.Length - 1; i = i + 1) {
+        for (var i = 0; i <= monsters.Length - 1; i++) {
             var b = monsters[i].boxCollider;
             if (box.OverlapPoint(b.transform.position - velocity))
                 return false;
@@ -447,23 +420,23 @@ public class GameManager : MonoBehaviour
 
     public static bool CanPushResource(BoxCollider2D resource, Vector3 velocity, BoxCollider2D[] obstacles, BoxCollider2D[] boxes, Monster[] monsters, BoxCollider2D[] resources)
     {
-        for (var i = 0; i <= obstacles.Length - 1; i = i + 1) {
+        for (var i = 0; i <= obstacles.Length - 1; i++) {
             var obstacle = obstacles[i];
             if (resource.OverlapPoint(obstacle.transform.position - velocity))
                 return false;
         }
-        for (var i = 0; i <= boxes.Length - 1; i = i + 1) {
+        for (var i = 0; i <= boxes.Length - 1; i++) {
             var b = boxes[i];
             if (resource.OverlapPoint(b.transform.position - velocity))
                 return false;
         }
-        for (var i = 0; i <= monsters.Length - 1; i = i + 1) {
+        for (var i = 0; i <= monsters.Length - 1; i++) {
             var b = monsters[i];
             if (resource.OverlapPoint(b.transform.position - velocity))
                 return false;
         }
 
-        for (var i = 0; i <= resources.Length - 1; i = i + 1) {
+        for (var i = 0; i <= resources.Length - 1; i++) {
             var b = resources[i];
             if (resource.OverlapPoint(b.transform.position - velocity) && resource != b && b.enabled == true)
                 return false;

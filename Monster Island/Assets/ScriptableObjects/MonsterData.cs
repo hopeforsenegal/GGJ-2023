@@ -7,10 +7,7 @@ public class MonsterData : ScriptableObject
     public int stepsToUpdate;
     public int sleepHour;
     public int wakeHour;
-
-    public bool isSleep;
-
-
+    
     //create selection list for types of navigation
     public enum NavigationType
     {
@@ -27,9 +24,6 @@ public class MonsterData : ScriptableObject
     {
         Vertical = 0,
         Horizontal = 1,
-    };
+    }
     public Direction lineOfSightDirection;
-
-
-    public int patrolRadius;
 }

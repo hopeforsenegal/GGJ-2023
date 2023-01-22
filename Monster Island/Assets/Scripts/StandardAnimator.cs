@@ -1,23 +1,8 @@
-/**
-All material in this application solution and source is, unless otherwise stated, 
-the property of Kamau Vassall
-Copyright and other intellectual property laws protect these materials. 
-Reproduction or retransmission of the materials, in whole or in part, 
-in any manner, without the prior written consent of the copyright holder,
-is a violation of copyright law.
-Originating Author: Kamau Vassall
-*----------------------------------------------------------------
-* StandardAnimator.cs : Handles the animation of spine in the UI
-*----------------------------------------------------------------
-*/
-
 using System;
 using UnityEngine;
 using Spine;
 using Spine.Unity;
 
-namespace MoonlitSystem.Animators
-{
     [DisallowMultipleComponent]
     [RequireComponent(typeof(SkeletonAnimation))]
     [RequireComponent(typeof(MeshRenderer))]
@@ -155,4 +140,3 @@ namespace MoonlitSystem.Animators
 
         #endregion
     }
-}
