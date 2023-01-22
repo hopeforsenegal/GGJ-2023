@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -110,7 +109,7 @@ public class GameManager : MonoBehaviour
                     var pushable = GetPushedBox(player.boxCollider, velocity, boxes);
                     var pushableResource = GetPushedResource(player.boxCollider, velocity, resources);
                     if (pushable != null) {
-                        if (CanPushBox(pushable, velocity, obstacles, boxes, resources, Monster.AsBoxColliderArray(monsters), new BoxCollider2D[] { objective })) {
+                        if (CanPushBox(pushable, velocity, obstacles, boxes, resources, Monster.AsBoxColliderArray(monsters), new[] { objective })) {
                             player.transform.localPosition += velocity;
                             pushable.transform.localPosition += velocity;
                             movement = true;
@@ -141,7 +140,7 @@ public class GameManager : MonoBehaviour
                     var pushableResource = GetPushedResource(player.boxCollider, velocity, resources);
                     if (pushable != null) {
                         //Debug.Log("IsPushing");
-                        if (CanPushBox(pushable, velocity, obstacles, boxes, resources, Monster.AsBoxColliderArray(monsters), new BoxCollider2D[] { objective })) {
+                        if (CanPushBox(pushable, velocity, obstacles, boxes, resources, Monster.AsBoxColliderArray(monsters), new[] { objective })) {
                             player.transform.localPosition += velocity;
                             pushable.transform.localPosition += velocity;
                             movement = true;
@@ -170,7 +169,7 @@ public class GameManager : MonoBehaviour
                     var pushableResource = GetPushedResource(player.boxCollider, velocity, resources);
                     if (pushable != null) {
                         //Debug.Log("IsPushing");
-                        if (CanPushBox(pushable, velocity, obstacles, boxes, resources, Monster.AsBoxColliderArray(monsters), new BoxCollider2D[] { objective })) {
+                        if (CanPushBox(pushable, velocity, obstacles, boxes, resources, Monster.AsBoxColliderArray(monsters), new[] { objective })) {
                             player.transform.localPosition += velocity;
                             pushable.transform.localPosition += velocity;
                             movement = true;
@@ -199,7 +198,7 @@ public class GameManager : MonoBehaviour
                     var pushableResource = GetPushedResource(player.boxCollider, velocity, resources);
                     if (pushable != null) {
                         //Debug.Log("IsPushing");
-                        if (CanPushBox(pushable, velocity, obstacles, boxes, resources, Monster.AsBoxColliderArray(monsters), new BoxCollider2D[] { objective })) {
+                        if (CanPushBox(pushable, velocity, obstacles, boxes, resources, Monster.AsBoxColliderArray(monsters), new[] { objective })) {
                             player.transform.localPosition += velocity;
                             pushable.transform.localPosition += velocity;
                             movement = true;
@@ -274,7 +273,7 @@ public class GameManager : MonoBehaviour
 
                     monster.spineAnimation.Loop(SkinsNames.@default, monster.isSleep ? MonsterAnim.sleep : MonsterAnim.awake);
 
-                    if (monster.isSleep == true) {
+                    if (monster.isSleep) {
                         //Debug.Log("Monster is sleep");
                         continue;   // break out if sleeping
                     }
@@ -303,7 +302,7 @@ public class GameManager : MonoBehaviour
                         continue;
 
                     //handle moves
-                    Direction hasMonsterMoved = Direction.None;
+                    var hasMonsterMoved = Direction.None;
                     if (isRandom)
                         hasMonsterMoved = MonsterMoveRandom(player.boxCollider, boxes, obstacles, monsters[i]);
                     if (isCircular)
@@ -366,9 +365,9 @@ public class GameManager : MonoBehaviour
                         m_WinAction = () =>
                         {
                             winScreen.Visibility = true;
-                            var audio = FindObjectOfType<AudioSource>();
-                            audio.clip = settingsData.winAudio;
-                            audio.Play();
+                            var audioSource = FindObjectOfType<AudioSource>();
+                            audioSource.clip = settingsData.winAudio;
+                            audioSource.Play();
                         };
                     });
                 }
@@ -482,7 +481,7 @@ public class GameManager : MonoBehaviour
 
         for (var i = 0; i <= resources.Length - 1; i++) {
             var b = resources[i];
-            if (resource.OverlapPoint(b.transform.position - velocity) && resource != b && b.enabled == true)
+            if (resource.OverlapPoint(b.transform.position - velocity) && resource != b && b.enabled)
                 return false;
         }
         return true;
@@ -567,14 +566,11 @@ public class GameManager : MonoBehaviour
             Vector3.down,
         };
         var inc = 0;
-        var checking = true;
-        while (checking && inc < 5) {
+        while (inc < 5) {
             //Debug.Log("Checking moves");
             var vel = dirs[Random.Range(1, 4)];
             if (!WillObjectCollide(monster.boxCollider, vel, obstacleBoxCollider2Ds, boxBoxCollider2Ds, playerBoxCollider2D)) {
                 monster.transform.localPosition += vel * monster.data.speed;
-                //Debug.Log($"moving monster {monster.transform.localPosition}");
-                checking = false;
                 return vel.x > 0 ? Direction.Horizontal : Direction.Vertical;
             }
             inc++;
@@ -608,14 +604,11 @@ public class GameManager : MonoBehaviour
             Vector3.left,
         };
         var inc = 0;
-        var checking = true;
-        while (checking && inc < 5) {
+        while (inc < 5) {
             //Debug.Log("Checking moves");
             var vel = dirs[Random.Range(1, 2)];
             if (!WillObjectCollide(monster.boxCollider, vel, obstacleBoxCollider2Ds, boxBoxCollider2Ds, playerBoxCollider2D)) {
                 monster.transform.localPosition += vel;
-                //Debug.Log($"moving monster {monster.transform.localPosition}");
-                checking = false;
                 return vel.x > 0 ? Direction.Horizontal : Direction.Vertical;
             }
             inc++;
@@ -630,14 +623,11 @@ public class GameManager : MonoBehaviour
             Vector3.down,
         };
         var inc = 0;
-        var checking = true;
-        while (checking && inc < 5) {
+        while (inc < 5) {
             //Debug.Log("Checking moves");
             var vel = dirs[Random.Range(1, 2)];
             if (!WillObjectCollide(monster.boxCollider, vel, obstacleBoxCollider2Ds, boxBoxCollider2Ds, playerBoxCollider2D)) {
                 monster.transform.localPosition += vel;
-                //Debug.Log($"moving monster {monster.transform.localPosition}");
-                checking = false;
                 return vel.x > 0 ? Direction.Horizontal : Direction.Vertical;
             }
             inc++;
@@ -666,7 +656,7 @@ public class GameManager : MonoBehaviour
         Debug.Log($"{monster.data.name} playery {playerY} monstery{monsterY}");
         Debug.Log($"line of sight vel ${vel}");
 
-        if (vel != Vector3.zero && !WillMonsterCollide(monster.boxCollider, vel, obstacleBoxCollider2Ds, boxBoxCollider2Ds, new BoxCollider2D[] { playerBoxCollider2D })) {
+        if (vel != Vector3.zero && !WillMonsterCollide(monster.boxCollider, vel, obstacleBoxCollider2Ds, boxBoxCollider2Ds, new[] { playerBoxCollider2D })) {
             monster.transform.localPosition += vel;
             return vel.x > 0 ? Direction.Horizontal : Direction.Vertical;
         }
@@ -680,7 +670,7 @@ public class GameManager : MonoBehaviour
         Vertical,
     }
 
-    enum LineOfSight
+    private enum LineOfSight
     {
         None,
         IsRightVerticalAligned,
@@ -691,13 +681,14 @@ public class GameManager : MonoBehaviour
 
     static LineOfSight DetectLineOfSight(Vector3 subject, Vector3 other)
     {
+        // This is making sure you are on the same column
+        // Then check above or below
         if (Mathf.Abs(subject.x - other.x) <= 0.5) {
-            // This is making sure you are on the same column
-            // Then check above or below
             return other.y > subject.y ? LineOfSight.IsBelowHorizontalAligned : LineOfSight.IsAboveHorizontalAligned;
-        } else if (Mathf.Abs(subject.y - other.y) <= 0.5) {
-            // This is making sure you are on the same row
-            // Then check left or right
+        }
+        // This is making sure you are on the same row
+        // Then check left or right
+        if (Mathf.Abs(subject.y - other.y) <= 0.5) {
             return other.x > subject.x ? LineOfSight.IsLeftVerticalAligned : LineOfSight.IsRightVerticalAligned;
         }
         return LineOfSight.None;
