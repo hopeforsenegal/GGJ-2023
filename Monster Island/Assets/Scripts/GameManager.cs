@@ -216,7 +216,7 @@ public class GameManager : MonoBehaviour
                     }
 
                     //Handle attack
-                    if (IsWithinRange(monsters[i].boxCollider.transform.localPosition, player.transform.localPosition, killRadius)) {
+                    if (IsWithinRange(monsters[i].boxCollider.transform.position, player.transform.position, killRadius)) {
                         Debug.Log("Monster can kill");
                         m_TimerDelayShowDeath = 0.1f;
                         m_DeathAction = () =>
