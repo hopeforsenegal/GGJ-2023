@@ -391,6 +391,8 @@ public class GameManager : MonoBehaviour
                 time = IncrementTime(time);
                 player.spineAnimation.Play(SkinsNames.@default, hasAddedToInventory ? PlayerAnim.item_collect : PlayerAnim.move).setOnAnimationEnd(() =>
                 {
+                    if (m_IsWon || m_IsGameOver)
+                        return;
                     player.spineAnimation.Loop(SkinsNames.@default, PlayerAnim.idle);
                 });
 
