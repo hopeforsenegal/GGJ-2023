@@ -11,7 +11,7 @@ public class TestNight : MonoBehaviour
 
     void Start()
     {
-        if (GameManager.IsNightTime(time)) {
+        if (GameManager.IsNightTime(time-1)) {
             night.color = Color.black;
         } else {
             night.color = Color.white;

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
@@ -19,6 +20,8 @@ public class GameManager : MonoBehaviour
     public CameraTransitionSquare[] cameraEndLocationTransforms;
     public GameOverScreen gameOverScreen;
     public WinScreen winScreen;
+    public Image sundial;
+    public SundialData sundialData;
 
     // private
     private const float LerpDuration = 0.5f;
@@ -70,11 +73,13 @@ public class GameManager : MonoBehaviour
             monster.spineAnimation.Loop(SkinsNames.@default, MonsterAnim.awake);
         }
 
-        if (IsNightTime(time)) {
+        // On start account for the offset
+        if (IsNightTime(time - 1)) {
             night.sprite.color = Color.black;
         } else {
             night.sprite.color = Color.white;
         }
+        sundial.sprite = sundialData.sprites[time - 1];
     }
 
     void AddToInventory(BoxCollider2D box)
@@ -307,6 +312,7 @@ public class GameManager : MonoBehaviour
                 } else {
                     night.sprite.color = Color.white;
                 }
+                sundial.sprite = sundialData.sprites[time];
 
                 // increment time
                 time = IncrementTime(time);
