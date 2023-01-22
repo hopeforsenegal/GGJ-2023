@@ -225,6 +225,11 @@ public class GameManager : MonoBehaviour
             if (movement) {
                 // Clamp player movement as a temporary hack
                 foreach (var center in roomCenters) {
+                    var distance = Vector3.Distance(center.position, player.transform.position);
+                    // skip if we are too far
+                    if (distance > 30)
+                        continue;
+                    Debug.Log($"name:{center.name} distance:{distance}");
                     var los = DetectLineOfSight(center.position, player.transform.position);
                     switch (los) {
                         case LineOfSight.IsAboveHorizontalAligned:
@@ -698,14 +703,12 @@ public class GameManager : MonoBehaviour
     {
         var diff = center - point;
         //check if on the same row by checking if diff.y is almost 0
-        if(Mathf.Abs(diff.y) <= 0.5)
-        {
+        if (Mathf.Abs(diff.y) <= 0.5) {
             return Mathf.Abs(diff.x) <= (radius * SpeedX / 2);
         }
 
         //check if on the same column by checking if diff.x is almost 0
-        if(Mathf.Abs(diff.x) <= 0.5)
-        {
+        if (Mathf.Abs(diff.x) <= 0.5) {
             return Mathf.Abs(diff.y) <= (radius * SpeedY / 2);
         }
 
