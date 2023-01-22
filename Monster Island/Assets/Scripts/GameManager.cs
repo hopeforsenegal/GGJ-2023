@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
@@ -405,10 +406,15 @@ public class GameManager : MonoBehaviour
                         m_TimerDelayShowWin = 0.1f;
                         m_WinAction = () =>
                         {
-                            winScreen.Visibility = true;
-                            var audioSource = FindObjectOfType<AudioSource>();
-                            audioSource.clip = settingsData.winAudio;
-                            audioSource.Play();
+                            if (SceneManager.GetActiveScene().name == SceneNames.Island_one) {
+                                SceneManager.LoadScene(SceneNames.Island_two);
+                                return;
+                            } else {
+                                winScreen.Visibility = true;
+                                var audioSource = FindObjectOfType<AudioSource>();
+                                audioSource.clip = settingsData.winAudio;
+                                audioSource.Play();
+                            }
                         };
                     });
                 }

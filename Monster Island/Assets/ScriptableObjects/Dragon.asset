@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a92c2714f0fb51146850181cc28af0fe, type: 3}
   m_Name: Dragon
   m_EditorClassIdentifier: 
-  killRadius: 1
+  killRadius: 2
   stepsToUpdate: 9999999
   sleepHour: -1
   wakeHour: -1
