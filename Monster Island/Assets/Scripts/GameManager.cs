@@ -230,19 +230,15 @@ public class GameManager : MonoBehaviour
                     switch (los) {
                         case LineOfSight.IsAboveHorizontalAligned:
                             player.transform.position = new Vector3(center.position.x, player.transform.position.y, player.transform.position.z);
-                            Debug.Log("Clamped!");
                             break;
                         case LineOfSight.IsBelowHorizontalAligned:
                             player.transform.position = new Vector3(center.position.x, player.transform.position.y, player.transform.position.z);
-                            Debug.Log("Clamped!");
                             break;
                         case LineOfSight.IsLeftVerticalAligned:
                             player.transform.position = new Vector3(player.transform.position.x, center.position.y, player.transform.position.z);
-                            Debug.Log("Clamped!");
                             break;
                         case LineOfSight.IsRightVerticalAligned:
                             player.transform.position = new Vector3(player.transform.position.x, center.position.y, player.transform.position.z);
-                            Debug.Log("Clamped!");
                             break;
                     }
                 }
@@ -287,7 +283,9 @@ public class GameManager : MonoBehaviour
                     if (IsWithinRange(monsters[i].boxCollider.transform.position, player.transform.position, killRadius)) {
                         Debug.Log($"{monsters[i].data.name} can kill");
                         m_IsGameOver = true;
-                        monsters[i].spineAnimation.Play(SkinsNames.@default, MonsterAnim.explode, string.Empty, () =>
+                        var clipName = monsters[i].data.attack;
+                        clipName = string.IsNullOrWhiteSpace(clipName) ? MonsterAnim.explode : clipName;
+                        monsters[i].spineAnimation.Play(SkinsNames.@default, clipName, string.Empty, () =>
                         {
                             m_TimerDelayShowGameOver = 0.1f;
                             m_GameOverAction = () =>
@@ -305,22 +303,32 @@ public class GameManager : MonoBehaviour
                         continue;
 
                     //handle moves
+                    Direction hasMonsterMoved = Direction.None;
                     if (isRandom)
-                        MonsterMoveRandom(player.boxCollider, boxes, obstacles, monsters[i]);
+                        hasMonsterMoved = MonsterMoveRandom(player.boxCollider, boxes, obstacles, monsters[i]);
                     if (isCircular)
-                        MonsterMoveCircular(player.boxCollider, boxes, obstacles, monsters[i]);
+                        hasMonsterMoved = MonsterMoveCircular(player.boxCollider, boxes, obstacles, monsters[i]);
                     if (isHorizontal)
-                        MonsterMoveHorizontal(player.boxCollider, boxes, obstacles, monsters[i]);
+                        hasMonsterMoved = MonsterMoveHorizontal(player.boxCollider, boxes, obstacles, monsters[i]);
                     if (isVertical)
-                        MonsterMoveVertical(player.boxCollider, boxes, obstacles, monsters[i]);
+                        hasMonsterMoved = MonsterMoveVertical(player.boxCollider, boxes, obstacles, monsters[i]);
                     if (isLineOfSight)
-                        MonsterMoveLineOfSight(player.boxCollider, boxes, obstacles, monsters[i], monsters[i].SpeedX, monsters[i].SpeedY);
+                        hasMonsterMoved = MonsterMoveLineOfSight(player.boxCollider, boxes, obstacles, monsters[i], monsters[i].SpeedX, monsters[i].SpeedY);
+
+                    if (hasMonsterMoved != Direction.None) {
+                        Debug.Log($"Has moved: {monsters[i].data.name}");
+                        var clipName = hasMonsterMoved == Direction.Horizontal ? monsters[i].data.moveLeftRight : monsters[i].data.moveUpDown;
+                        clipName = string.IsNullOrWhiteSpace(clipName) ? MonsterAnim.move : clipName;
+                        monsters[i].spineAnimation.Play(SkinsNames.@default, clipName);
+                    }
 
                     //Handle attack
                     if (IsWithinRange(monsters[i].boxCollider.transform.localPosition, player.transform.localPosition, killRadius)) {
                         Debug.Log($"{monsters[i].data.name} can kill");
                         m_IsGameOver = true;
-                        monsters[i].spineAnimation.Play(SkinsNames.@default, MonsterAnim.explode, string.Empty, () =>
+                        var clipName = monsters[i].data.attack;
+                        clipName = string.IsNullOrWhiteSpace(clipName) ? MonsterAnim.explode : clipName;
+                        monsters[i].spineAnimation.Play(SkinsNames.@default, clipName, string.Empty, () =>
                         {
                             m_TimerDelayShowGameOver = 0.1f;
                             m_GameOverAction = () =>
@@ -550,7 +558,7 @@ public class GameManager : MonoBehaviour
         return a.OverlapPoint(b.transform.position) || b.OverlapPoint(a.transform.position);
     }
 
-    public static void MonsterMoveRandom(BoxCollider2D playerBoxCollider2D, BoxCollider2D[] boxBoxCollider2Ds, BoxCollider2D[] obstacleBoxCollider2Ds, Monster monster)
+    public static Direction MonsterMoveRandom(BoxCollider2D playerBoxCollider2D, BoxCollider2D[] boxBoxCollider2Ds, BoxCollider2D[] obstacleBoxCollider2Ds, Monster monster)
     {
         Vector3[] dirs = {
             Vector3.up,
@@ -567,12 +575,14 @@ public class GameManager : MonoBehaviour
                 monster.transform.localPosition += vel * monster.data.speed;
                 //Debug.Log($"moving monster {monster.transform.localPosition}");
                 checking = false;
+                return vel.x > 0 ? Direction.Horizontal : Direction.Vertical;
             }
             inc++;
         }
+        return Direction.None;
     }
 
-    public static void MonsterMoveCircular(BoxCollider2D playerBoxCollider2D, BoxCollider2D[] boxBoxCollider2Ds, BoxCollider2D[] obstacleBoxCollider2Ds, Monster monster)
+    public static Direction MonsterMoveCircular(BoxCollider2D playerBoxCollider2D, BoxCollider2D[] boxBoxCollider2Ds, BoxCollider2D[] obstacleBoxCollider2Ds, Monster monster)
     {
         Vector3[] dirs = {
             Vector3.up,
@@ -586,10 +596,12 @@ public class GameManager : MonoBehaviour
         if (!WillObjectCollide(monster.boxCollider, vel, obstacleBoxCollider2Ds, boxBoxCollider2Ds, playerBoxCollider2D)) {
             monster.transform.localPosition += vel;
             monster.lastDirectionMovedIndex = inc;
+            return vel.x > 0 ? Direction.Horizontal : Direction.Vertical;
         }
+        return Direction.None;
     }
 
-    public static void MonsterMoveHorizontal(BoxCollider2D playerBoxCollider2D, BoxCollider2D[] boxBoxCollider2Ds, BoxCollider2D[] obstacleBoxCollider2Ds, Monster monster)
+    public static Direction MonsterMoveHorizontal(BoxCollider2D playerBoxCollider2D, BoxCollider2D[] boxBoxCollider2Ds, BoxCollider2D[] obstacleBoxCollider2Ds, Monster monster)
     {
         Vector3[] dirs = {
             Vector3.right,
@@ -604,12 +616,14 @@ public class GameManager : MonoBehaviour
                 monster.transform.localPosition += vel;
                 //Debug.Log($"moving monster {monster.transform.localPosition}");
                 checking = false;
+                return vel.x > 0 ? Direction.Horizontal : Direction.Vertical;
             }
             inc++;
         }
+        return Direction.None;
     }
 
-    public static void MonsterMoveVertical(BoxCollider2D playerBoxCollider2D, BoxCollider2D[] boxBoxCollider2Ds, BoxCollider2D[] obstacleBoxCollider2Ds, Monster monster)
+    public static Direction MonsterMoveVertical(BoxCollider2D playerBoxCollider2D, BoxCollider2D[] boxBoxCollider2Ds, BoxCollider2D[] obstacleBoxCollider2Ds, Monster monster)
     {
         Vector3[] dirs = {
             Vector3.up,
@@ -624,9 +638,46 @@ public class GameManager : MonoBehaviour
                 monster.transform.localPosition += vel;
                 //Debug.Log($"moving monster {monster.transform.localPosition}");
                 checking = false;
+                return vel.x > 0 ? Direction.Horizontal : Direction.Vertical;
             }
             inc++;
         }
+        return Direction.None;
+    }
+
+    public static Direction MonsterMoveLineOfSight(BoxCollider2D playerBoxCollider2D, BoxCollider2D[] boxBoxCollider2Ds, BoxCollider2D[] obstacleBoxCollider2Ds, Monster monster, float speedX, float speedY)
+    {
+        var playerX = playerBoxCollider2D.transform.localPosition.x;
+        var monsterX = monster.boxCollider.transform.localPosition.x;
+        var playerY = playerBoxCollider2D.transform.localPosition.y;
+        var monsterY = monster.boxCollider.transform.localPosition.y;
+        var los = DetectLineOfSight(playerBoxCollider2D.transform.localPosition, monster.boxCollider.transform.localPosition);
+        var vel = los switch
+        {
+            LineOfSight.IsAboveHorizontalAligned => Vector3.up * speedY,
+            LineOfSight.IsBelowHorizontalAligned => Vector3.down * speedY,
+            LineOfSight.IsLeftVerticalAligned => Vector3.left * speedX,
+            LineOfSight.IsRightVerticalAligned => Vector3.right * speedX,
+            LineOfSight.None => Vector3.zero,
+            _ => throw new System.NotImplementedException(),
+        };
+
+        Debug.Log($"{monster.data.name} playerx {playerX} monsterx{monsterX}");
+        Debug.Log($"{monster.data.name} playery {playerY} monstery{monsterY}");
+        Debug.Log($"line of sight vel ${vel}");
+
+        if (vel != Vector3.zero && !WillMonsterCollide(monster.boxCollider, vel, obstacleBoxCollider2Ds, boxBoxCollider2Ds, new BoxCollider2D[] { playerBoxCollider2D })) {
+            monster.transform.localPosition += vel;
+            return vel.x > 0 ? Direction.Horizontal : Direction.Vertical;
+        }
+        return Direction.None;
+    }
+
+    public enum Direction
+    {
+        None,
+        Horizontal,
+        Vertical,
     }
 
     enum LineOfSight
@@ -650,32 +701,6 @@ public class GameManager : MonoBehaviour
             return other.x > subject.x ? LineOfSight.IsLeftVerticalAligned : LineOfSight.IsRightVerticalAligned;
         }
         return LineOfSight.None;
-    }
-
-    public static void MonsterMoveLineOfSight(BoxCollider2D playerBoxCollider2D, BoxCollider2D[] boxBoxCollider2Ds, BoxCollider2D[] obstacleBoxCollider2Ds, Monster monster, float speedX, float speedY)
-    {
-        var playerX = playerBoxCollider2D.transform.localPosition.x;
-        var monsterX = monster.boxCollider.transform.localPosition.x;
-        var playerY = playerBoxCollider2D.transform.localPosition.y;
-        var monsterY = monster.boxCollider.transform.localPosition.y;
-        var los = DetectLineOfSight(playerBoxCollider2D.transform.localPosition, monster.boxCollider.transform.localPosition);
-        var vel = los switch
-        {
-            LineOfSight.IsAboveHorizontalAligned => Vector3.up * speedY,
-            LineOfSight.IsBelowHorizontalAligned => Vector3.down * speedY,
-            LineOfSight.IsLeftVerticalAligned => Vector3.left * speedX,
-            LineOfSight.IsRightVerticalAligned => Vector3.right * speedX,
-            LineOfSight.None => Vector3.zero,
-            _ => throw new System.NotImplementedException(),
-        };
-
-        Debug.Log($"{monster.data.name} playerx {playerX} monsterx{monsterX}");
-        Debug.Log($"{monster.data.name} playery {playerY} monstery{monsterY}");
-        Debug.Log($"line of sight vel ${vel}");
-
-        if (!WillMonsterCollide(monster.boxCollider, vel, obstacleBoxCollider2Ds, boxBoxCollider2Ds, new BoxCollider2D[] { playerBoxCollider2D })) {
-            monster.transform.localPosition += vel;
-        }
     }
 
     public static bool IsWithinRange(Vector3 center, Vector3 point, float radius)

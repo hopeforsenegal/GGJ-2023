@@ -1,0 +1,13 @@
+snakebits.png
+size:1024,256
+filter:Linear,Linear
+pma:true
+Z
+bounds:795,165,76,190
+rotate:90
+body
+bounds:2,146,791,95
+sleep
+bounds:2,2,235,142
+tongue
+bounds:239,50,54,94

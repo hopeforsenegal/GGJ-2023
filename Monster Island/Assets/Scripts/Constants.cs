@@ -11,6 +11,7 @@ public static class MonsterAnim
     public static readonly string awake = $"{nameof(awake)}";
     public static readonly string explode = $"{nameof(explode)}";
     public static readonly string sleep = $"{nameof(sleep)}";
+    public static readonly string move = $"{nameof(move)}";
 }
 
 public static class PlayerAnim

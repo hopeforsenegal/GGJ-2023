@@ -8,15 +8,19 @@ public class MonsterData : ScriptableObject
     public int sleepHour;
     public int wakeHour;
     public int speed;
-    
+    public string attack;
+    public string moveUpDown;
+    public string moveLeftRight;
+
     //create selection list for types of navigation
     public enum NavigationType
     {
-        Random = 0,
-        Circular = 1,
-        Horizontal = 2,
-        Vertical = 3,
-        LineOfSight = 4,
+        None = 0,
+        Random = 1,
+        Circular = 2,
+        Horizontal = 3,
+        Vertical = 4,
+        LineOfSight = 5,
     }
     public NavigationType navigationType;
 }
