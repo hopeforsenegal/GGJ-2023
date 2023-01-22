@@ -9,8 +9,6 @@ public class GameManager : MonoBehaviour
     private const float CameraLerpDuration = 0.5f;
 
     // inspector
-    public float SpeedX = 2.2f;
-    public float SpeedY = 2;
     public Player player;
     public BoxCollider2D[] obstacles;
     public BoxCollider2D[] boxes;
@@ -287,8 +285,7 @@ public class GameManager : MonoBehaviour
                     if (isVertical)
                         MonsterMoveVertical(player.boxCollider, boxes, obstacles, monsters[i]);
                     if (isLineOfSight)
-                        MonsterMoveLineOfSight(player.boxCollider, boxes, obstacles, monsters[i], SpeedX, SpeedY);
-
+                        MonsterMoveLineOfSight(player.boxCollider, boxes, obstacles, monsters[i], monsters[i].SpeedX, monsters[i].SpeedY);
 
                     //Handle attack
                     if (IsWithinRange(monsters[i].boxCollider.transform.localPosition, player.transform.localPosition, killRadius)) {
@@ -578,7 +575,6 @@ public class GameManager : MonoBehaviour
 
     }
 
-    //Move monster Horizontal
     public static void MonsterMoveHorizontal(BoxCollider2D playerBoxCollider2D, BoxCollider2D[] boxBoxCollider2Ds, BoxCollider2D[] obstacleBoxCollider2Ds, Monster monster)
     {
         Vector3[] dirs = {
@@ -600,7 +596,6 @@ public class GameManager : MonoBehaviour
 
     }
 
-    //Move monster Vertical
     public static void MonsterMoveVertical(BoxCollider2D playerBoxCollider2D, BoxCollider2D[] boxBoxCollider2Ds, BoxCollider2D[] obstacleBoxCollider2Ds, Monster monster)
     {
         Vector3[] dirs = {
@@ -619,7 +614,6 @@ public class GameManager : MonoBehaviour
             }
             inc++;
         }
-
     }
 
     public static void MonsterMoveLineOfSight(BoxCollider2D playerBoxCollider2D, BoxCollider2D[] boxBoxCollider2Ds, BoxCollider2D[] obstacleBoxCollider2Ds, Monster monster, float SpeedX, float SpeedY)
