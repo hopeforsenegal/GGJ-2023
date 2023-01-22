@@ -27,7 +27,7 @@ public static class Util
         return timeRemaining > 0 && HasHitTime(ref timeRemaining, deltaTime);
     }
 
-    public static bool HasHitTime(ref float timeRemaining, float deltaTime)
+    private static bool HasHitTime(ref float timeRemaining, float deltaTime)
     {
         timeRemaining -= deltaTime;
         return timeRemaining <= 0;

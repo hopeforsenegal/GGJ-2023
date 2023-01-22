@@ -19,7 +19,7 @@ public class Monster : MonoBehaviour
         boxCollider = GetComponent<BoxCollider2D>();
     }
 
-    public static BoxCollider2D[] AsBoxColliderArray(Monster[] array)
+    public static BoxCollider2D[] AsBoxColliderArray(IEnumerable<Monster> array)
     {
         var colliders = new List<BoxCollider2D>();
         foreach (var square in array) {

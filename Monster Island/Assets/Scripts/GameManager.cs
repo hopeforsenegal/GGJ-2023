@@ -24,25 +24,25 @@ public class GameManager : MonoBehaviour
     public SundialData sundialData;
 
     // private
-    float timeElapsed;
-    bool m_IsGameOver;
-    bool m_IsWon;
-    Vector3 endMarkerPos;
-    Vector3 startMarkerPos;
-    float m_TimerDelayShowGameOver;
-    System.Action m_GameOverAction;
-    float m_TimerDelayShowWin;
-    System.Action m_WinAction;
-    readonly Dictionary<CameraTransitionSquare, CameraState> cameraState = new Dictionary<CameraTransitionSquare, CameraState>();
-    int points = 0;
-    int POINTS_TO_WIN = 1;
+    private float timeElapsed;
+    private bool m_IsGameOver;
+    private bool m_IsWon;
+    private Vector3 endMarkerPos;
+    private Vector3 startMarkerPos;
+    private float m_TimerDelayShowGameOver;
+    private System.Action m_GameOverAction;
+    private float m_TimerDelayShowWin;
+    private System.Action m_WinAction;
+    private readonly Dictionary<CameraTransitionSquare, CameraState> cameraState = new Dictionary<CameraTransitionSquare, CameraState>();
+    private int points = 0;
+    private int POINTS_TO_WIN = 2;
 
     //HOURS 0-8
     //Start at 1 since we get a free move at start
-    //Blobs wakup at 4 go to sleep at 8
-    int time = 1;
+    //Blobs wakeup at 4 go to sleep at 8
+    private int time = 1;
 
-    void Start()
+    private void Start()
     {
         mainCamera = Camera.main;
         gameOverScreen = FindObjectOfType<GameOverScreen>();
@@ -55,6 +55,8 @@ public class GameManager : MonoBehaviour
         resources = GameObject.Find("Resources").GetComponentsInChildren<BoxCollider2D>();
         objective = GameObject.Find("Objective").GetComponent<BoxCollider2D>();
         cameraEndLocationTransforms = GetCameraTransitionSquares();
+
+        Debug.Assert(POINTS_TO_WIN == resources.Length);
 
         winScreen.ExitApplicationEvent += MainMenu.ExitApplication;
         winScreen.ReturnToMenuEvent += MainMenu.LoadMainMenu;
@@ -80,7 +82,7 @@ public class GameManager : MonoBehaviour
         sundial.sprite = sundialData.sprites[time - 1];
     }
 
-    void Update()
+    private void Update()
     {
         // Inputs
         var actions = GetUserActions();
@@ -625,7 +627,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public static void MonsterMoveLineOfSight(BoxCollider2D playerBoxCollider2D, BoxCollider2D[] boxBoxCollider2Ds, BoxCollider2D[] obstacleBoxCollider2Ds, Monster monster, float SpeedX, float SpeedY)
+    public static void MonsterMoveLineOfSight(BoxCollider2D playerBoxCollider2D, BoxCollider2D[] boxBoxCollider2Ds, BoxCollider2D[] obstacleBoxCollider2Ds, Monster monster, float speedX, float speedY)
     {
         var lineOfSightDirection = monster.data.lineOfSightDirection;
         var vel = Vector3.zero;
@@ -639,20 +641,20 @@ public class GameManager : MonoBehaviour
             if (Mathf.Abs(playerX - monsterX) <= 0.2) {
                 if (monsterY > playerY) {
                     //go down
-                    vel = Vector3.down * SpeedY;
+                    vel = Vector3.down * speedY;
                 } else {
                     //go up
-                    vel = Vector3.up * SpeedY;
+                    vel = Vector3.up * speedY;
                 }
             }
         } else if (lineOfSightDirection == MonsterData.Direction.Horizontal) {
             if (Mathf.Abs(playerY - monsterY) <= 0.2) {
                 if (monsterX > playerX) {
                     //go left
-                    vel = Vector3.left * SpeedX;
+                    vel = Vector3.left * speedX;
                 } else {
                     //go right
-                    vel = Vector3.right * SpeedX;
+                    vel = Vector3.right * speedX;
                 }
             }
         }
