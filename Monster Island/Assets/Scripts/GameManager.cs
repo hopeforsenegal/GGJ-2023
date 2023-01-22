@@ -20,6 +20,7 @@ public class GameManager : MonoBehaviour
     public Camera mainCamera;
     public CameraTransitionSquare[] cameraEndLocationTransforms;
     public GameOverScreen gameOverScreen;
+    public Image[] pointsImages;
     public WinScreen winScreen;
     public Image sundial;
     public SettingsData settingsData;
@@ -57,12 +58,18 @@ public class GameManager : MonoBehaviour
         resources = GameObject.Find("Resources").GetComponentsInChildren<BoxCollider2D>();
         objective = GameObject.Find("Objective").GetComponent<BoxCollider2D>();
         roomCenters = GameObject.Find("RoomClampers").GetComponentsInChildren<Transform>().Where(x => x.name != "RoomClampers").ToArray();
+        pointsImages = GameObject.Find("PointsHolder").GetComponentsInChildren<Image>();
         cameraEndLocationTransforms = GetCameraTransitionSquares();
 
         winScreen.ExitApplicationEvent += MainMenu.ExitApplication;
         winScreen.ReturnToMenuEvent += MainMenu.LoadMainMenu;
         gameOverScreen.RetryEvent += MainMenu.ReloadScene;
         gameOverScreen.ReturnToMenuEvent += MainMenu.LoadMainMenu;
+
+        //set all points images to be invisible
+        foreach (var point in pointsImages) {
+            point.enabled = false;
+        }
 
         foreach (var cT in cameraEndLocationTransforms) {
             cameraState.Add(cT, new CameraState());
@@ -404,6 +411,8 @@ public class GameManager : MonoBehaviour
         box.enabled = false;
         resources = resources.Where(e => e != box).ToArray();
         points += 1;
+        //make point image in pointsImages array visible
+        pointsImages[points - 1].enabled = true;
     }
 
     public static int IncrementTime(int time)
