@@ -110,22 +110,22 @@ public class GameManager : MonoBehaviour
                     var pushable = GetPushedBox(player.boxCollider, velocity, boxes);
                     var pushableResource = GetPushedResource(player.boxCollider, velocity, resources);
                     if (pushable != null) {
-                        //Debug.Log("IsPushing");
                         if (CanPushBox(pushable, velocity, obstacles, boxes, resources, Monster.AsBoxColliderArray(monsters), new BoxCollider2D[] { objective })) {
                             player.transform.localPosition += velocity;
                             pushable.transform.localPosition += velocity;
+                            movement = true;
                         }
-
                     } else if (pushableResource != null) {
                         AddToInventory(pushableResource);
                         hasAddedToInventory = true;
                         player.transform.localPosition += velocity;
+                        movement = true;
 
                     } else {
                         player.transform.localPosition += velocity;
+                        movement = true;
                     }
                     player.transform.localScale = PlayerScale.Left;
-                    movement = true;
                 }
                 var (hasCollided, locationInfo) =
                     WillCollideCameraLocation(player.boxCollider, velocity, cameraEndLocationTransforms);
@@ -144,16 +144,17 @@ public class GameManager : MonoBehaviour
                         if (CanPushBox(pushable, velocity, obstacles, boxes, resources, Monster.AsBoxColliderArray(monsters), new BoxCollider2D[] { objective })) {
                             player.transform.localPosition += velocity;
                             pushable.transform.localPosition += velocity;
+                            movement = true;
                         }
-
                     } else if (pushableResource != null) {
                         AddToInventory(pushableResource);
                         hasAddedToInventory = true;
                         player.transform.localPosition += velocity;
+                        movement = true;
                     } else {
                         player.transform.localPosition += velocity;
+                        movement = true;
                     }
-                    movement = true;
                 }
                 var (hasCollided, locationInfo) =
                     WillCollideCameraLocation(player.boxCollider, velocity, cameraEndLocationTransforms);
@@ -172,16 +173,17 @@ public class GameManager : MonoBehaviour
                         if (CanPushBox(pushable, velocity, obstacles, boxes, resources, Monster.AsBoxColliderArray(monsters), new BoxCollider2D[] { objective })) {
                             player.transform.localPosition += velocity;
                             pushable.transform.localPosition += velocity;
+                            movement = true;
                         }
-
                     } else if (pushableResource != null) {
                         AddToInventory(pushableResource);
                         hasAddedToInventory = true;
                         player.transform.localPosition += velocity;
+                        movement = true;
                     } else {
                         player.transform.localPosition += velocity;
+                        movement = true;
                     }
-                    movement = true;
                 }
                 var (hasCollided, locationInfo) =
                     WillCollideCameraLocation(player.boxCollider, velocity, cameraEndLocationTransforms);
@@ -200,16 +202,18 @@ public class GameManager : MonoBehaviour
                         if (CanPushBox(pushable, velocity, obstacles, boxes, resources, Monster.AsBoxColliderArray(monsters), new BoxCollider2D[] { objective })) {
                             player.transform.localPosition += velocity;
                             pushable.transform.localPosition += velocity;
+                            movement = true;
                         }
                     } else if (pushableResource != null) {
                         AddToInventory(pushableResource);
                         hasAddedToInventory = true;
                         player.transform.localPosition += velocity;
+                        movement = true;
                     } else {
                         player.transform.localPosition += velocity;
+                        movement = true;
                     }
                     player.transform.localScale = PlayerScale.Right;
-                    movement = true;
                 }
                 var (hasCollided, locationInfo) =
                     WillCollideCameraLocation(player.boxCollider, velocity, cameraEndLocationTransforms);
