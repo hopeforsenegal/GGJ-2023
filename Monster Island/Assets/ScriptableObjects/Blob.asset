@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   killRadius: 1
   stepsToUpdate: 1
-  sleepHour: 22
-  wakeHour: 9
+  sleepHour: 0
+  wakeHour: 4
   isRandom: 1
   isSleep: 1

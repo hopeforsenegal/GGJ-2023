@@ -4,7 +4,10 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    const int NumMovesInTimePeriod = 4;
+    private static class AnimNames
+    {
+        public static readonly string idle = $"{nameof(idle)}";
+    }
 
     // inspector
     public Player player;
@@ -19,8 +22,6 @@ public class GameManager : MonoBehaviour
     public GameOverScreen gameOverScreen;
 
     // private
-    bool isDayOrNight;
-    int movementCount;
     private const float LerpDuration = 0.5f;
     float timeElapsed;
     private Vector3 endMarkerPos;
@@ -30,10 +31,11 @@ public class GameManager : MonoBehaviour
     readonly Dictionary<CameraTransitionSquare, CameraState> cameraState = new Dictionary<CameraTransitionSquare, CameraState>();
     int points = 0;
 
-    //HOURS 0- 24
-    //Start at 6 am
-    //Blobs wakup at 9am go to sleep at 10pm
-    int time = 6;
+    //HOURS 0-8
+    //Start at 1 since we get a free move at start
+    //Blobs wakup at 4 go to sleep at 8
+    int time = 1;
+    public const int TimeInDay = 8;
 
     void Start()
     {
@@ -57,6 +59,14 @@ public class GameManager : MonoBehaviour
         }
 
         gameOverScreen.Visibility = false;
+
+        Util.LoopAnimation(player.spineAnimation, AnimNames.idle);
+
+        if (IsNightTime(time)) {
+            night.sprite.color = Color.black;
+        } else {
+            night.sprite.color = Color.white;
+        }
     }
 
     void Update()
@@ -65,8 +75,7 @@ public class GameManager : MonoBehaviour
         var actions = GetUserActions();
         {
             // Player updates
-            if (actions.left)
-            {
+            if (actions.left) {
                 //Debug.Log("left");
                 var velocity = Vector3.left * player.playerSpeed;
                 if (!WillCollide(player.boxCollider, velocity, obstacles)) {
@@ -96,8 +105,7 @@ public class GameManager : MonoBehaviour
                     (startMarkerPos, endMarkerPos) = UpdateAnimationToExecute(locationInfo, mainCamera.transform, cameraState);
                 }
             }
-            if (actions.up)
-            {
+            if (actions.up) {
                 //Debug.Log("up");
                 var velocity = Vector3.up * player.playerSpeed;
                 if (!WillCollide(player.boxCollider, velocity, obstacles)) {
@@ -127,8 +135,7 @@ public class GameManager : MonoBehaviour
                     (startMarkerPos, endMarkerPos) = UpdateAnimationToExecute(locationInfo, mainCamera.transform, cameraState);
                 }
             }
-            if (actions.down)
-            {
+            if (actions.down) {
                 //Debug.Log("down");
                 var velocity = Vector3.down * player.playerSpeed;
                 if (!WillCollide(player.boxCollider, velocity, obstacles)) {
@@ -197,38 +204,49 @@ public class GameManager : MonoBehaviour
                     int wakeHour = monster.data.wakeHour;
                     int sleepHour = monster.data.sleepHour;
                     int stepsToUpdate = monster.data.stepsToUpdate;
-                    
+
                     //check if monster is asleep
-                    if(time == wakeHour && wakeHour != -1)
+                    if (time == wakeHour && wakeHour != -1)
                         monster.data.isSleep = false;
-                    if(time == sleepHour && sleepHour != -1)
+                    if (time == sleepHour && sleepHour != -1)
                         monster.data.isSleep = true;
-                    if(monster.data.isSleep == true){
+                    if (monster.data.isSleep == true) {
                         Debug.Log("Monster is sleep");
                         continue;
                     }
 
                     //check if can step
                     Debug.Log($"if can step ${time % stepsToUpdate != 0}");
-                    if(time % stepsToUpdate != 0)
-                        continue;     
+                    if (time % stepsToUpdate != 0)
+                        continue;
 
                     //handle moves
-                    if(isRandom)
+                    if (isRandom)
                         MonsterMoveRandom(player.boxCollider, boxes, obstacles, monsters[i].boxCollider);
 
 
                     //Handle attack
                     if (IsWithinRange(monsters[i].boxCollider.transform.localPosition, player.transform.localPosition, killRadius)) {
-                        Die();
+                        Debug.Log("Monster can kill");
+                        m_TimerDelayShowDeath = 0.1f;
+                        m_DeathAction = () =>
+                        {
+                            gameOverScreen.Visibility = true;
+                        };
+                        return;
                     }
                 }
-                // night day updates
-                OnDayNightCycle(ref isDayOrNight, ref movementCount, night.sprite);
 
-                //increment time
-                time += 1;
-                if(time >= 24) time = 0;
+                // night day updates
+                if (IsNightTime(time)) {
+                    night.sprite.color = Color.black;
+                } else {
+                    night.sprite.color = Color.white;
+                }
+
+                // increment time
+                time = IncrementTime(time);
+
                 Debug.Log($"Current time ${time}");
                 CheckPoints(resources, objective, ref points);
             }
@@ -254,6 +272,13 @@ public class GameManager : MonoBehaviour
             }
         }
         Debug.Log($"Current points ${points}");
+    }
+
+    public static int IncrementTime(int time)
+    {
+        time += 1;
+        if (time >= TimeInDay) time = 0;
+        return time;
     }
 
     private static Actions GetUserActions()
@@ -385,7 +410,9 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public static (Vector3 startMarkerPos, Vector3 endMarkerPos) UpdateAnimationToExecute(CameraTransitionSquare cameraTransitionSquare, Transform cameraTransform, Dictionary<CameraTransitionSquare, CameraState> cameraLocations)
+    public static (Vector3 startMarkerPos, Vector3 endMarkerPos) UpdateAnimationToExecute(CameraTransitionSquare cameraTransitionSquare,
+                                                                                          Transform cameraTransform,
+                                                                                          Dictionary<CameraTransitionSquare, CameraState> cameraLocations)
     {
         foreach (var kv in cameraLocations) {
             kv.Value.IsAnimating = false;
@@ -393,7 +420,6 @@ public class GameManager : MonoBehaviour
         cameraLocations[cameraTransitionSquare].IsAnimating = true;
         var startMarkerPos = cameraTransform.position;
         var endMarkerPos = cameraTransitionSquare.roomCenter.transform.position;
-        //Debug.Log($"Room center togo ${endMarkerPos}");
         endMarkerPos.z = -10;   // Camera always needs to be at -10
         return (startMarkerPos, endMarkerPos);
     }
@@ -471,6 +497,10 @@ public class GameManager : MonoBehaviour
         return false;
     }
 
+    public static bool IsNightTime(int time)
+    {
+        return time >= (TimeInDay / 2);
+    }
 
 
 

@@ -1,4 +1,6 @@
 
+using Spine.Unity;
+
 public static class Util
 {
     // Simply switches on every call
@@ -32,5 +34,13 @@ public static class Util
     {
         timeRemaining -= deltaTime;
         return timeRemaining <= 0;
+    }
+
+    public static void LoopAnimation(SkeletonAnimation spineAnimation, string clipName)
+    {
+        spineAnimation.Skeleton.SetSlotsToSetupPose(); // 2. Make sure it refreshes.
+        spineAnimation.AnimationState.Apply(spineAnimation.Skeleton); // 3. Make sure the attachments from your currently playing animation are applied.
+        var entry = spineAnimation.AnimationState.SetAnimation(0, clipName, true);
+        entry.TimeScale = 1;
     }
 }
