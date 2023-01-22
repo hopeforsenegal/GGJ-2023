@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -10,6 +11,7 @@ public class GameManager : MonoBehaviour
     public Player player;
     public BoxCollider2D[] obstacles;
     public BoxCollider2D[] boxes;
+    public BoxCollider2D[] monsters;
     public DayNight night;
     public Camera mainCamera;
     public CameraTransitionSquare[] cameraEndLocationTransforms;
@@ -30,6 +32,7 @@ public class GameManager : MonoBehaviour
         night = FindObjectOfType<DayNight>();
         obstacles = GameObject.Find("Obstacles").GetComponentsInChildren<BoxCollider2D>();
         boxes = GameObject.Find("Boxes").GetComponentsInChildren<BoxCollider2D>();
+        monsters = GameObject.Find("Monsters").GetComponentsInChildren<BoxCollider2D>();
         cameraEndLocationTransforms = GetCameraTransitionSquares();
 
         foreach (var cT in cameraEndLocationTransforms) {
@@ -49,14 +52,13 @@ public class GameManager : MonoBehaviour
                 var velocity = Vector3.left * player.playerSpeed;
                 if (!WillCollide(player.boxCollider, velocity, obstacles)) {
                     var pushable = GetPushedBox(player.boxCollider, velocity, boxes);
-                    if(pushable != null){
+                    if (pushable != null) {
                         Debug.Log("IsPushing");
-                        if(CanPushBox(pushable, velocity, obstacles, boxes)){
+                        if (CanPushBox(pushable, velocity, obstacles, boxes)) {
                             player.transform.localPosition += velocity;
                             pushable.transform.localPosition += velocity;
                         }
-                    } 
-                    else {
+                    } else {
                         player.transform.localPosition += velocity;
                     }
                 }
@@ -72,14 +74,13 @@ public class GameManager : MonoBehaviour
                 var velocity = Vector3.up * player.playerSpeed;
                 if (!WillCollide(player.boxCollider, velocity, obstacles)) {
                     var pushable = GetPushedBox(player.boxCollider, velocity, boxes);
-                    if(pushable != null){
+                    if (pushable != null) {
                         Debug.Log("IsPushing");
-                        if(CanPushBox(pushable, velocity, obstacles, boxes)){
+                        if (CanPushBox(pushable, velocity, obstacles, boxes)) {
                             player.transform.localPosition += velocity;
                             pushable.transform.localPosition += velocity;
                         }
-                    } 
-                    else {
+                    } else {
                         player.transform.localPosition += velocity;
                     }
                 }
@@ -95,14 +96,13 @@ public class GameManager : MonoBehaviour
                 var velocity = Vector3.down * player.playerSpeed;
                 if (!WillCollide(player.boxCollider, velocity, obstacles)) {
                     var pushable = GetPushedBox(player.boxCollider, velocity, boxes);
-                    if(pushable != null){
+                    if (pushable != null) {
                         Debug.Log("IsPushing");
-                        if(CanPushBox(pushable, velocity, obstacles, boxes)){
+                        if (CanPushBox(pushable, velocity, obstacles, boxes)) {
                             player.transform.localPosition += velocity;
                             pushable.transform.localPosition += velocity;
                         }
-                    } 
-                    else {
+                    } else {
                         player.transform.localPosition += velocity;
                     }
                 }
@@ -118,14 +118,13 @@ public class GameManager : MonoBehaviour
                 var velocity = Vector3.right * player.playerSpeed;
                 if (!WillCollide(player.boxCollider, velocity, obstacles)) {
                     var pushable = GetPushedBox(player.boxCollider, velocity, boxes);
-                    if(pushable != null){
+                    if (pushable != null) {
                         Debug.Log("IsPushing");
-                        if(CanPushBox(pushable, velocity, obstacles, boxes)){
+                        if (CanPushBox(pushable, velocity, obstacles, boxes)) {
                             player.transform.localPosition += velocity;
                             pushable.transform.localPosition += velocity;
                         }
-                    } 
-                    else {
+                    } else {
                         player.transform.localPosition += velocity;
                     }
                 }
@@ -135,8 +134,15 @@ public class GameManager : MonoBehaviour
                     (startMarkerPos, endMarkerPos) = UpdateAnimationToExecute(locationInfo, mainCamera.transform, cameraState);
                 }
             }
-            // night day updates
             if (actions.movement) {
+                // monster updates
+                for (var i = 0; i <= monsters.Length - 1; i += 1) {
+                    MonsterMoveRandom(player.boxCollider, boxes, obstacles, monsters, i);
+                    if (IsWithinRange(monsters[i].transform.localPosition, player.transform.localPosition, 1)) {
+                        Die();
+                    }
+                }
+                // night day updates
                 OnDayNightCycle(ref isDayOrNight, ref movementCount, night.sprite);
             }
             // Camera updates
@@ -208,35 +214,26 @@ public class GameManager : MonoBehaviour
     {
         var increment = Util.IncrementLoop(ref movementCount, NumMovesInTimePeriod);
         Debug.Log(increment);
-        if (increment == NumMovesInTimePeriod)
-        {
-            if (Util.Switch(ref isDayOrNight))
-            {
+        if (increment == NumMovesInTimePeriod) {
+            if (Util.Switch(ref isDayOrNight)) {
                 night.color = Color.black;
-            }
-            else
-            {
+            } else {
                 night.color = Color.white;
             }
         }
     }
 
-    public static void InterpolateActiveCamera(Transform cameraTransform, Dictionary<CameraTransitionSquare, CameraState> cameraLocations, 
+    public static void InterpolateActiveCamera(Transform cameraTransform, Dictionary<CameraTransitionSquare, CameraState> cameraLocations,
         ref float timeElapsed,
         float lerpDuration,
         Vector3 startMarkerPos, Vector3 endMarkerPos)
     {
-        foreach (var kv in cameraLocations)
-        {
-            if (kv.Value.IsAnimating)
-            {
-                if (timeElapsed < lerpDuration)
-                {
+        foreach (var kv in cameraLocations) {
+            if (kv.Value.IsAnimating) {
+                if (timeElapsed < lerpDuration) {
                     cameraTransform.transform.position = Vector3.Lerp(startMarkerPos, endMarkerPos, timeElapsed / lerpDuration);
                     timeElapsed += Time.deltaTime;
-                }
-                else
-                {
+                } else {
                     cameraTransform.transform.position = endMarkerPos;
                     timeElapsed = 0f;
                     kv.Value.IsAnimating = false;
@@ -256,6 +253,63 @@ public class GameManager : MonoBehaviour
         Debug.Log($"Room center togo ${endMarkerPos}");
         endMarkerPos.z = -10;   // Camera always needs to be at -10
         return (startMarkerPos, endMarkerPos);
+    }
+
+    public static void Die()
+    {
+        Debug.Log("Monster can kill");
+        Application.Quit();
+        EditorApplication.isPlaying = false;
+    }
+
+    private static bool WillObjectCollide(BoxCollider2D box, Vector3 velocity, BoxCollider2D[] obstacleBoxCollider2Ds, BoxCollider2D[] boxBoxCollider2Ds, BoxCollider2D playerBoxCollider2D)
+    {
+        for (var i = 0; i <= obstacleBoxCollider2Ds.Length - 1; i += 1) {
+            var obstacle = obstacleBoxCollider2Ds[i];
+            if (box.OverlapPoint(obstacle.transform.position - velocity) && obstacle != box)
+                return true;
+        }
+        for (var i = 0; i <= boxBoxCollider2Ds.Length - 1; i += 1) {
+            var b = boxBoxCollider2Ds[i];
+            if (box.OverlapPoint(b.transform.position - velocity) && b != box)
+                return true;
+        }
+
+        if (box.OverlapPoint(playerBoxCollider2D.transform.position - velocity))
+            return true;
+
+        return false;
+    }
+
+    public static void MonsterMoveRandom(BoxCollider2D playerBoxCollider2D, BoxCollider2D[] boxBoxCollider2Ds, BoxCollider2D[] obstacleBoxCollider2Ds, BoxCollider2D[] boxCollider2Ds, int index)
+    {
+        Vector3[] dirs = {
+            Vector3.up,
+            Vector3.right,
+            Vector3.left,
+            Vector3.down
+        };
+        var inc = 0;
+        var checking = true;
+        while (checking && inc < 5) {
+            Debug.Log("Checking moves");
+            var vel = dirs[Random.Range(1, 4)];
+            if (!WillObjectCollide(boxCollider2Ds[index], vel, obstacleBoxCollider2Ds, boxBoxCollider2Ds, playerBoxCollider2D)) {
+                boxCollider2Ds[index].transform.localPosition += vel;
+                Debug.Log("moving monster");
+                checking = false;
+            }
+            inc++;
+        }
+
+    }
+
+    public static bool IsWithinRange(Vector3 center, Vector3 point, float radius)
+    {
+        var diff = center - point;
+        if (Mathf.Abs(diff.x) <= radius && Mathf.Abs(diff.y) <= radius)
+            return true;
+        return false;
     }
 
 
