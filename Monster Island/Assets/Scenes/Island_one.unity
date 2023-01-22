@@ -8227,7 +8227,7 @@ MonoBehaviour:
   gameOverScreen: {fileID: 0}
   winScreen: {fileID: 0}
   sundial: {fileID: 786035757}
-  sundialData: {fileID: 11400000, guid: 8b93bd387016a492e8c553462b24d64e, type: 2}
+  settingsData: {fileID: 11400000, guid: 8b93bd387016a492e8c553462b24d64e, type: 2}
 --- !u!4 &1326672667
 Transform:
   m_ObjectHideFlags: 0
