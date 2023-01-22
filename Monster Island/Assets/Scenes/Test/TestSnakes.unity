@@ -3675,7 +3675,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 365f3927ebdce8b49b172d1fbbf23f2c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  data: {fileID: 11400000, guid: 169c3e82bfd315a429fba00435c62d39, type: 2}
+  data: {fileID: 11400000, guid: 25d3f247a7eeb8249ab74845e849b2a5, type: 2}
   boxCollider: {fileID: 0}
   spineAnimation: {fileID: 1401929429}
   spriteRenderer: {fileID: 139849440}
