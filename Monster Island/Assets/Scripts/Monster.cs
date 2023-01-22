@@ -1,3 +1,4 @@
+using MoonlitSystem.Animators;
 using UnityEngine;
 
 [RequireComponent(typeof(BoxCollider2D))]
@@ -7,6 +8,7 @@ public class Monster : MonoBehaviour
     public int lastDirectionMovedIndex;
 
     public BoxCollider2D boxCollider;
+    public StandardAnimator spineAnimation;
     public bool isSleep;
 
     protected void Awake()

@@ -1,0 +1,149 @@
+blob.png
+size:4096,4096
+filter:Linear,Linear
+pma:true
+Layer 10
+bounds:786,415,849,370
+rotate:90
+Layer 11
+bounds:400,379,885,384
+rotate:90
+Layer 12
+bounds:2,373,907,396
+rotate:90
+Layer 13
+bounds:2,1282,937,406
+rotate:90
+Layer 14
+bounds:873,1930,947,431
+Layer 15
+bounds:2950,2779,958,436
+Layer 16
+bounds:2978,3652,971,442
+Layer 17
+bounds:1983,3220,975,439
+Layer 18
+bounds:2,2221,985,432
+rotate:90
+Layer 19
+bounds:988,3660,993,434
+Layer 2
+bounds:2699,331,369,247
+rotate:90
+Layer 20
+bounds:2960,3217,986,433
+Layer 21
+bounds:976,2794,989,431
+Layer 22
+bounds:988,3227,990,431
+Layer 23
+bounds:1983,3661,993,433
+Layer 24
+bounds:1967,2790,981,428
+Layer 25
+bounds:1849,2359,971,429
+Layer 26
+bounds:436,2236,970,435
+rotate:90
+Layer 27
+bounds:2,3208,972,439
+Layer 28
+bounds:2,3649,984,445
+Layer 29
+bounds:873,2363,974,429
+Layer 3
+bounds:3641,2099,428,277
+Layer 30
+bounds:436,1266,968,402
+rotate:90
+Layer 31
+bounds:2,18,962,353
+Layer 32
+bounds:840,1366,956,191
+Layer 33
+bounds:3951,3601,114,89
+Layer 4
+bounds:3106,2046,533,322
+Layer 5
+bounds:2498,2039,606,318
+Layer 6
+bounds:1822,2015,674,342
+Layer 7
+bounds:1616,1562,740,366
+Layer 8
+bounds:840,1559,774,369
+Layer 9
+bounds:966,46,811,367
+blob
+bounds:3951,3884,210,141
+rotate:90
+eyes
+bounds:4029,3780,102,49
+rotate:90
+mouth
+bounds:3948,3513,86,106
+rotate:90
+x1
+bounds:3910,2967,173,248
+x10
+bounds:1158,850,514,429
+rotate:90
+x11
+bounds:2358,1596,516,417
+x12
+bounds:2876,1625,517,412
+x13
+bounds:1158,428,520,420
+x14
+bounds:2474,1184,520,410
+x15
+bounds:2179,550,523,408
+rotate:90
+x16
+bounds:2822,2370,528,407
+x17
+bounds:1779,7,531,409
+x18
+bounds:3352,2378,532,399
+x19
+bounds:2996,1231,535,392
+x2
+bounds:2699,5,246,324
+x20
+bounds:3533,1270,538,387
+x21
+bounds:3395,1659,542,385
+x22
+bounds:2312,2,546,385
+rotate:90
+x23
+bounds:3533,889,548,379
+x24
+bounds:3028,678,551,372
+rotate:90
+x25
+bounds:2948,127,549,365
+rotate:90
+x3
+bounds:3723,77,348,381
+x4
+bounds:3315,23,435,406
+rotate:90
+x5
+bounds:3402,460,470,427
+x6
+bounds:2589,702,480,437
+rotate:90
+x7
+bounds:2026,1075,485,446
+rotate:90
+x8
+bounds:1680,418,497,439
+x9
+bounds:1589,859,505,435
+rotate:90
+z
+bounds:3951,3692,76,190
+zface
+bounds:4029,3703,75,48
+rotate:90

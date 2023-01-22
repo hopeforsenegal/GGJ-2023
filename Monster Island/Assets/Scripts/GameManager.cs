@@ -4,12 +4,35 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    private static class AnimNames
+    private static class PlayerScale
+    {
+        public static readonly Vector3 Left = Vector3.one;
+        public static readonly Vector3 Right = new Vector3(-1, 1, 1);
+    }
+
+    private static class MonsterAnim
+    {
+        public static readonly string awake = $"{nameof(awake)}";
+        public static readonly string explode = $"{nameof(explode)}";
+        public static readonly string sleep = $"{nameof(sleep)}";
+    }
+
+    private static class PlayerAnim
     {
         public static readonly string idle = $"{nameof(idle)}";
+        public static readonly string move = $"{nameof(move)}";
+        public static readonly string hit = $"{nameof(hit)}";
+    }
+
+    private static class SkinsNames
+    {
+        public static readonly string @default = $"{nameof(@default)}";
     }
 
     // inspector
+    public float SpeedX = 2.2f;
+    public float SpeedY = 2;
+
     public Player player;
     public BoxCollider2D[] obstacles;
     public BoxCollider2D[] boxes;
@@ -35,6 +58,7 @@ public class GameManager : MonoBehaviour
     //Start at 1 since we get a free move at start
     //Blobs wakup at 4 go to sleep at 8
     int time = 1;
+    private bool m_IsDead;
     public const int TimeInDay = 8;
 
     void Start()
@@ -50,8 +74,6 @@ public class GameManager : MonoBehaviour
         objective = GameObject.Find("Objective").GetComponent<BoxCollider2D>();
         cameraEndLocationTransforms = GetCameraTransitionSquares();
 
-        //Debug.Log($"resources: {resources.Length}");
-
         gameOverScreen.RetryEvent += MainMenu.ReLoadScene;
         gameOverScreen.QuitEvent += MainMenu.LoadMainMenu;
         foreach (var cT in cameraEndLocationTransforms) {
@@ -60,7 +82,10 @@ public class GameManager : MonoBehaviour
 
         gameOverScreen.Visibility = false;
 
-        Util.LoopAnimation(player.spineAnimation, AnimNames.idle);
+        player.spineAnimation.Loop(SkinsNames.@default, PlayerAnim.idle);
+        foreach (var monster in monsters) {
+            monster.spineAnimation.Loop(SkinsNames.@default, MonsterAnim.awake);
+        }
 
         if (IsNightTime(time)) {
             night.sprite.color = Color.black;
@@ -79,6 +104,14 @@ public class GameManager : MonoBehaviour
     {
         // Inputs
         var actions = GetUserActions();
+
+        {   // Check if we died before processing any more logic
+            if (Util.HasHitTimeOnce(ref m_TimerDelayShowDeath, Time.deltaTime)) {
+                m_DeathAction?.Invoke();
+            }
+            if (m_IsDead)
+                return;
+        }
         {
             // Player updates
             if (actions.left) {
@@ -103,6 +136,7 @@ public class GameManager : MonoBehaviour
                     else {
                         player.transform.localPosition += velocity;
                     }
+                    player.transform.localScale = PlayerScale.Left;
                 }
                 var (hasCollided, locationInfo) =
                     WillCollideCameraLocation(player.boxCollider, velocity, cameraEndLocationTransforms);
@@ -166,8 +200,7 @@ public class GameManager : MonoBehaviour
                     (startMarkerPos, endMarkerPos) = UpdateAnimationToExecute(locationInfo, mainCamera.transform, cameraState);
                 }
             }
-            if (actions.right)
-            {
+            if (actions.right) {
                 //Debug.Log("right");l
                 var velocity = Vector3.right * player.playerSpeedX;
                 if (!WillCollide(player.boxCollider, velocity, obstacles)) {
@@ -187,6 +220,7 @@ public class GameManager : MonoBehaviour
                     else {
                         player.transform.localPosition += velocity;
                     }
+                    player.transform.localScale = PlayerScale.Right;
                 }
                 var (hasCollided, locationInfo) =
                     WillCollideCameraLocation(player.boxCollider, velocity, cameraEndLocationTransforms);
@@ -216,6 +250,9 @@ public class GameManager : MonoBehaviour
                         monster.isSleep = false;
                     if (time == sleepHour && sleepHour != -1)
                         monster.isSleep = true;
+
+                    monster.spineAnimation.Loop(SkinsNames.@default, monster.isSleep ? MonsterAnim.sleep : MonsterAnim.awake);
+
                     if (monster.isSleep == true) {
                         //Debug.Log("Monster is sleep");
                         continue;   // break out if sleeping
@@ -224,11 +261,17 @@ public class GameManager : MonoBehaviour
                     //Handle attack
                     if (IsWithinRange(monsters[i].boxCollider.transform.position, player.transform.position, killRadius)) {
                         Debug.Log("Monster can kill");
-                        m_TimerDelayShowDeath = 0.1f;
-                        m_DeathAction = () =>
+
+                        m_IsDead = true;
+                        monsters[i].spineAnimation.Play(SkinsNames.@default, MonsterAnim.explode, string.Empty, () =>
                         {
-                            gameOverScreen.Visibility = true;
-                        };
+                            m_TimerDelayShowDeath = 0.1f;
+                            m_DeathAction = () =>
+                            {
+                                gameOverScreen.Visibility = true;
+                            };
+                        });
+                        player.spineAnimation.Play(SkinsNames.@default, PlayerAnim.hit);
                         return;
                     }
 
@@ -247,7 +290,7 @@ public class GameManager : MonoBehaviour
                     if (isVertical)
                         MonsterMoveVertical(player.boxCollider, boxes, obstacles, monsters[i]);
                     if(isLineOfSight)
-                        MonsterMoveLineOfSight(player.boxCollider, boxes, obstacles, monsters[i]);
+                        MonsterMoveLineOfSight(player.boxCollider, boxes, obstacles, monsters[i], SpeedX, SpeedY);
 
 
                     //Handle attack
@@ -272,20 +315,21 @@ public class GameManager : MonoBehaviour
                 // increment time
                 time = IncrementTime(time);
 
+
+                player.spineAnimation.Play(SkinsNames.@default, PlayerAnim.move, PlayerAnim.idle);
+
                 Debug.Log($"Current time ${time}");
                 CheckPoints(resources, objective, ref points);
-            }
-            if (Util.HasHitTimeOnce(ref m_TimerDelayShowDeath, Time.deltaTime)) {
-                m_DeathAction?.Invoke();
             }
             // Camera updates
             InterpolateActiveCamera(mainCamera.transform, cameraState, ref timeElapsed, LerpDuration, startMarkerPos, endMarkerPos);
         }
     }
 
-    public static void CheckPoints(BoxCollider2D[] resources, BoxCollider2D objective, ref int points){
-        for(var i = 0;  i <= resources.Length - 1; i++){
-            if(IsOverlapping(resources[i], objective) && resources[i].enabled == true){
+    public static void CheckPoints(BoxCollider2D[] resources, BoxCollider2D objective, ref int points)
+    {
+        for (var i = 0; i <= resources.Length - 1; i++) {
+            if (IsOverlapping(resources[i], objective) && resources[i].enabled == true) {
                 //remove resource
                 resources[i].gameObject.SetActive(false);
                 //and its collider
@@ -377,7 +421,7 @@ public class GameManager : MonoBehaviour
         return true;
     }
 
-    public static bool CanPushResource(BoxCollider2D resource, Vector3 velocity, BoxCollider2D[] obstacles , BoxCollider2D[] boxes, Monster[] monsters, BoxCollider2D[] resources)
+    public static bool CanPushResource(BoxCollider2D resource, Vector3 velocity, BoxCollider2D[] obstacles, BoxCollider2D[] boxes, Monster[] monsters, BoxCollider2D[] resources)
     {
         for (var i = 0; i <= obstacles.Length - 1; i = i + 1) {
             var obstacle = obstacles[i];
@@ -402,19 +446,6 @@ public class GameManager : MonoBehaviour
         }
         return true;
     }
-
-    // public static void OnDayNightCycle(ref bool isDayOrNight, ref int movementCount, SpriteRenderer night)
-    // {
-    //     var increment = Util.IncrementLoop(ref movementCount, NumMovesInTimePeriod);
-    //     //Debug.Log(increment);
-    //     if (increment == NumMovesInTimePeriod) {
-    //         if (Util.Switch(ref isDayOrNight)) {
-    //             night.color = Color.black;
-    //         } else {
-    //             night.color = Color.white;
-    //         }
-    //     }
-    // }
 
     public static void InterpolateActiveCamera(Transform cameraTransform, Dictionary<CameraTransitionSquare, CameraState> cameraLocations,
         ref float timeElapsed,
@@ -459,7 +490,8 @@ public class GameManager : MonoBehaviour
 
     }
 
-    public static void Win(){
+    public static void Win()
+    {
         Application.Quit();
         UnityEditor.EditorApplication.isPlaying = false;
     }
@@ -479,6 +511,22 @@ public class GameManager : MonoBehaviour
 
         if (box.OverlapPoint(playerBoxCollider2D.transform.position - velocity))
             return true;
+
+        return false;
+    }
+
+    private static bool WillMonsterCollide(BoxCollider2D box, Vector3 velocity, BoxCollider2D[] obstacleBoxCollider2Ds, BoxCollider2D[] boxBoxCollider2Ds, BoxCollider2D playerBoxCollider2D)
+    {
+        for (var i = 0; i <= obstacleBoxCollider2Ds.Length - 1; i += 1) {
+            var obstacle = obstacleBoxCollider2Ds[i];
+            if (box.OverlapPoint(obstacle.transform.position - velocity) && obstacle != box)
+                return true;
+        }
+        for (var i = 0; i <= boxBoxCollider2Ds.Length - 1; i += 1) {
+            var b = boxBoxCollider2Ds[i];
+            if (box.OverlapPoint(b.transform.position - velocity) && b != box)
+                return true;
+        }
 
         return false;
     }
@@ -577,7 +625,7 @@ public class GameManager : MonoBehaviour
 
     }
 
-    public static void MonsterMoveLineOfSight(BoxCollider2D playerBoxCollider2D, BoxCollider2D[] boxBoxCollider2Ds, BoxCollider2D[] obstacleBoxCollider2Ds, Monster monster) {
+    public static void MonsterMoveLineOfSight(BoxCollider2D playerBoxCollider2D, BoxCollider2D[] boxBoxCollider2Ds, BoxCollider2D[] obstacleBoxCollider2Ds, Monster monster, float SpeedX, float SpeedY) {
         MonsterData.Direction lineOfSightDirection = monster.data.lineOfSightDirection;
         Vector3 vel = Vector3.zero;
 
@@ -590,10 +638,10 @@ public class GameManager : MonoBehaviour
             if(Mathf.Abs(playerX-monsterX) <= 0.2){
                 if(monsterY > playerY){
                     //go down
-                    vel = Vector3.down;
+                    vel = Vector3.down * SpeedY;
                 }else {
                     //go up
-                    vel = Vector3.up;
+                    vel = Vector3.up * SpeedY;
                 }
             }
         }
@@ -601,15 +649,17 @@ public class GameManager : MonoBehaviour
             if(Mathf.Abs(playerY-monsterY) <= 0.2){
                 if(monsterX > playerX){
                     //go left
-                    vel = Vector3.left;
+                    vel = Vector3.left * SpeedX;
                 }else {
                     //go right
-                    vel = Vector3.right;
+                    vel = Vector3.right * SpeedX;
                 }
             }
         }
 
-        if (!WillObjectCollide(monster.boxCollider, vel, obstacleBoxCollider2Ds, boxBoxCollider2Ds, playerBoxCollider2D)) {
+        Debug.Log($"line of sight vel ${vel}");
+
+        if (!WillMonsterCollide(monster.boxCollider, vel, obstacleBoxCollider2Ds, boxBoxCollider2Ds, playerBoxCollider2D)) {
             monster.transform.localPosition += vel;
         }
 
