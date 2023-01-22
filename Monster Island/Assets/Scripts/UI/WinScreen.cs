@@ -38,7 +38,7 @@ public class WinScreen : MonoBehaviour
         }
         set
         {
-            canvasGroup.alpha = value ? 1f : 0f;
+            Util.Toggle(canvasGroup, value);
         }
     }
 }

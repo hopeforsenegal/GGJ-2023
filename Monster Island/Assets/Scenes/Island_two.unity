@@ -468,7 +468,6 @@ MonoBehaviour:
   spriteRenderer: {fileID: 1885845655}
   lastDirectionMovedIndex: 0
   isSleep: 0
-  hasSeenPlayer: 0
   SpeedX: 2.2
   SpeedY: 2
 --- !u!61 &53044437
@@ -963,7 +962,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 2031434858}
-  m_RootOrder: 1
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -984,7 +983,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 0
+  m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -1627,7 +1626,7 @@ RectTransform:
   m_Children:
   - {fileID: 772840440}
   m_Father: {fileID: 2031434858}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -4823,7 +4822,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 916244719}
-  m_RootOrder: 1
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -4844,7 +4843,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 0
+  m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -5600,9 +5599,9 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 954292185}
-  - {fileID: 832002061}
   - {fileID: 1338902900}
   - {fileID: 1511936580}
+  - {fileID: 832002061}
   m_Father: {fileID: 881842488}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -8275,7 +8274,7 @@ RectTransform:
   m_Children:
   - {fileID: 1807057973}
   m_Father: {fileID: 916244719}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -8396,7 +8395,7 @@ RectTransform:
   m_Children:
   - {fileID: 2049029703}
   m_Father: {fileID: 2031434858}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -9195,7 +9194,6 @@ MonoBehaviour:
   spriteRenderer: {fileID: 363075515}
   lastDirectionMovedIndex: 0
   isSleep: 0
-  hasSeenPlayer: 0
   SpeedX: 2.2
   SpeedY: 2
 --- !u!1 &1460439064
@@ -9610,7 +9608,7 @@ RectTransform:
   m_Children:
   - {fileID: 1502112225}
   m_Father: {fileID: 916244719}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -11523,9 +11521,9 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1863073086}
-  - {fileID: 108833274}
   - {fileID: 1348889760}
   - {fileID: 229551572}
+  - {fileID: 108833274}
   m_Father: {fileID: 881842488}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

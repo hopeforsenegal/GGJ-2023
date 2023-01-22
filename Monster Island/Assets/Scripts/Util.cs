@@ -1,3 +1,5 @@
+using UnityEngine;
+
 public static class Util
 {
     // Simply switches on every call
@@ -19,6 +21,14 @@ public static class Util
                 val = 0;
             }
         }
+    }
+
+    public static bool Toggle(CanvasGroup canvasGroup, bool enabled)
+    {
+        canvasGroup.alpha = enabled ? 1f : 0f;
+        canvasGroup.interactable = enabled;
+        canvasGroup.blocksRaycasts = enabled;
+        return enabled;
     }
 
     public static bool HasHitTimeOnce(ref float timeRemaining, float deltaTime)

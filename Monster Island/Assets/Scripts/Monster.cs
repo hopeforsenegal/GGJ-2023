@@ -11,6 +11,7 @@ public class Monster : MonoBehaviour
     public SpriteRenderer spriteRenderer;
     public int lastDirectionMovedIndex;
     public bool isSleep;
+    public bool hasSeenPlayer;
     public float SpeedX = 2.2f;
     public float SpeedY = 2;
 
