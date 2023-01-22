@@ -280,7 +280,7 @@ public class GameManager : MonoBehaviour
                     }
 
                     //Handle attack
-                    if (IsWithinRange(monsters[i].boxCollider.transform.position, player.transform.position, killRadius)) {
+                    if (IsWithinRange(monsters[i].boxCollider.transform.position, player.transform.position, killRadius, monsters[i].SpeedX, monsters[i].SpeedY)) {
                         Debug.Log($"{monsters[i].data.name} can kill");
                         m_IsGameOver = true;
                         var clipName = monsters[i].data.attack;
@@ -323,7 +323,7 @@ public class GameManager : MonoBehaviour
                     }
 
                     //Handle attack
-                    if (IsWithinRange(monsters[i].boxCollider.transform.localPosition, player.transform.localPosition, killRadius)) {
+                    if (IsWithinRange(monsters[i].boxCollider.transform.localPosition, player.transform.localPosition, killRadius, monsters[i].SpeedX, monsters[i].SpeedY)) {
                         Debug.Log($"{monsters[i].data.name} can kill");
                         m_IsGameOver = true;
                         var clipName = monsters[i].data.attack;
@@ -703,10 +703,22 @@ public class GameManager : MonoBehaviour
         return LineOfSight.None;
     }
 
-    public static bool IsWithinRange(Vector3 center, Vector3 point, float radius)
+    public static bool IsWithinRange(Vector3 center, Vector3 point, float radius, float SpeedX, float SpeedY)
     {
         var diff = center - point;
-        return Mathf.Abs(diff.x) <= radius && Mathf.Abs(diff.y) <= radius;
+        //check if on the same row by checking if diff.y is almost 0
+        if(Mathf.Abs(diff.y) <= 0.5)
+        {
+            return Mathf.Abs(diff.x) <= (radius * SpeedX / 2);
+        }
+
+        //check if on the same column by checking if diff.x is almost 0
+        if(Mathf.Abs(diff.x) <= 0.5)
+        {
+            return Mathf.Abs(diff.y) <= (radius * SpeedY / 2);
+        }
+
+        return false;
     }
 
     public static bool IsNightTime(int time)
