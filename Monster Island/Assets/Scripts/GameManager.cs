@@ -56,7 +56,7 @@ public class GameManager : MonoBehaviour
         monsters = GameObject.Find("Monsters").GetComponentsInChildren<Monster>();
         resources = GameObject.Find("Resources").GetComponentsInChildren<BoxCollider2D>();
         objective = GameObject.Find("Objective").GetComponent<BoxCollider2D>();
-        roomCenters = GameObject.Find("RoomClampers").GetComponentsInChildren<Transform>();
+        roomCenters = GameObject.Find("RoomClampers").GetComponentsInChildren<Transform>().Where(x => x.name != "RoomClampers").ToArray();
         cameraEndLocationTransforms = GetCameraTransitionSquares();
 
         winScreen.ExitApplicationEvent += MainMenu.ExitApplication;
@@ -226,21 +226,38 @@ public class GameManager : MonoBehaviour
             // Update the world time and everything only if you were able to actually move
             if (movement) {
                 // Clamp player movement as a temporary hack
+                float smallestDistance = 99f;
+                Transform closetPosition = null;
                 foreach (var center in roomCenters) {
-                    var los = DetectLineOfSight(center.position, player.transform.position);
-                    switch (los) {
-                        case LineOfSight.IsAboveHorizontalAligned:
-                            player.transform.position = new Vector3(center.position.x, player.transform.position.y, player.transform.position.z);
-                            break;
-                        case LineOfSight.IsBelowHorizontalAligned:
-                            player.transform.position = new Vector3(center.position.x, player.transform.position.y, player.transform.position.z);
-                            break;
-                        case LineOfSight.IsLeftVerticalAligned:
-                            player.transform.position = new Vector3(player.transform.position.x, center.position.y, player.transform.position.z);
-                            break;
-                        case LineOfSight.IsRightVerticalAligned:
-                            player.transform.position = new Vector3(player.transform.position.x, center.position.y, player.transform.position.z);
-                            break;
+                    var distance = Vector3.Distance(center.position, player.transform.position);
+                    if (distance < smallestDistance) {
+                        smallestDistance = distance;
+                        closetPosition = center;
+                    }
+                }
+
+                foreach (var center in roomCenters) {
+                    if (center == closetPosition) {
+                        var los = DetectLineOfSight(player.transform.position, center.position);
+                        switch (los) {
+                            case LineOfSight.IsAboveHorizontalAligned:
+                            case LineOfSight.IsBelowHorizontalAligned:
+                                player.transform.position = new Vector3(center.position.x, player.transform.position.y, player.transform.position.z);
+                                player.transform.position = new Vector3(center.position.x, player.transform.position.y, player.transform.position.z);
+                                break;
+                            case LineOfSight.IsLeftVerticalAligned:
+                            case LineOfSight.IsRightVerticalAligned:
+                                player.transform.position = new Vector3(player.transform.position.x, center.position.y, player.transform.position.z);
+                                player.transform.position = new Vector3(player.transform.position.x, center.position.y, player.transform.position.z);
+                                break;
+                        }
+                        if (smallestDistance < 1f) {
+                            player.transform.position = center.position;
+                        }
+                        if (los != LineOfSight.None) {
+                            Debug.Log($"Clamped to {center.name} because LOS {los}. New position {player.transform.position} based off of {center.position}");
+                        }
+                        break;
                     }
                 }
 
@@ -681,17 +698,17 @@ public class GameManager : MonoBehaviour
         IsBelowHorizontalAligned,
     }
 
-    static LineOfSight DetectLineOfSight(Vector3 subject, Vector3 other)
+    static LineOfSight DetectLineOfSight(Vector3 subject, Vector3 against)
     {
         // This is making sure you are on the same column
         // Then check above or below
-        if (Mathf.Abs(subject.x - other.x) <= 0.5) {
-            return other.y > subject.y ? LineOfSight.IsBelowHorizontalAligned : LineOfSight.IsAboveHorizontalAligned;
+        if (Mathf.Abs(subject.x - against.x) <= 0.5) {
+            return against.y > subject.y ? LineOfSight.IsBelowHorizontalAligned : LineOfSight.IsAboveHorizontalAligned;
         }
         // This is making sure you are on the same row
         // Then check left or right
-        if (Mathf.Abs(subject.y - other.y) <= 0.5) {
-            return other.x > subject.x ? LineOfSight.IsLeftVerticalAligned : LineOfSight.IsRightVerticalAligned;
+        if (Mathf.Abs(subject.y - against.y) <= 0.5) {
+            return against.x > subject.x ? LineOfSight.IsLeftVerticalAligned : LineOfSight.IsRightVerticalAligned;
         }
         return LineOfSight.None;
     }
