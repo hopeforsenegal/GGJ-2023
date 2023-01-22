@@ -7,6 +7,9 @@ public class GameManager : MonoBehaviour
     private static class AnimNames
     {
         public static readonly string idle = $"{nameof(idle)}";
+        public static readonly string move = $"{nameof(move)}";
+        public static readonly string hit = $"{nameof(hit)}";
+        public static readonly string awake = $"{nameof(awake)}";
     }
 
     // inspector
@@ -50,8 +53,6 @@ public class GameManager : MonoBehaviour
         objective = GameObject.Find("Objective").GetComponent<BoxCollider2D>();
         cameraEndLocationTransforms = GetCameraTransitionSquares();
 
-        //Debug.Log($"resources: {resources.Length}");
-
         gameOverScreen.RetryEvent += MainMenu.ReLoadScene;
         gameOverScreen.QuitEvent += MainMenu.LoadMainMenu;
         foreach (var cT in cameraEndLocationTransforms) {
@@ -61,6 +62,9 @@ public class GameManager : MonoBehaviour
         gameOverScreen.Visibility = false;
 
         Util.LoopAnimation(player.spineAnimation, AnimNames.idle);
+        foreach (var monster in monsters) {
+            Util.LoopAnimation(monster.spineAnimation, AnimNames.awake);
+        }
 
         if (IsNightTime(time)) {
             night.sprite.color = Color.black;
@@ -87,15 +91,13 @@ public class GameManager : MonoBehaviour
                             player.transform.localPosition += velocity;
                             pushable.transform.localPosition += velocity;
                         }
-                        
-                    } 
-                    else if (pushableResource != null) {
+
+                    } else if (pushableResource != null) {
                         if (CanPushResource(pushableResource, velocity, obstacles, boxes, monsters, resources)) {
                             player.transform.localPosition += velocity;
                             pushableResource.transform.localPosition += velocity;
                         }
-                    }
-                    else {
+                    } else {
                         player.transform.localPosition += velocity;
                     }
                 }
@@ -117,15 +119,13 @@ public class GameManager : MonoBehaviour
                             player.transform.localPosition += velocity;
                             pushable.transform.localPosition += velocity;
                         }
-                        
-                    } 
-                    else if(pushableResource != null){
+
+                    } else if (pushableResource != null) {
                         if (CanPushResource(pushableResource, velocity, obstacles, boxes, monsters, resources)) {
                             player.transform.localPosition += velocity;
                             pushableResource.transform.localPosition += velocity;
                         }
-                    }
-                    else {
+                    } else {
                         player.transform.localPosition += velocity;
                     }
                 }
@@ -147,15 +147,13 @@ public class GameManager : MonoBehaviour
                             player.transform.localPosition += velocity;
                             pushable.transform.localPosition += velocity;
                         }
-                        
-                    } 
-                    else if(pushableResource != null){
+
+                    } else if (pushableResource != null) {
                         if (CanPushResource(pushableResource, velocity, obstacles, boxes, monsters, resources)) {
                             player.transform.localPosition += velocity;
                             pushableResource.transform.localPosition += velocity;
                         }
-                    }
-                    else {
+                    } else {
                         player.transform.localPosition += velocity;
                     }
                 }
@@ -165,8 +163,7 @@ public class GameManager : MonoBehaviour
                     (startMarkerPos, endMarkerPos) = UpdateAnimationToExecute(locationInfo, mainCamera.transform, cameraState);
                 }
             }
-            if (actions.right)
-            {
+            if (actions.right) {
                 //Debug.Log("right");l
                 var velocity = Vector3.right * player.playerSpeedX;
                 if (!WillCollide(player.boxCollider, velocity, obstacles)) {
@@ -178,14 +175,12 @@ public class GameManager : MonoBehaviour
                             player.transform.localPosition += velocity;
                             pushable.transform.localPosition += velocity;
                         }
-                    } 
-                    else if(pushableResource != null){
+                    } else if (pushableResource != null) {
                         if (CanPushResource(pushableResource, velocity, obstacles, boxes, monsters, resources)) {
                             player.transform.localPosition += velocity;
                             pushableResource.transform.localPosition += velocity;
                         }
-                    }
-                    else {
+                    } else {
                         player.transform.localPosition += velocity;
                     }
                 }
@@ -218,11 +213,15 @@ public class GameManager : MonoBehaviour
                     //Handle attack
                     if (IsWithinRange(monsters[i].boxCollider.transform.position, player.transform.position, killRadius)) {
                         Debug.Log("Monster can kill");
-                        m_TimerDelayShowDeath = 0.1f;
-                        m_DeathAction = () =>
+
+                        Util.PlayAnimation(player.spineAnimation, AnimNames.hit, () =>
                         {
-                            gameOverScreen.Visibility = true;
-                        };
+                            m_TimerDelayShowDeath = 0.1f;
+                            m_DeathAction = () =>
+                            {
+                                gameOverScreen.Visibility = true;
+                            };
+                        });
                         return;
                     }
 
@@ -246,6 +245,12 @@ public class GameManager : MonoBehaviour
                 // increment time
                 time = IncrementTime(time);
 
+
+                Util.PlayAnimation(player.spineAnimation, AnimNames.move, () =>
+                {
+                    //Util.LoopAnimation(player.spineAnimation, AnimNames.idle);
+                });
+
                 Debug.Log($"Current time ${time}");
                 CheckPoints(resources, objective, ref points);
             }
@@ -257,9 +262,10 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public static void CheckPoints(BoxCollider2D[] resources, BoxCollider2D objective, ref int points){
-        for(var i = 0;  i <= resources.Length - 1; i++){
-            if(IsOverlapping(resources[i], objective) && resources[i].enabled == true){
+    public static void CheckPoints(BoxCollider2D[] resources, BoxCollider2D objective, ref int points)
+    {
+        for (var i = 0; i <= resources.Length - 1; i++) {
+            if (IsOverlapping(resources[i], objective) && resources[i].enabled == true) {
                 //remove resource
                 resources[i].gameObject.SetActive(false);
                 //and its collider
@@ -351,7 +357,7 @@ public class GameManager : MonoBehaviour
         return true;
     }
 
-    public static bool CanPushResource(BoxCollider2D resource, Vector3 velocity, BoxCollider2D[] obstacles , BoxCollider2D[] boxes, Monster[] monsters, BoxCollider2D[] resources)
+    public static bool CanPushResource(BoxCollider2D resource, Vector3 velocity, BoxCollider2D[] obstacles, BoxCollider2D[] boxes, Monster[] monsters, BoxCollider2D[] resources)
     {
         for (var i = 0; i <= obstacles.Length - 1; i = i + 1) {
             var obstacle = obstacles[i];
@@ -376,19 +382,6 @@ public class GameManager : MonoBehaviour
         }
         return true;
     }
-
-    // public static void OnDayNightCycle(ref bool isDayOrNight, ref int movementCount, SpriteRenderer night)
-    // {
-    //     var increment = Util.IncrementLoop(ref movementCount, NumMovesInTimePeriod);
-    //     //Debug.Log(increment);
-    //     if (increment == NumMovesInTimePeriod) {
-    //         if (Util.Switch(ref isDayOrNight)) {
-    //             night.color = Color.black;
-    //         } else {
-    //             night.color = Color.white;
-    //         }
-    //     }
-    // }
 
     public static void InterpolateActiveCamera(Transform cameraTransform, Dictionary<CameraTransitionSquare, CameraState> cameraLocations,
         ref float timeElapsed,
@@ -433,7 +426,8 @@ public class GameManager : MonoBehaviour
 
     }
 
-    public static void Win(){
+    public static void Win()
+    {
         Application.Quit();
         UnityEditor.EditorApplication.isPlaying = false;
     }

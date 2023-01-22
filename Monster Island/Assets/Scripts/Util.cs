@@ -1,4 +1,5 @@
 
+using System;
 using Spine.Unity;
 
 public static class Util
@@ -42,5 +43,19 @@ public static class Util
         spineAnimation.AnimationState.Apply(spineAnimation.Skeleton); // 3. Make sure the attachments from your currently playing animation are applied.
         var entry = spineAnimation.AnimationState.SetAnimation(0, clipName, true);
         entry.TimeScale = 1;
+    }
+
+    public static void PlayAnimation(SkeletonAnimation spineAnimation, string clipName, Action onEnd)
+    {
+        spineAnimation.Skeleton.SetSlotsToSetupPose(); // 2. Make sure it refreshes.
+        spineAnimation.AnimationState.Apply(spineAnimation.Skeleton); // 3. Make sure the attachments from your currently playing animation are applied.
+        var entry = spineAnimation.AnimationState.SetAnimation(0, clipName, false);
+        entry.Complete += _ =>
+        {
+            onEnd?.Invoke();
+        };
+        spineAnimation.AnimationState.TimeScale = 1;
+        spineAnimation.AnimationState.Update(0);
+        spineAnimation.Update(0); // Do we lose interpolation when we want with this?
     }
 }
