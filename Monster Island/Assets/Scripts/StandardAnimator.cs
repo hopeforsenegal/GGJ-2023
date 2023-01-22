@@ -73,6 +73,7 @@ namespace MoonlitSystem.Animators
 
         public void Play(string skin, string introOrDefault, string loop = "", Action EndAnimationEvent = null)
         {
+            Clear();
             //Debug.LogFormat("[StandardAnimator::Play] skin:'{0}' introOrDefault:'{1}' loop:'{2}'", skin, introOrDefault, loop);
             m_LoopAnimation = loop;
 

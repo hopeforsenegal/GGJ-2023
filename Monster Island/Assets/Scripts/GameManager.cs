@@ -22,6 +22,8 @@ public class GameManager : MonoBehaviour
         public static readonly string idle = $"{nameof(idle)}";
         public static readonly string move = $"{nameof(move)}";
         public static readonly string hit = $"{nameof(hit)}";
+        public static readonly string victory = $"{nameof(victory)}";
+        public static readonly string item_collect = $"{nameof(item_collect)}";
     }
 
     private static class SkinsNames
@@ -128,6 +130,7 @@ public class GameManager : MonoBehaviour
         }
         {
             bool movement = false;
+            bool hasAddedToInventory = false;
             // Player updates
             if (actions.left) {
                 //Debug.Log("left");
@@ -144,6 +147,7 @@ public class GameManager : MonoBehaviour
 
                     } else if (pushableResource != null) {
                         AddToInventory(pushableResource);
+                        hasAddedToInventory = true;
                         player.transform.localPosition += velocity;
 
                     } else {
@@ -173,6 +177,7 @@ public class GameManager : MonoBehaviour
 
                     } else if (pushableResource != null) {
                         AddToInventory(pushableResource);
+                        hasAddedToInventory = true;
                         player.transform.localPosition += velocity;
                     } else {
                         player.transform.localPosition += velocity;
@@ -200,6 +205,7 @@ public class GameManager : MonoBehaviour
 
                     } else if (pushableResource != null) {
                         AddToInventory(pushableResource);
+                        hasAddedToInventory = true;
                         player.transform.localPosition += velocity;
                     } else {
                         player.transform.localPosition += velocity;
@@ -226,6 +232,7 @@ public class GameManager : MonoBehaviour
                         }
                     } else if (pushableResource != null) {
                         AddToInventory(pushableResource);
+                        hasAddedToInventory = true;
                         player.transform.localPosition += velocity;
                     } else {
                         player.transform.localPosition += velocity;
@@ -330,19 +337,22 @@ public class GameManager : MonoBehaviour
 
                 // increment time
                 time = IncrementTime(time);
-                player.spineAnimation.Play(SkinsNames.@default, PlayerAnim.move, PlayerAnim.idle);
+                player.spineAnimation.Play(SkinsNames.@default, hasAddedToInventory ? PlayerAnim.item_collect : PlayerAnim.move, PlayerAnim.idle);
 
                 //Debug.Log($"Current time ${time}");
-                
+
                 // Determine if they won
                 if (IsOverlapping(player.boxCollider, objective) && points >= POINTS_TO_WIN) {
                     Debug.Log("Win");
                     m_IsWon = true;
-                    m_TimerDelayShowWin = 0.1f;
-                    m_WinAction = () =>
+                    player.spineAnimation.Play(SkinsNames.@default, PlayerAnim.victory, string.Empty, () =>
                     {
-                        winScreen.Visibility = true;
-                    };
+                        m_TimerDelayShowWin = 0.1f;
+                        m_WinAction = () =>
+                        {
+                            winScreen.Visibility = true;
+                        };
+                    });
                 }
                 //Debug.Log($"Current points ${points}");
             }
