@@ -607,41 +607,39 @@ public class GameManager : MonoBehaviour
 
     public static void MonsterMoveLineOfSight(BoxCollider2D playerBoxCollider2D, BoxCollider2D[] boxBoxCollider2Ds, BoxCollider2D[] obstacleBoxCollider2Ds, Monster monster, float speedX, float speedY)
     {
-        var lineOfSightDirection = monster.data.lineOfSightDirection;
         var vel = Vector3.zero;
-
         var playerX = playerBoxCollider2D.transform.localPosition.x;
         var monsterX = monster.boxCollider.transform.localPosition.x;
         var playerY = playerBoxCollider2D.transform.localPosition.y;
         var monsterY = monster.boxCollider.transform.localPosition.y;
 
-        if (lineOfSightDirection == MonsterData.Direction.Vertical) {
-            if (Mathf.Abs(playerX - monsterX) <= 0.2) {
-                if (monsterY > playerY) {
-                    //go down
-                    vel = Vector3.down * speedY;
-                } else {
-                    //go up
-                    vel = Vector3.up * speedY;
-                }
+        // This is making sure you are on the same column
+        if (Mathf.Abs(playerX - monsterX) <= 0.5) {
+            // Then check above or below
+            if (monsterY > playerY) {
+                //go down
+                vel = Vector3.down * speedY;
+            } else {
+                //go up
+                vel = Vector3.up * speedY;
             }
-        } else if (lineOfSightDirection == MonsterData.Direction.Horizontal) {
-            if (Mathf.Abs(playerY - monsterY) <= 0.2) {
-                if (monsterX > playerX) {
-                    //go left
-                    vel = Vector3.left * speedX;
-                } else {
-                    //go right
-                    vel = Vector3.right * speedX;
-                }
+            // This is making sure you are on the same row
+        } else if (Mathf.Abs(playerY - monsterY) <= 0.5) {
+            // Then check left or right
+            if (monsterX > playerX) {
+                //go left
+                vel = Vector3.left * speedX;
+            } else {
+                //go right
+                vel = Vector3.right * speedX;
             }
         }
 
+        //Debug.Log($"{monster.data.name} playerx {playerX} monsterx{monsterX}");
+        //Debug.Log($"{monster.data.name} playery {playerY} monstery{monsterY}");
         //Debug.Log($"line of sight vel ${vel}");
 
         if (!WillMonsterCollide(monster.boxCollider, vel, obstacleBoxCollider2Ds, boxBoxCollider2Ds, new BoxCollider2D[] { playerBoxCollider2D })) {
-            Debug.Log("Not looking at wall");
-            Debug.Log("But looking at player");
             monster.transform.localPosition += vel;
         }
     }

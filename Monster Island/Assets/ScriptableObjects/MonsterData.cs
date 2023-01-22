@@ -18,12 +18,4 @@ public class MonsterData : ScriptableObject
         LineOfSight = 4,
     }
     public NavigationType navigationType;
-
-
-    public enum Direction
-    {
-        Vertical = 0,
-        Horizontal = 1,
-    }
-    public Direction lineOfSightDirection;
 }
