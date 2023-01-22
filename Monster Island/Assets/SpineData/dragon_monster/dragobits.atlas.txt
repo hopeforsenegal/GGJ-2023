@@ -1,0 +1,78 @@
+dragobits.png
+size:4096,4096
+filter:Linear,Linear
+pma:true
+Layer 1
+bounds:2664,2372,253,167
+rotate:90
+Layer 10
+bounds:1003,3560,984,533
+Layer 11
+bounds:2,2482,958,551
+Layer 12
+bounds:2,1935,953,545
+Layer 13
+bounds:2,1394,950,539
+Layer 14
+bounds:1989,3580,922,513
+Layer 15
+bounds:2,879,920,513
+Layer 16
+bounds:2,362,916,515
+Layer 17
+bounds:2913,3575,854,518
+Layer 18
+bounds:2897,3064,853,509
+Layer 19
+bounds:1981,2627,852,502
+Layer 2
+bounds:954,1658,532,252
+Layer 20
+bounds:2835,2566,850,496
+Layer 21
+bounds:962,2166,849,488
+Layer 22
+bounds:1813,2144,849,481
+Layer 3
+bounds:957,1912,660,252
+Layer 4
+bounds:2,2,797,358
+Layer 5
+bounds:1003,2656,850,379
+Layer 6
+bounds:1989,3131,906,447
+Layer 7
+bounds:1003,3037,976,521
+Layer 8
+bounds:2,3565,999,528
+Layer 9
+bounds:2,3035,999,528
+arm_left
+bounds:4038,4017,76,53
+rotate:90
+arm_r
+bounds:1235,1575,77,81
+body
+bounds:3769,3811,267,282
+eye
+bounds:2835,3081,31,48
+head
+bounds:2833,2425,139,278
+rotate:90
+horn
+bounds:3687,2928,61,134
+jaw
+bounds:801,194,102,166
+leg_left
+bounds:1488,1820,82,90
+leg_r
+bounds:1619,2058,86,106
+sleep
+bounds:954,1399,257,279
+rotate:90
+wing
+bounds:3769,3738,88,71
+wing_left
+bounds:3769,3738,88,71
+z
+bounds:1855,2845,76,190
