@@ -36,6 +36,30 @@ public class TestCameraBasedOnPlayer : MonoBehaviour
                 (startMarkerPos, endMarkerPos) = GameManager.UpdateAnimationToExecute(locationInfo, mainCamera.transform, cameraState);
             }
         }
+        if (Input.GetKeyDown(KeyCode.D)) {
+            player.transform.localPosition += Vector3.right * speed;
+            var (hasCollided, locationInfo) =
+                GameManager.WillCollideCameraLocation(player, Vector3.left * speed, cameraEndLocationTransforms);
+            if (hasCollided) {
+                (startMarkerPos, endMarkerPos) = GameManager.UpdateAnimationToExecute(locationInfo, mainCamera.transform, cameraState);
+            }
+        }
+        if (Input.GetKeyDown(KeyCode.S)) {
+            player.transform.localPosition += Vector3.down * speed;
+            var (hasCollided, locationInfo) =
+                GameManager.WillCollideCameraLocation(player, Vector3.left * speed, cameraEndLocationTransforms);
+            if (hasCollided) {
+                (startMarkerPos, endMarkerPos) = GameManager.UpdateAnimationToExecute(locationInfo, mainCamera.transform, cameraState);
+            }
+        }
+        if (Input.GetKeyDown(KeyCode.W)) {
+            player.transform.localPosition += Vector3.up * speed;
+            var (hasCollided, locationInfo) =
+                GameManager.WillCollideCameraLocation(player, Vector3.left * speed, cameraEndLocationTransforms);
+            if (hasCollided) {
+                (startMarkerPos, endMarkerPos) = GameManager.UpdateAnimationToExecute(locationInfo, mainCamera.transform, cameraState);
+            }
+        }
 
         GameManager.InterpolateActiveCamera(mainCamera.transform, cameraState, ref timeElapsed, LerpDuration, startMarkerPos, endMarkerPos);
     }

@@ -45,6 +45,7 @@ public class GameManager : MonoBehaviour
             // Player updates
             if (actions.left)
             {
+                Debug.Log("left");
                 var velocity = Vector3.left * player.playerSpeed;
                 if (!WillCollide(player.boxCollider, velocity, obstacles)) {
                     var pushable = GetPushedBox(player.boxCollider, velocity, boxes);
@@ -67,6 +68,7 @@ public class GameManager : MonoBehaviour
             }
             if (actions.up)
             {
+                Debug.Log("up");
                 var velocity = Vector3.up * player.playerSpeed;
                 if (!WillCollide(player.boxCollider, velocity, obstacles)) {
                     var pushable = GetPushedBox(player.boxCollider, velocity, boxes);
@@ -89,6 +91,7 @@ public class GameManager : MonoBehaviour
             }
             if (actions.down)
             {
+                Debug.Log("down");
                 var velocity = Vector3.down * player.playerSpeed;
                 if (!WillCollide(player.boxCollider, velocity, obstacles)) {
                     var pushable = GetPushedBox(player.boxCollider, velocity, boxes);
@@ -111,6 +114,7 @@ public class GameManager : MonoBehaviour
             }
             if (actions.right)
             {
+                Debug.Log("right");
                 var velocity = Vector3.right * player.playerSpeed;
                 if (!WillCollide(player.boxCollider, velocity, obstacles)) {
                     var pushable = GetPushedBox(player.boxCollider, velocity, boxes);
@@ -168,7 +172,7 @@ public class GameManager : MonoBehaviour
     {
         for (var i = 0; i <= boxCollider2Ds.Length - 1; i++) {
             var obstacle = boxCollider2Ds[i].boxCollider;
-            if (player.OverlapPoint(obstacle.transform.position - velocity))
+            if (player.OverlapPoint(obstacle.transform.position))
                 return (true, boxCollider2Ds[i]);
         }
         return (false, null);
