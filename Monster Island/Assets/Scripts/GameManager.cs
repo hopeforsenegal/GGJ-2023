@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Spine.Unity;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -27,6 +28,7 @@ public class GameManager : MonoBehaviour
     public SettingsData settingsData;
     public float SpeedX = 2.2f;
     public float SpeedY = 2.2f;
+    public SkeletonGraphic cutscene;
 
     // private
     private float timeElapsed;
@@ -234,6 +236,9 @@ public class GameManager : MonoBehaviour
                 if (hasCollided) {
                     (startMarkerPos, endMarkerPos) = UpdateAnimationToExecute(locationInfo, mainCamera.transform, cameraState);
                 }
+            }
+            if (Input.anyKey) {
+                cutscene.enabled = false;
             }
 
             // Update the world time and everything only if you were able to actually move
@@ -748,7 +753,7 @@ public class GameManager : MonoBehaviour
 
         var diff = center - point;
         //log diff.x and diff.y to see if they are almost 0
-      //  Debug.Log($"IsWithinRange diff.x {diff.x} diff.y {diff.y}");
+        //  Debug.Log($"IsWithinRange diff.x {diff.x} diff.y {diff.y}");
         //if radius is 0 just check if they are on the same spot by checking if diff is almost 0
         if (radius == 0) {
             return Mathf.Abs(diff.x) <= 0.5 && Mathf.Abs(diff.y) <= 0.5;
