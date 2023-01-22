@@ -69,6 +69,12 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    void AddToInventory(BoxCollider2D box){
+        box.gameObject.SetActive(false);
+        box.enabled = false;
+        points += 1;
+    }
+
     void Update()
     {
         // Inputs
@@ -89,11 +95,10 @@ public class GameManager : MonoBehaviour
                         }
                         
                     } 
-                    else if (pushableResource != null) {
-                        if (CanPushResource(pushableResource, velocity, obstacles, boxes, monsters, resources)) {
-                            player.transform.localPosition += velocity;
-                            pushableResource.transform.localPosition += velocity;
-                        }
+                    else  if(pushableResource != null){
+                        AddToInventory(pushableResource);
+                        player.transform.localPosition += velocity;
+                        
                     }
                     else {
                         player.transform.localPosition += velocity;
@@ -120,10 +125,8 @@ public class GameManager : MonoBehaviour
                         
                     } 
                     else if(pushableResource != null){
-                        if (CanPushResource(pushableResource, velocity, obstacles, boxes, monsters, resources)) {
-                            player.transform.localPosition += velocity;
-                            pushableResource.transform.localPosition += velocity;
-                        }
+                        AddToInventory(pushableResource);
+                        player.transform.localPosition += velocity;
                     }
                     else {
                         player.transform.localPosition += velocity;
@@ -149,11 +152,9 @@ public class GameManager : MonoBehaviour
                         }
                         
                     } 
-                    else if(pushableResource != null){
-                        if (CanPushResource(pushableResource, velocity, obstacles, boxes, monsters, resources)) {
-                            player.transform.localPosition += velocity;
-                            pushableResource.transform.localPosition += velocity;
-                        }
+                    else  if(pushableResource != null){
+                        AddToInventory(pushableResource);
+                        player.transform.localPosition += velocity;
                     }
                     else {
                         player.transform.localPosition += velocity;
@@ -180,10 +181,8 @@ public class GameManager : MonoBehaviour
                         }
                     } 
                     else if(pushableResource != null){
-                        if (CanPushResource(pushableResource, velocity, obstacles, boxes, monsters, resources)) {
-                            player.transform.localPosition += velocity;
-                            pushableResource.transform.localPosition += velocity;
-                        }
+                        AddToInventory(pushableResource);
+                        player.transform.localPosition += velocity;
                     }
                     else {
                         player.transform.localPosition += velocity;
@@ -204,11 +203,13 @@ public class GameManager : MonoBehaviour
                     bool isCircular = monster.data.navigationType == MonsterData.NavigationType.Circular;
                     bool isHorizontal = monster.data.navigationType == MonsterData.NavigationType.Horizontal;
                     bool isVertical = monster.data.navigationType == MonsterData.NavigationType.Vertical;
+                    bool isLineOfSight = monster.data.navigationType == MonsterData.NavigationType.LineOfSight;
 
                     int killRadius = monster.data.killRadius;
                     int wakeHour = monster.data.wakeHour;
                     int sleepHour = monster.data.sleepHour;
                     int stepsToUpdate = monster.data.stepsToUpdate;
+                    MonsterData.Direction direction = monster.data.lineOfSightDirection;
 
                     //check if monster is asleep
                     if (time == wakeHour && wakeHour != -1)
@@ -245,6 +246,8 @@ public class GameManager : MonoBehaviour
                         MonsterMoveHorizontal(player.boxCollider, boxes, obstacles, monsters[i]);
                     if (isVertical)
                         MonsterMoveVertical(player.boxCollider, boxes, obstacles, monsters[i]);
+                    if(isLineOfSight)
+                        MonsterMoveLineOfSight(player.boxCollider, boxes, obstacles, monsters[i]);
 
 
                     //Handle attack
@@ -570,6 +573,44 @@ public class GameManager : MonoBehaviour
                 checking = false;
             }
             inc++;
+        }
+
+    }
+
+    public static void MonsterMoveLineOfSight(BoxCollider2D playerBoxCollider2D, BoxCollider2D[] boxBoxCollider2Ds, BoxCollider2D[] obstacleBoxCollider2Ds, Monster monster) {
+        MonsterData.Direction lineOfSightDirection = monster.data.lineOfSightDirection;
+        Vector3 vel = Vector3.zero;
+
+        float playerX = playerBoxCollider2D.transform.localPosition.x;
+        float monsterX = monster.boxCollider.transform.localPosition.x;
+        float playerY = playerBoxCollider2D.transform.localPosition.y;
+        float monsterY = monster.boxCollider.transform.localPosition.y;
+
+        if(lineOfSightDirection == MonsterData.Direction.Vertical){
+            if(Mathf.Abs(playerX-monsterX) <= 0.2){
+                if(monsterY > playerY){
+                    //go down
+                    vel = Vector3.down;
+                }else {
+                    //go up
+                    vel = Vector3.up;
+                }
+            }
+        }
+        else if(lineOfSightDirection == MonsterData.Direction.Horizontal) {
+            if(Mathf.Abs(playerY-monsterY) <= 0.2){
+                if(monsterX > playerX){
+                    //go left
+                    vel = Vector3.left;
+                }else {
+                    //go right
+                    vel = Vector3.right;
+                }
+            }
+        }
+
+        if (!WillObjectCollide(monster.boxCollider, vel, obstacleBoxCollider2Ds, boxBoxCollider2Ds, playerBoxCollider2D)) {
+            monster.transform.localPosition += vel;
         }
 
     }

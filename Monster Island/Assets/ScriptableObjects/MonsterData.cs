@@ -17,10 +17,19 @@ public class MonsterData : ScriptableObject
         Random = 0,
         Circular = 1,
         Horizontal = 2,
-        Vertical = 3
+        Vertical = 3,
+        LineOfSight = 4,
     }
-
     public NavigationType navigationType;
+
+
+    public enum Direction
+    {
+        Vertical = 0,
+        Horizontal = 1,
+    };
+    public Direction lineOfSightDirection;
+
 
     public int patrolRadius;
 }
