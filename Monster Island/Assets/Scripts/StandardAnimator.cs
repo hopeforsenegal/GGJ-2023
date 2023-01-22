@@ -1,40 +1,36 @@
+
 using System;
-using UnityEngine;
-using Spine;
 using Spine.Unity;
+using UnityEngine;
+using Object = UnityEngine.Object;
 
 [DisallowMultipleComponent]
 [RequireComponent(typeof(SkeletonAnimation))]
 [RequireComponent(typeof(MeshRenderer))]
 public class StandardAnimator : MonoBehaviour
 {
-    #region Enums and Constants
+    public float TimeScale
+    {
+        get => m_SkeletonAnimation.AnimationState.TimeScale;
+        set => m_TimeScale = value;
+    }
 
-    #endregion
+    public string Skin
+    {
+        get => m_SkeletonAnimation.Skeleton.Skin.Name;
+        set
+        {
+            m_SkeletonAnimation.initialSkinName = value;
+            m_SkeletonAnimation.Skeleton.SetSkin(value);
+        }
+    }
 
-    #region Events
-
-    #endregion
-
-    #region Properties
-
-    #endregion
-
-    #region Inspectables
-
-    #endregion
-
-    #region Private Member Variables
+    public string CurrentAnimation => m_CurrentAnimation;
 
     private SkeletonAnimation m_SkeletonAnimation;
     private MeshRenderer m_MeshRenderer;
-    private Action m_OnEndEvent;
-    private string m_LoopAnimation;
     private string m_CurrentAnimation;
-
-    #endregion
-
-    #region Monobehaviours
+    private float m_TimeScale = 1;
 
     protected void Awake()
     {
@@ -45,58 +41,54 @@ public class StandardAnimator : MonoBehaviour
         Debug.Assert(m_SkeletonAnimation != null);
     }
 
-    #endregion
-
-    #region Public Methods
-
-    public static StandardAnimator AddStandardAnimatorComponent(GameObject gameObject, SkeletonDataAsset skeletonDataAsset)
+    public StandardAnimatorDesc Play(string skin, string play)
     {
-        var skeleton = SkeletonAnimation.AddToGameObject(gameObject, skeletonDataAsset);
-        var animator = skeleton.gameObject.AddComponent<StandardAnimator>();
-        return animator;
-    }
+        //Debug.Log($"[StandardAnimator::Play] skin:'{skin}' play:'{play}'");
 
-    public void Play(string skin, string introOrDefault, Action endAnimationEvent = null)
-    {
-        Clear();
-        //Debug.LogFormat("[StandardAnimator::Play] skin:'{0}' introOrDefault:'{1}' loop:'{2}'", skin, introOrDefault, loop);
-
-        SetSkin(skin);
+        if (!string.IsNullOrWhiteSpace(skin)) {
+            Skin = skin;
+        }
+        var desc = new StandardAnimatorDesc();
         m_SkeletonAnimation.Skeleton.SetSlotsToSetupPose(); // 2. Make sure it refreshes.
         m_SkeletonAnimation.AnimationState.Apply(m_SkeletonAnimation.Skeleton); // 3. Make sure the attachments from your currently playing animation are applied.
-        m_SkeletonAnimation.AnimationState.TimeScale = 1;
-        m_MeshRenderer.enabled = true;
-
-        var entry = m_SkeletonAnimation.AnimationState.SetAnimation(0, introOrDefault, false);
-        entry.TimeScale = 1;
+        m_CurrentAnimation = play;
+        var entry = m_SkeletonAnimation.AnimationState.SetAnimation(0, m_CurrentAnimation, false);
+        entry.TimeScale = m_TimeScale;
         entry.Complete += _ =>
         {
-            endAnimationEvent?.Invoke();
+            desc.FireAnimationEnd();
+            m_CurrentAnimation = string.Empty;
         };
+        m_SkeletonAnimation.AnimationState.TimeScale = m_TimeScale;
+        m_SkeletonAnimation.AnimationState.Update(0);
+        m_SkeletonAnimation.Update(0); // Do we lose interpolation when we want with this?
+        return desc;
     }
 
     public void Loop(string skin, string loop)
     {
-        m_MeshRenderer.enabled = true;
         if (m_CurrentAnimation != loop) {
-            //Debug.LogFormat("[StandardAnimator::Loop] skin:'{0}' loop:'{1}'", skin, loop);
-            m_CurrentAnimation = loop;
+            //Debug.Log($"[StandardAnimator::Loop] skin:'{skin}' loop:'{loop}'");
 
-            SetSkin(skin);
+            if (!string.IsNullOrWhiteSpace(skin)) {
+                Skin = skin;
+            }
             m_SkeletonAnimation.Skeleton.SetSlotsToSetupPose(); // 2. Make sure it refreshes.
             m_SkeletonAnimation.AnimationState.Apply(m_SkeletonAnimation.Skeleton); // 3. Make sure the attachments from your currently playing animation are applied.
-            var entry = m_SkeletonAnimation.AnimationState.SetAnimation(0, loop, true);
-            entry.TimeScale = 1;
-            m_SkeletonAnimation.AnimationState.TimeScale = 1;
+            m_CurrentAnimation = loop;
+            var entry = m_SkeletonAnimation.AnimationState.SetAnimation(0, m_CurrentAnimation, true);
+            entry.TimeScale = m_TimeScale;
+            m_SkeletonAnimation.AnimationState.TimeScale = m_TimeScale;
         }
     }
 
-    public void Still(string skin, string still)
+    public void Still(string still, string skin = "")
     {
         //Debug.LogFormat("[StandardAnimator::Still] skin:'{0}' still:'{1}'", skin, still);
 
-        m_MeshRenderer.enabled = true;
-        SetSkin(skin);
+        if (!string.IsNullOrWhiteSpace(skin)) {
+            Skin = skin;
+        }
         m_SkeletonAnimation.Skeleton.SetSlotsToSetupPose(); // 2. Make sure it refreshes.
         m_SkeletonAnimation.AnimationState.Apply(m_SkeletonAnimation.Skeleton); // 3. Make sure the attachments from your currently playing animation are applied.
         var entry = m_SkeletonAnimation.AnimationState.SetAnimation(0, still, true);
@@ -104,11 +96,12 @@ public class StandardAnimator : MonoBehaviour
         m_SkeletonAnimation.AnimationState.TimeScale = 1;
     }
 
+    // Animation not clearing properly? Could be the mix duration.
     public void Clear(bool doHardClear = true)
     {
         //Debug.LogFormat("[StandardAnimator::Clear]");
 
-        m_MeshRenderer.enabled = false;
+        m_CurrentAnimation = string.Empty;
         if (doHardClear) {
             m_SkeletonAnimation.Initialize(true);
             m_SkeletonAnimation.AnimationState.SetEmptyAnimations(0);
@@ -117,17 +110,12 @@ public class StandardAnimator : MonoBehaviour
         }
     }
 
-    #endregion
-
-    #region Private Methods
-
-    private void SetSkin(string skin)
+    public static StandardAnimator GetComponentOrAssert(Object context, GameObject gameObject)
     {
-        if (!string.IsNullOrEmpty(skin)) {
-            m_SkeletonAnimation.initialSkinName = skin;
-            m_SkeletonAnimation.Skeleton.SetSkin(skin);
-        }
-    }
+        var component = gameObject.GetComponent<StandardAnimator>();
 
-    #endregion
+        Debug.Assert(component != null, context);
+
+        return component;
+    }
 }

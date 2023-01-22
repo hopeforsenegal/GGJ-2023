@@ -44,6 +44,7 @@ public class GameManager : MonoBehaviour
     //Start at 1 since we get a free move at start
     //Blobs wakeup at 4 go to sleep at 8
     private int time = 1;
+    private System.Action m_LoopNextFrame;
 
     private void Start()
     {
@@ -95,7 +96,9 @@ public class GameManager : MonoBehaviour
         // Inputs
         var actions = GetUserActions();
 
-        {   // Check if we died/won before processing any more logic
+        {
+            m_LoopNextFrame?.Invoke();
+            // Check if we died/won before processing any more logic
             if (Util.HasHitTimeOnce(ref m_TimerDelayShowGameOver, Time.deltaTime)) {
                 Debug.Log("Hey!!!");
                 m_GameOverAction?.Invoke();
@@ -316,7 +319,7 @@ public class GameManager : MonoBehaviour
                         m_IsGameOver = true;
                         var clipName = monsters[i].data.attack;
                         clipName = string.IsNullOrWhiteSpace(clipName) ? MonsterAnim.explode : clipName;
-                        monsters[i].spineAnimation.Play(SkinsNames.@default, clipName, () =>
+                        monsters[i].spineAnimation.Play(SkinsNames.@default, clipName).setOnAnimationEnd(() =>
                         {
                             Debug.Log("Hello");
                             m_TimerDelayShowGameOver = 0.1f;
@@ -361,7 +364,7 @@ public class GameManager : MonoBehaviour
                         m_IsGameOver = true;
                         var clipName = monsters[i].data.attack;
                         clipName = string.IsNullOrWhiteSpace(clipName) ? MonsterAnim.explode : clipName;
-                        monsters[i].spineAnimation.Play(SkinsNames.@default, clipName, () =>
+                        monsters[i].spineAnimation.Play(SkinsNames.@default, clipName).setOnAnimationEnd(() =>
                         {
                             Debug.Log("Hello");
                             m_TimerDelayShowGameOver = 0.1f;
@@ -386,9 +389,12 @@ public class GameManager : MonoBehaviour
 
                 // increment time
                 time = IncrementTime(time);
-                player.spineAnimation.Play(SkinsNames.@default, hasAddedToInventory ? PlayerAnim.item_collect : PlayerAnim.move, () =>
+                player.spineAnimation.Play(SkinsNames.@default, hasAddedToInventory ? PlayerAnim.item_collect : PlayerAnim.move).setOnAnimationEnd(() =>
                 {
-                    player.spineAnimation.Loop(SkinsNames.@default, PlayerAnim.idle);
+                    //m_LoopNextFrame = () =>
+                    {
+                        player.spineAnimation.Loop(SkinsNames.@default, PlayerAnim.idle);
+                    };
                 });
 
                 //Debug.Log($"Current time ${time}");
@@ -398,7 +404,7 @@ public class GameManager : MonoBehaviour
                 if (IsOverlapping(player.boxCollider, objective) && points >= pointsNeededToWin) {
                     Debug.Log("Win");
                     m_IsWon = true;
-                    player.spineAnimation.Play(SkinsNames.@default, PlayerAnim.victory, () =>
+                    player.spineAnimation.Play(SkinsNames.@default, PlayerAnim.victory).setOnAnimationEnd(() =>
                     {
                         m_TimerDelayShowWin = 0.1f;
                         m_WinAction = () =>
