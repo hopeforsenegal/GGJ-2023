@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -13,6 +14,7 @@ public class GameManager : MonoBehaviour
     public BoxCollider2D[] obstacles;
     public BoxCollider2D[] boxes;
     public BoxCollider2D[] resources;
+    public Transform[] roomCenters;
     public BoxCollider2D objective;
     public Monster[] monsters;
     public DayNight night;
@@ -53,6 +55,7 @@ public class GameManager : MonoBehaviour
         monsters = GameObject.Find("Monsters").GetComponentsInChildren<Monster>();
         resources = GameObject.Find("Resources").GetComponentsInChildren<BoxCollider2D>();
         objective = GameObject.Find("Objective").GetComponent<BoxCollider2D>();
+        roomCenters = GameObject.Find("RoomClampers").GetComponentsInChildren<Transform>();
         cameraEndLocationTransforms = GetCameraTransitionSquares();
 
         winScreen.ExitApplicationEvent += MainMenu.ExitApplication;
@@ -221,6 +224,29 @@ public class GameManager : MonoBehaviour
 
             // Update the world time and everything only if you were able to actually move
             if (movement) {
+                // Clamp player movement as a temporary hack
+                foreach (var center in roomCenters) {
+                    var los = DetectLineOfSight(center.position, player.transform.position);
+                    switch (los) {
+                        case LineOfSight.IsAboveHorizontalAligned:
+                            player.transform.position = new Vector3(center.position.x, player.transform.position.y, player.transform.position.z);
+                            Debug.Log("Clamped!");
+                            break;
+                        case LineOfSight.IsBelowHorizontalAligned:
+                            player.transform.position = new Vector3(center.position.x, player.transform.position.y, player.transform.position.z);
+                            Debug.Log("Clamped!");
+                            break;
+                        case LineOfSight.IsLeftVerticalAligned:
+                            player.transform.position = new Vector3(player.transform.position.x, center.position.y, player.transform.position.z);
+                            Debug.Log("Clamped!");
+                            break;
+                        case LineOfSight.IsRightVerticalAligned:
+                            player.transform.position = new Vector3(player.transform.position.x, center.position.y, player.transform.position.z);
+                            Debug.Log("Clamped!");
+                            break;
+                    }
+                }
+
                 // monster updates
                 for (var i = 0; i <= monsters.Length - 1; i++) {
                     var monster = monsters[i];
@@ -603,39 +629,49 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    enum LineOfSight
+    {
+        None,
+        IsRightVerticalAligned,
+        IsLeftVerticalAligned,
+        IsAboveHorizontalAligned,
+        IsBelowHorizontalAligned,
+    }
+
+    static LineOfSight DetectLineOfSight(Vector3 subject, Vector3 other)
+    {
+        if (Mathf.Abs(subject.x - other.x) <= 0.5) {
+            // This is making sure you are on the same column
+            // Then check above or below
+            return other.y > subject.y ? LineOfSight.IsBelowHorizontalAligned : LineOfSight.IsAboveHorizontalAligned;
+        } else if (Mathf.Abs(subject.y - other.y) <= 0.5) {
+            // This is making sure you are on the same row
+            // Then check left or right
+            return other.x > subject.x ? LineOfSight.IsLeftVerticalAligned : LineOfSight.IsRightVerticalAligned;
+        }
+        return LineOfSight.None;
+    }
+
     public static void MonsterMoveLineOfSight(BoxCollider2D playerBoxCollider2D, BoxCollider2D[] boxBoxCollider2Ds, BoxCollider2D[] obstacleBoxCollider2Ds, Monster monster, float speedX, float speedY)
     {
-        var vel = Vector3.zero;
         var playerX = playerBoxCollider2D.transform.localPosition.x;
         var monsterX = monster.boxCollider.transform.localPosition.x;
         var playerY = playerBoxCollider2D.transform.localPosition.y;
         var monsterY = monster.boxCollider.transform.localPosition.y;
+        var los = DetectLineOfSight(playerBoxCollider2D.transform.localPosition, monster.boxCollider.transform.localPosition);
+        var vel = los switch
+        {
+            LineOfSight.IsAboveHorizontalAligned => Vector3.up * speedY,
+            LineOfSight.IsBelowHorizontalAligned => Vector3.down * speedY,
+            LineOfSight.IsLeftVerticalAligned => Vector3.left * speedX,
+            LineOfSight.IsRightVerticalAligned => Vector3.right * speedX,
+            LineOfSight.None => Vector3.zero,
+            _ => throw new System.NotImplementedException(),
+        };
 
-        // This is making sure you are on the same column
-        if (Mathf.Abs(playerX - monsterX) <= 0.5) {
-            // Then check above or below
-            if (monsterY > playerY) {
-                //go down
-                vel = Vector3.down * speedY;
-            } else {
-                //go up
-                vel = Vector3.up * speedY;
-            }
-            // This is making sure you are on the same row
-        } else if (Mathf.Abs(playerY - monsterY) <= 0.5) {
-            // Then check left or right
-            if (monsterX > playerX) {
-                //go left
-                vel = Vector3.left * speedX;
-            } else {
-                //go right
-                vel = Vector3.right * speedX;
-            }
-        }
-
-        //Debug.Log($"{monster.data.name} playerx {playerX} monsterx{monsterX}");
-        //Debug.Log($"{monster.data.name} playery {playerY} monstery{monsterY}");
-        //Debug.Log($"line of sight vel ${vel}");
+        Debug.Log($"{monster.data.name} playerx {playerX} monsterx{monsterX}");
+        Debug.Log($"{monster.data.name} playery {playerY} monstery{monsterY}");
+        Debug.Log($"line of sight vel ${vel}");
 
         if (!WillMonsterCollide(monster.boxCollider, vel, obstacleBoxCollider2Ds, boxBoxCollider2Ds, new BoxCollider2D[] { playerBoxCollider2D })) {
             monster.transform.localPosition += vel;
