@@ -50,7 +50,7 @@ public class GameManager : MonoBehaviour
         objective = GameObject.Find("Objective").GetComponent<BoxCollider2D>();
         cameraEndLocationTransforms = GetCameraTransitionSquares();
 
-        Debug.Log($"resources: {resources.Length}");
+        //Debug.Log($"resources: {resources.Length}");
 
         gameOverScreen.RetryEvent += MainMenu.ReLoadScene;
         gameOverScreen.QuitEvent += MainMenu.LoadMainMenu;
@@ -82,7 +82,7 @@ public class GameManager : MonoBehaviour
                     var pushable = GetPushedBox(player.boxCollider, velocity, boxes);
                     var pushableResource = GetPushedResource(player.boxCollider, velocity, resources);
                     if (pushable != null) {
-                        Debug.Log("IsPushing");
+                        //Debug.Log("IsPushing");
                         if (CanPushBox(pushable, velocity, obstacles, boxes)) {
                             player.transform.localPosition += velocity;
                             pushable.transform.localPosition += velocity;
@@ -216,7 +216,7 @@ public class GameManager : MonoBehaviour
                     if (time == sleepHour && sleepHour != -1)
                         monster.data.isSleep = true;
                     if (monster.data.isSleep == true) {
-                        Debug.Log("Monster is sleep");
+                        //Debug.Log("Monster is sleep");
                         continue;
                     }
 
@@ -282,7 +282,7 @@ public class GameManager : MonoBehaviour
                 points += 1;
             }
         }
-        Debug.Log($"Current points ${points}");
+        //Debug.Log($"Current points ${points}");
     }
 
     public static int IncrementTime(int time)
@@ -425,6 +425,7 @@ public class GameManager : MonoBehaviour
                                                                                           Transform cameraTransform,
                                                                                           Dictionary<CameraTransitionSquare, CameraState> cameraLocations)
     {
+        Debug.Log($"UpdateAnimationToExecute {cameraTransitionSquare.name}");
         foreach (var kv in cameraLocations) {
             kv.Value.IsAnimating = false;
         }
