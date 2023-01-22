@@ -10,7 +10,7 @@ public class MainMenu : MonoBehaviour
     void Start()
     {
         play.onClick.AddListener(LoadFirstIsland);
-        quit.onClick.AddListener(ExitGame);
+        quit.onClick.AddListener(ExitApplication);
     }
 
     protected void Update()
@@ -30,7 +30,7 @@ public class MainMenu : MonoBehaviour
         if (hitEnterKey || hitLetter) {
             LoadFirstIsland();
         } else if (Input.GetKey(KeyCode.Escape)) {
-            ExitGame();
+            ExitApplication();
         }
     }
 
@@ -46,15 +46,15 @@ public class MainMenu : MonoBehaviour
         UnityEngine.SceneManagement.SceneManager.LoadScene(SceneNames.MainMenu);
     }
 
-    public static void ReLoadScene()
+    public static void ReloadScene()
     {
-        Debug.Log($"{nameof(ReLoadScene)}");
+        Debug.Log($"{nameof(ReloadScene)}");
         UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
     }
 
-    public static void ExitGame()
+    public static void ExitApplication()
     {
-        Debug.Log($"{nameof(ExitGame)}");
+        Debug.Log($"{nameof(ExitApplication)}");
 #if UNITY_EDITOR
         // Application.Quit() does not work in the editor so
         // UnityEditor.EditorApplication.isPlaying need to be set to false to end the game

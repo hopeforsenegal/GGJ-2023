@@ -43,14 +43,17 @@ public class GameManager : MonoBehaviour
     public Camera mainCamera;
     public CameraTransitionSquare[] cameraEndLocationTransforms;
     public GameOverScreen gameOverScreen;
+    public WinScreen winScreen;
 
     // private
     private const float LerpDuration = 0.5f;
     float timeElapsed;
     private Vector3 endMarkerPos;
     private Vector3 startMarkerPos;
-    private float m_TimerDelayShowDeath;
-    private System.Action m_DeathAction;
+    private float m_TimerDelayShowGameOver;
+    private System.Action m_GameOverAction;
+    private float m_TimerDelayShowWin;
+    private System.Action m_WinAction;
     readonly Dictionary<CameraTransitionSquare, CameraState> cameraState = new Dictionary<CameraTransitionSquare, CameraState>();
     int points = 0;
     int POINTS_TO_WIN = 1;
@@ -59,13 +62,15 @@ public class GameManager : MonoBehaviour
     //Start at 1 since we get a free move at start
     //Blobs wakup at 4 go to sleep at 8
     int time = 1;
-    private bool m_IsDead;
+    private bool m_IsGameOver;
+    private bool m_IsWon;
     public const int TimeInDay = 8;
 
     void Start()
     {
         mainCamera = Camera.main;
         gameOverScreen = FindObjectOfType<GameOverScreen>();
+        winScreen = FindObjectOfType<WinScreen>();
         player = FindObjectOfType<Player>();
         night = FindObjectOfType<DayNight>();
         obstacles = GameObject.Find("Obstacles").GetComponentsInChildren<BoxCollider2D>();
@@ -75,13 +80,15 @@ public class GameManager : MonoBehaviour
         objective = GameObject.Find("Objective").GetComponent<BoxCollider2D>();
         cameraEndLocationTransforms = GetCameraTransitionSquares();
 
-        gameOverScreen.RetryEvent += MainMenu.ReLoadScene;
-        gameOverScreen.QuitEvent += MainMenu.LoadMainMenu;
+        winScreen.ExitApplicationEvent += MainMenu.ExitApplication;
+        winScreen.ReturnToMenuEvent += MainMenu.LoadMainMenu;
+        gameOverScreen.RetryEvent += MainMenu.ReloadScene;
+        gameOverScreen.ReturnToMenuEvent += MainMenu.LoadMainMenu;
+
         foreach (var cT in cameraEndLocationTransforms) {
             cameraState.Add(cT, new CameraState());
         }
-
-        gameOverScreen.Visibility = false;
+        winScreen.Visibility = gameOverScreen.Visibility = false;
 
         player.spineAnimation.Loop(SkinsNames.@default, PlayerAnim.idle);
         foreach (var monster in monsters) {
@@ -107,11 +114,16 @@ public class GameManager : MonoBehaviour
         // Inputs
         var actions = GetUserActions();
 
-        {   // Check if we died before processing any more logic
-            if (Util.HasHitTimeOnce(ref m_TimerDelayShowDeath, Time.deltaTime)) {
-                m_DeathAction?.Invoke();
+        {   // Check if we died/won before processing any more logic
+            if (Util.HasHitTimeOnce(ref m_TimerDelayShowGameOver, Time.deltaTime)) {
+                m_GameOverAction?.Invoke();
             }
-            if (m_IsDead)
+            if (m_IsGameOver)
+                return;
+            if (Util.HasHitTimeOnce(ref m_TimerDelayShowWin, Time.deltaTime)) {
+                m_WinAction?.Invoke();
+            }
+            if (m_IsWon)
                 return;
         }
         {
@@ -261,12 +273,11 @@ public class GameManager : MonoBehaviour
                     //Handle attack
                     if (IsWithinRange(monsters[i].boxCollider.transform.position, player.transform.position, killRadius)) {
                         Debug.Log($"{monsters[i].data.name} can kill");
-
-                        m_IsDead = true;
+                        m_IsGameOver = true;
                         monsters[i].spineAnimation.Play(SkinsNames.@default, MonsterAnim.explode, string.Empty, () =>
                         {
-                            m_TimerDelayShowDeath = 0.1f;
-                            m_DeathAction = () =>
+                            m_TimerDelayShowGameOver = 0.1f;
+                            m_GameOverAction = () =>
                             {
                                 gameOverScreen.Visibility = true;
                             };
@@ -295,12 +306,17 @@ public class GameManager : MonoBehaviour
 
                     //Handle attack
                     if (IsWithinRange(monsters[i].boxCollider.transform.localPosition, player.transform.localPosition, killRadius)) {
-                        Debug.Log("Monster can kill");
-                        m_TimerDelayShowDeath = 0.1f;
-                        m_DeathAction = () =>
+                        Debug.Log($"{monsters[i].data.name} can kill");
+                        m_IsGameOver = true;
+                        monsters[i].spineAnimation.Play(SkinsNames.@default, MonsterAnim.explode, string.Empty, () =>
                         {
-                            gameOverScreen.Visibility = true;
-                        };
+                            m_TimerDelayShowGameOver = 0.1f;
+                            m_GameOverAction = () =>
+                            {
+                                gameOverScreen.Visibility = true;
+                            };
+                        });
+                        player.spineAnimation.Play(SkinsNames.@default, PlayerAnim.hit);
                         return;
                     }
                 }
@@ -317,20 +333,23 @@ public class GameManager : MonoBehaviour
                 player.spineAnimation.Play(SkinsNames.@default, PlayerAnim.move, PlayerAnim.idle);
 
                 //Debug.Log($"Current time ${time}");
-                CheckPoints(player.boxCollider, objective, ref points, POINTS_TO_WIN);
+                
+                // Determine if they won
+                if (IsOverlapping(player.boxCollider, objective) && points >= POINTS_TO_WIN) {
+                    Debug.Log("Win");
+                    m_IsWon = true;
+                    m_TimerDelayShowWin = 0.1f;
+                    m_WinAction = () =>
+                    {
+                        winScreen.Visibility = true;
+                    };
+                }
+                //Debug.Log($"Current points ${points}");
             }
 
             // Camera updates
             InterpolateActiveCamera(mainCamera.transform, cameraState, ref timeElapsed, LerpDuration, startMarkerPos, endMarkerPos);
         }
-    }
-
-    public static void CheckPoints(BoxCollider2D playerBox, BoxCollider2D objective, ref int points, int POINTS_TO_WIN)
-    {
-            if (IsOverlapping(playerBox, objective) && points >=POINTS_TO_WIN) {
-                Win();
-            }
-        //Debug.Log($"Current points ${points}");
     }
 
     public static int IncrementTime(int time)
@@ -476,13 +495,6 @@ public class GameManager : MonoBehaviour
         var endMarkerPos = cameraTransitionSquare.roomCenter.transform.position;
         endMarkerPos.z = -10;   // Camera always needs to be at -10
         return (startMarkerPos, endMarkerPos);
-    }
-
-    public static void Win()
-    {
-        Application.Quit();
-        UnityEditor.EditorApplication.isPlaying = false;
-        Debug.Log("Win");
     }
 
     private static bool WillObjectCollide(BoxCollider2D box, Vector3 velocity, BoxCollider2D[] obstacleBoxCollider2Ds, BoxCollider2D[] boxBoxCollider2Ds, BoxCollider2D playerBoxCollider2D)

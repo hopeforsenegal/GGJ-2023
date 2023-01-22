@@ -3,13 +3,13 @@ using UnityEngine;
 using UnityEngine.UI;
 
 [RequireComponent(typeof(CanvasGroup))]
-public class GameOverScreen : MonoBehaviour
+public class WinScreen : MonoBehaviour
 {
-    public Button retryIsland;
-    public Button quit;
+    public Button returnToMenu;
+    public Button exitApplication;
 
-    public event Action RetryEvent;
     public event Action ReturnToMenuEvent;
+    public event Action ExitApplicationEvent;
 
     private CanvasGroup canvasGroup;
 
@@ -20,13 +20,13 @@ public class GameOverScreen : MonoBehaviour
 
     void Start()
     {
-        retryIsland.onClick.AddListener(() =>
-        {
-            RetryEvent?.Invoke();
-        });
-        quit.onClick.AddListener(() =>
+        returnToMenu.onClick.AddListener(() =>
         {
             ReturnToMenuEvent?.Invoke();
+        });
+        exitApplication.onClick.AddListener(() =>
+        {
+            ExitApplicationEvent?.Invoke();
         });
     }
 
