@@ -21,7 +21,7 @@ public class GameManager : MonoBehaviour
     public GameOverScreen gameOverScreen;
     public WinScreen winScreen;
     public Image sundial;
-    public SundialData sundialData;
+    public SettingsData settingsData;
 
     // private
     private float timeElapsed;
@@ -79,7 +79,7 @@ public class GameManager : MonoBehaviour
         } else {
             night.sprite.color = Color.white;
         }
-        sundial.sprite = sundialData.sprites[time - 1];
+        sundial.sprite = settingsData.sundialSprites[time - 1];
     }
 
     private void Update()
@@ -336,7 +336,7 @@ public class GameManager : MonoBehaviour
                 } else {
                     night.sprite.color = Color.white;
                 }
-                sundial.sprite = sundialData.sprites[time];
+                sundial.sprite = settingsData.sundialSprites[time];
 
                 // increment time
                 time = IncrementTime(time);
@@ -354,6 +354,9 @@ public class GameManager : MonoBehaviour
                         m_WinAction = () =>
                         {
                             winScreen.Visibility = true;
+                            var audio = FindObjectOfType<AudioSource>();
+                            audio.clip = settingsData.winAudio;
+                            audio.Play();
                         };
                     });
                 }
