@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -15,6 +14,7 @@ public class GameManager : MonoBehaviour
     public DayNight night;
     public Camera mainCamera;
     public CameraTransitionSquare[] cameraEndLocationTransforms;
+    public GameOverScreen gameOverScreen;
 
     // private
     bool isDayOrNight;
@@ -23,7 +23,9 @@ public class GameManager : MonoBehaviour
     float timeElapsed;
     private Vector3 endMarkerPos;
     private Vector3 startMarkerPos;
-    Dictionary<CameraTransitionSquare, CameraState> cameraState = new Dictionary<CameraTransitionSquare, CameraState>();
+    private float m_TimerDelayShowDeath;
+    private System.Action m_DeathAction;
+    readonly Dictionary<CameraTransitionSquare, CameraState> cameraState = new Dictionary<CameraTransitionSquare, CameraState>();
 
     //HOURS 0- 24
     //Start at 6 am
@@ -33,6 +35,7 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         mainCamera = Camera.main;
+        gameOverScreen = FindObjectOfType<GameOverScreen>();
         player = FindObjectOfType<Player>();
         night = FindObjectOfType<DayNight>();
         obstacles = GameObject.Find("Obstacles").GetComponentsInChildren<BoxCollider2D>();
@@ -40,9 +43,13 @@ public class GameManager : MonoBehaviour
         monsters = GameObject.Find("Monsters").GetComponentsInChildren<Monster>();
         cameraEndLocationTransforms = GetCameraTransitionSquares();
 
+        gameOverScreen.RetryEvent += MainMenu.ReLoadScene;
+        gameOverScreen.QuitEvent += MainMenu.LoadMainMenu;
         foreach (var cT in cameraEndLocationTransforms) {
             cameraState.Add(cT, new CameraState());
         }
+
+        gameOverScreen.Visibility = false;
     }
 
     void Update()
@@ -181,6 +188,9 @@ public class GameManager : MonoBehaviour
                 time += 1;
                 if(time >= 24) time = 0;
                 Debug.Log($"Current time ${time}");
+            }
+            if (Util.HasHitTimeOnce(ref m_TimerDelayShowDeath, Time.deltaTime)) {
+                m_DeathAction?.Invoke();
             }
             // Camera updates
             InterpolateActiveCamera(mainCamera.transform, cameraState, ref timeElapsed, LerpDuration, startMarkerPos, endMarkerPos);
