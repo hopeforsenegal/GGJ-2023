@@ -352,6 +352,7 @@ public class GameManager : MonoBehaviour
     {
         box.gameObject.SetActive(false);
         box.enabled = false;
+        resources = resources.Where(e => e != box).ToArray();
         points += 1;
     }
 
@@ -425,6 +426,7 @@ public class GameManager : MonoBehaviour
                     return false;
             }
         }
+
         return true;
     }
 
