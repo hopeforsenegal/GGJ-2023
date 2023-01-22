@@ -77,7 +77,7 @@ public class GameManager : MonoBehaviour
             // Player updates
             if (actions.left) {
                 //Debug.Log("left");
-                var velocity = Vector3.left * player.playerSpeed;
+                var velocity = Vector3.left * player.playerSpeedX;
                 if (!WillCollide(player.boxCollider, velocity, obstacles)) {
                     var pushable = GetPushedBox(player.boxCollider, velocity, boxes);
                     var pushableResource = GetPushedResource(player.boxCollider, velocity, resources);
@@ -107,7 +107,7 @@ public class GameManager : MonoBehaviour
             }
             if (actions.up) {
                 //Debug.Log("up");
-                var velocity = Vector3.up * player.playerSpeed;
+                var velocity = Vector3.up * player.playerSpeedY;
                 if (!WillCollide(player.boxCollider, velocity, obstacles)) {
                     var pushable = GetPushedBox(player.boxCollider, velocity, boxes);
                     var pushableResource = GetPushedResource(player.boxCollider, velocity, resources);
@@ -137,7 +137,7 @@ public class GameManager : MonoBehaviour
             }
             if (actions.down) {
                 //Debug.Log("down");
-                var velocity = Vector3.down * player.playerSpeed;
+                var velocity = Vector3.down * player.playerSpeedY;
                 if (!WillCollide(player.boxCollider, velocity, obstacles)) {
                     var pushable = GetPushedBox(player.boxCollider, velocity, boxes);
                     var pushableResource = GetPushedResource(player.boxCollider, velocity, resources);
@@ -168,7 +168,7 @@ public class GameManager : MonoBehaviour
             if (actions.right)
             {
                 //Debug.Log("right");l
-                var velocity = Vector3.right * player.playerSpeed;
+                var velocity = Vector3.right * player.playerSpeedX;
                 if (!WillCollide(player.boxCollider, velocity, obstacles)) {
                     var pushable = GetPushedBox(player.boxCollider, velocity, boxes);
                     var pushableResource = GetPushedResource(player.boxCollider, velocity, resources);

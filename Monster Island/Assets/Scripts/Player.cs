@@ -4,7 +4,8 @@ using UnityEngine;
 [RequireComponent(typeof(BoxCollider2D))]
 public class Player : MonoBehaviour
 {
-    public float playerSpeed = 1;
+    public float playerSpeedX = 2.2f;
+    public float playerSpeedY = 2;
     public BoxCollider2D boxCollider;
     public SkeletonAnimation spineAnimation;
 
