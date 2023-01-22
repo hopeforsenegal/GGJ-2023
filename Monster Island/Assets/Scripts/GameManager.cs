@@ -115,6 +115,7 @@ public class GameManager : MonoBehaviour
                 return;
         }
         {
+            bool movement = false;
             // Player updates
             if (actions.left) {
                 //Debug.Log("left");
@@ -137,6 +138,7 @@ public class GameManager : MonoBehaviour
                         player.transform.localPosition += velocity;
                     }
                     player.transform.localScale = PlayerScale.Left;
+                    movement = true;
                 }
                 var (hasCollided, locationInfo) =
                     WillCollideCameraLocation(player.boxCollider, velocity, cameraEndLocationTransforms);
@@ -163,6 +165,7 @@ public class GameManager : MonoBehaviour
                     } else {
                         player.transform.localPosition += velocity;
                     }
+                    movement = true;
                 }
                 var (hasCollided, locationInfo) =
                     WillCollideCameraLocation(player.boxCollider, velocity, cameraEndLocationTransforms);
@@ -189,6 +192,7 @@ public class GameManager : MonoBehaviour
                     } else {
                         player.transform.localPosition += velocity;
                     }
+                    movement = true;
                 }
                 var (hasCollided, locationInfo) =
                     WillCollideCameraLocation(player.boxCollider, velocity, cameraEndLocationTransforms);
@@ -215,6 +219,7 @@ public class GameManager : MonoBehaviour
                         player.transform.localPosition += velocity;
                     }
                     player.transform.localScale = PlayerScale.Right;
+                    movement = true;
                 }
                 var (hasCollided, locationInfo) =
                     WillCollideCameraLocation(player.boxCollider, velocity, cameraEndLocationTransforms);
@@ -222,9 +227,11 @@ public class GameManager : MonoBehaviour
                     (startMarkerPos, endMarkerPos) = UpdateAnimationToExecute(locationInfo, mainCamera.transform, cameraState);
                 }
             }
-            if (actions.movement) {
+
+            // Update the world time and everything only if you were able to actually move
+            if (movement) {
                 // monster updates
-                for (var i = 0; i <= monsters.Length - 1; i += 1) {
+                for (var i = 0; i <= monsters.Length - 1; i++) {
                     Monster monster = monsters[i];
 
                     bool isRandom = monster.data.navigationType == MonsterData.NavigationType.Random;
@@ -335,15 +342,13 @@ public class GameManager : MonoBehaviour
 
     private static Actions GetUserActions()
     {
-        var action = new Actions
+        return new Actions
         {
             left = Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow),
             up = Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow),
             down = Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow),
             right = Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow),
         };
-        action.movement = action.left || action.right || action.up || action.down;
-        return action;
     }
 
     public static bool WillCollide(BoxCollider2D player, Vector3 velocity, BoxCollider2D[] boxCollider2Ds)
@@ -462,7 +467,7 @@ public class GameManager : MonoBehaviour
                                                                                           Transform cameraTransform,
                                                                                           Dictionary<CameraTransitionSquare, CameraState> cameraLocations)
     {
-        Debug.Log($"UpdateAnimationToExecute {cameraTransitionSquare.name} to {cameraTransitionSquare.roomCenter.name}");
+        //Debug.Log($"UpdateAnimationToExecute {cameraTransitionSquare.name} to {cameraTransitionSquare.roomCenter.name}");
         foreach (var kv in cameraLocations) {
             kv.Value.IsAnimating = false;
         }
@@ -482,12 +487,12 @@ public class GameManager : MonoBehaviour
 
     private static bool WillObjectCollide(BoxCollider2D box, Vector3 velocity, BoxCollider2D[] obstacleBoxCollider2Ds, BoxCollider2D[] boxBoxCollider2Ds, BoxCollider2D playerBoxCollider2D)
     {
-        for (var i = 0; i <= obstacleBoxCollider2Ds.Length - 1; i += 1) {
+        for (var i = 0; i <= obstacleBoxCollider2Ds.Length - 1; i++) {
             var obstacle = obstacleBoxCollider2Ds[i];
             if (box.OverlapPoint(obstacle.transform.position - velocity) && obstacle != box)
                 return true;
         }
-        for (var i = 0; i <= boxBoxCollider2Ds.Length - 1; i += 1) {
+        for (var i = 0; i <= boxBoxCollider2Ds.Length - 1; i++) {
             var b = boxBoxCollider2Ds[i];
             if (box.OverlapPoint(b.transform.position - velocity) && b != box)
                 return true;
@@ -501,12 +506,12 @@ public class GameManager : MonoBehaviour
 
     private static bool WillMonsterCollide(BoxCollider2D box, Vector3 velocity, BoxCollider2D[] obstacleBoxCollider2Ds, BoxCollider2D[] boxBoxCollider2Ds, BoxCollider2D playerBoxCollider2D)
     {
-        for (var i = 0; i <= obstacleBoxCollider2Ds.Length - 1; i += 1) {
+        for (var i = 0; i <= obstacleBoxCollider2Ds.Length - 1; i++) {
             var obstacle = obstacleBoxCollider2Ds[i];
             if (box.OverlapPoint(obstacle.transform.position - velocity) && obstacle != box)
                 return true;
         }
-        for (var i = 0; i <= boxBoxCollider2Ds.Length - 1; i += 1) {
+        for (var i = 0; i <= boxBoxCollider2Ds.Length - 1; i++) {
             var b = boxBoxCollider2Ds[i];
             if (box.OverlapPoint(b.transform.position - velocity) && b != box)
                 return true;
@@ -556,7 +561,7 @@ public class GameManager : MonoBehaviour
             Vector3.down
         };
 
-        var inc = monster.lastDirectionMovedIndex != null ? (monster.lastDirectionMovedIndex + 1) % dirs.Length - 1 : 0;
+        var inc = (monster.lastDirectionMovedIndex + 1) % dirs.Length - 1;
         var vel = dirs[inc];
         if (!WillObjectCollide(monster.boxCollider, vel, obstacleBoxCollider2Ds, boxBoxCollider2Ds, playerBoxCollider2D)) {
             monster.transform.localPosition += vel;
@@ -680,5 +685,4 @@ public struct Actions
     public bool up;
     public bool down;
     public bool right;
-    public bool movement;
 }
