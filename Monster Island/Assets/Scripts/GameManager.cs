@@ -122,7 +122,7 @@ public class GameManager : MonoBehaviour
                     var pushableResource = GetPushedResource(player.boxCollider, velocity, resources);
                     if (pushable != null) {
                         //Debug.Log("IsPushing");
-                        if (CanPushBox(pushable, velocity, obstacles, boxes)) {
+                        if (CanPushBox(pushable, velocity, obstacles, boxes, monsters)) {
                             player.transform.localPosition += velocity;
                             pushable.transform.localPosition += velocity;
                         }
@@ -152,7 +152,7 @@ public class GameManager : MonoBehaviour
                     var pushableResource = GetPushedResource(player.boxCollider, velocity, resources);
                     if (pushable != null) {
                         Debug.Log("IsPushing");
-                        if (CanPushBox(pushable, velocity, obstacles, boxes)) {
+                        if (CanPushBox(pushable, velocity, obstacles, boxes, monsters)) {
                             player.transform.localPosition += velocity;
                             pushable.transform.localPosition += velocity;
                         }
@@ -180,7 +180,7 @@ public class GameManager : MonoBehaviour
                     var pushableResource = GetPushedResource(player.boxCollider, velocity, resources);
                     if (pushable != null) {
                         //Debug.Log("IsPushing");
-                        if (CanPushBox(pushable, velocity, obstacles, boxes)) {
+                        if (CanPushBox(pushable, velocity, obstacles, boxes, monsters)) {
                             player.transform.localPosition += velocity;
                             pushable.transform.localPosition += velocity;
                         }
@@ -208,7 +208,7 @@ public class GameManager : MonoBehaviour
                     var pushableResource = GetPushedResource(player.boxCollider, velocity, resources);
                     if (pushable != null) {
                         //Debug.Log("IsPushing");
-                        if (CanPushBox(pushable, velocity, obstacles, boxes)) {
+                        if (CanPushBox(pushable, velocity, obstacles, boxes, monsters)) {
                             player.transform.localPosition += velocity;
                             pushable.transform.localPosition += velocity;
                         }
@@ -243,7 +243,7 @@ public class GameManager : MonoBehaviour
                     int wakeHour = monster.data.wakeHour;
                     int sleepHour = monster.data.sleepHour;
                     int stepsToUpdate = monster.data.stepsToUpdate;
-                    MonsterData.Direction direction = monster.data.lineOfSightDirection;
+                    //MonsterData.Direction direction = monster.data.lineOfSightDirection;
 
                     //check if monster is asleep
                     if (time == wakeHour && wakeHour != -1)
@@ -406,7 +406,7 @@ public class GameManager : MonoBehaviour
         return null;
     }
 
-    public static bool CanPushBox(BoxCollider2D box, Vector3 velocity, BoxCollider2D[] obstacleBoxCollider2Ds, BoxCollider2D[] boxBoxCollider2Ds)
+    public static bool CanPushBox(BoxCollider2D box, Vector3 velocity, BoxCollider2D[] obstacleBoxCollider2Ds, BoxCollider2D[] boxBoxCollider2Ds, Monster[] monsters)
     {
         for (var i = 0; i <= obstacleBoxCollider2Ds.Length - 1; i = i + 1) {
             var obstacle = obstacleBoxCollider2Ds[i];
@@ -415,6 +415,11 @@ public class GameManager : MonoBehaviour
         }
         for (var i = 0; i <= boxBoxCollider2Ds.Length - 1; i = i + 1) {
             var b = boxBoxCollider2Ds[i];
+            if (box.OverlapPoint(b.transform.position - velocity))
+                return false;
+        }
+        for (var i = 0; i <= monsters.Length - 1; i = i + 1) {
+            var b = monsters[i].boxCollider;
             if (box.OverlapPoint(b.transform.position - velocity))
                 return false;
         }
