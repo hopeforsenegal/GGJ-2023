@@ -53,6 +53,7 @@ public class GameManager : MonoBehaviour
     private System.Action m_DeathAction;
     readonly Dictionary<CameraTransitionSquare, CameraState> cameraState = new Dictionary<CameraTransitionSquare, CameraState>();
     int points = 0;
+    int POINTS_TO_WIN = 1;
 
     //HOURS 0-8
     //Start at 1 since we get a free move at start
@@ -309,7 +310,7 @@ public class GameManager : MonoBehaviour
                 player.spineAnimation.Play(SkinsNames.@default, PlayerAnim.move, PlayerAnim.idle);
 
                 //Debug.Log($"Current time ${time}");
-                CheckPoints(resources, objective, ref points);
+                CheckPoints(player.boxCollider, objective, ref points, POINTS_TO_WIN);
             }
 
             // Camera updates
@@ -317,20 +318,11 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public static void CheckPoints(BoxCollider2D[] resources, BoxCollider2D objective, ref int points)
+    public static void CheckPoints(BoxCollider2D playerBox, BoxCollider2D objective, ref int points, int POINTS_TO_WIN)
     {
-        for (var i = 0; i <= resources.Length - 1; i++) {
-            if (IsOverlapping(resources[i], objective) && resources[i].enabled == true) {
-                //remove resource
-                resources[i].gameObject.SetActive(false);
-                //and its collider
-                resources[i].enabled = false;
-                //remove from array
-                resources = resources.Where((source, index) => index != i).ToArray();
-                //add points
-                points += 1;
+            if (IsOverlapping(playerBox, objective) && points >=POINTS_TO_WIN) {
+                Win();
             }
-        }
         //Debug.Log($"Current points ${points}");
     }
 
@@ -483,6 +475,7 @@ public class GameManager : MonoBehaviour
     {
         Application.Quit();
         UnityEditor.EditorApplication.isPlaying = false;
+        Debug.Log("Win");
     }
 
     private static bool WillObjectCollide(BoxCollider2D box, Vector3 velocity, BoxCollider2D[] obstacleBoxCollider2Ds, BoxCollider2D[] boxBoxCollider2Ds, BoxCollider2D playerBoxCollider2D)
