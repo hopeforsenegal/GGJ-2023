@@ -74,11 +74,11 @@ public class TestMonster : MonoBehaviour
 
         if (Input.anyKeyDown) {
             for (var i = 0; i <= monsters.Length - 1; i += 1) {
-                GameManager.MonsterMoveRandom(player, boxes, obstacles, monsters[i].boxCollider);
-                if (GameManager.IsWithinRange(monsters[i].boxCollider.transform.localPosition, player.transform.localPosition, 1)) {
-                    Application.Quit();
-                    EditorApplication.isPlaying = false;
-                }
+                // GameManager.MonsterMoveRandom(player, boxes, obstacles, monsters[i].boxCollider);
+                // if (GameManager.IsWithinRange(monsters[i].boxCollider.transform.localPosition, player.transform.localPosition, 1)) {
+                //     Application.Quit();
+                //     EditorApplication.isPlaying = false;
+                // }
             }
         }
     }
