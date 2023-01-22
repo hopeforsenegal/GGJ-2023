@@ -661,8 +661,8 @@ public class GameManager : MonoBehaviour
         var los = DetectLineOfSight(playerBoxCollider2D.transform.localPosition, monster.boxCollider.transform.localPosition);
         var vel = los switch
         {
-            LineOfSight.IsAboveHorizontalAligned => Vector3.down * speedY,
-            LineOfSight.IsBelowHorizontalAligned => Vector3.up * speedY,
+            LineOfSight.IsAboveHorizontalAligned => Vector3.up * speedY,
+            LineOfSight.IsBelowHorizontalAligned => Vector3.down * speedY,
             LineOfSight.IsLeftVerticalAligned => Vector3.left * speedX,
             LineOfSight.IsRightVerticalAligned => Vector3.right * speedX,
             LineOfSight.None => Vector3.zero,
