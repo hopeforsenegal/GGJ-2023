@@ -5,10 +5,12 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
+    private const int TimeInDay = 8;
+    private const float CameraLerpDuration = 0.5f;
+
     // inspector
     public float SpeedX = 2.2f;
     public float SpeedY = 2;
-
     public Player player;
     public BoxCollider2D[] obstacles;
     public BoxCollider2D[] boxes;
@@ -24,14 +26,15 @@ public class GameManager : MonoBehaviour
     public SundialData sundialData;
 
     // private
-    private const float LerpDuration = 0.5f;
     float timeElapsed;
-    private Vector3 endMarkerPos;
-    private Vector3 startMarkerPos;
-    private float m_TimerDelayShowGameOver;
-    private System.Action m_GameOverAction;
-    private float m_TimerDelayShowWin;
-    private System.Action m_WinAction;
+    bool m_IsGameOver;
+    bool m_IsWon;
+    Vector3 endMarkerPos;
+    Vector3 startMarkerPos;
+    float m_TimerDelayShowGameOver;
+    System.Action m_GameOverAction;
+    float m_TimerDelayShowWin;
+    System.Action m_WinAction;
     readonly Dictionary<CameraTransitionSquare, CameraState> cameraState = new Dictionary<CameraTransitionSquare, CameraState>();
     int points = 0;
     int POINTS_TO_WIN = 1;
@@ -40,9 +43,6 @@ public class GameManager : MonoBehaviour
     //Start at 1 since we get a free move at start
     //Blobs wakup at 4 go to sleep at 8
     int time = 1;
-    private bool m_IsGameOver;
-    private bool m_IsWon;
-    public const int TimeInDay = 8;
 
     void Start()
     {
@@ -82,13 +82,6 @@ public class GameManager : MonoBehaviour
         sundial.sprite = sundialData.sprites[time - 1];
     }
 
-    void AddToInventory(BoxCollider2D box)
-    {
-        box.gameObject.SetActive(false);
-        box.enabled = false;
-        points += 1;
-    }
-
     void Update()
     {
         // Inputs
@@ -107,8 +100,8 @@ public class GameManager : MonoBehaviour
                 return;
         }
         {
-            bool movement = false;
-            bool hasAddedToInventory = false;
+            var movement = false;
+            var hasAddedToInventory = false;
             // Player updates
             if (actions.left) {
                 //Debug.Log("left");
@@ -229,23 +222,23 @@ public class GameManager : MonoBehaviour
             if (movement) {
                 // monster updates
                 for (var i = 0; i <= monsters.Length - 1; i++) {
-                    Monster monster = monsters[i];
+                    var monster = monsters[i];
 
-                    bool isRandom = monster.data.navigationType == MonsterData.NavigationType.Random;
-                    bool isCircular = monster.data.navigationType == MonsterData.NavigationType.Circular;
-                    bool isHorizontal = monster.data.navigationType == MonsterData.NavigationType.Horizontal;
-                    bool isVertical = monster.data.navigationType == MonsterData.NavigationType.Vertical;
-                    bool isLineOfSight = monster.data.navigationType == MonsterData.NavigationType.LineOfSight;
+                    var isRandom = monster.data.navigationType == MonsterData.NavigationType.Random;
+                    var isCircular = monster.data.navigationType == MonsterData.NavigationType.Circular;
+                    var isHorizontal = monster.data.navigationType == MonsterData.NavigationType.Horizontal;
+                    var isVertical = monster.data.navigationType == MonsterData.NavigationType.Vertical;
+                    var isLineOfSight = monster.data.navigationType == MonsterData.NavigationType.LineOfSight;
 
-                    int killRadius = monster.data.killRadius;
-                    int wakeHour = monster.data.wakeHour;
-                    int sleepHour = monster.data.sleepHour;
-                    int stepsToUpdate = monster.data.stepsToUpdate;
+                    var killRadius = monster.data.killRadius;
+                    var wakeHour = monster.data.wakeHour;
+                    var sleepHour = monster.data.sleepHour;
+                    var stepsToUpdate = monster.data.stepsToUpdate;
 
                     //check if monster is ABOUT to sleep or wakeup
-                    if (time == wakeHour - 1 || (time == TimeInDay - 1 && wakeHour == 0) && wakeHour != -1)
+                    if ((time == wakeHour - 1 || (time == TimeInDay - 1 && wakeHour == 0)) && wakeHour != -1)
                         monster.spriteRenderer.enabled = true;
-                    else if (time == sleepHour - 1 || (time == TimeInDay - 1 && sleepHour == 0) && sleepHour != -1)
+                    else if ((time == sleepHour - 1 || (time == TimeInDay - 1 && sleepHour == 0)) && sleepHour != -1)
                         monster.spriteRenderer.enabled = true;
                     else
                         monster.spriteRenderer.enabled = false;
@@ -345,8 +338,15 @@ public class GameManager : MonoBehaviour
             }
 
             // Camera updates
-            InterpolateActiveCamera(mainCamera.transform, cameraState, ref timeElapsed, LerpDuration, startMarkerPos, endMarkerPos);
+            InterpolateActiveCamera(mainCamera.transform, cameraState, ref timeElapsed, CameraLerpDuration, startMarkerPos, endMarkerPos);
         }
+    }
+
+    private void AddToInventory(BoxCollider2D box)
+    {
+        box.gameObject.SetActive(false);
+        box.enabled = false;
+        points += 1;
     }
 
     public static int IncrementTime(int time)
@@ -405,7 +405,7 @@ public class GameManager : MonoBehaviour
     {
         for (var i = 0; i <= resources.Length - 1; i++) {
             var box = resources[i];
-            if (player.OverlapPoint(box.transform.position - velocity) && box.enabled == true) {
+            if (player.OverlapPoint(box.transform.position - velocity) && box.enabled) {
                 return box;
             }
         }
@@ -544,7 +544,7 @@ public class GameManager : MonoBehaviour
             Vector3.up,
             Vector3.right,
             Vector3.left,
-            Vector3.down
+            Vector3.down,
         };
         var inc = 0;
         var checking = true;
@@ -567,7 +567,7 @@ public class GameManager : MonoBehaviour
             Vector3.up,
             Vector3.right,
             Vector3.left,
-            Vector3.down
+            Vector3.down,
         };
 
         var inc = (monster.lastDirectionMovedIndex + 1) % dirs.Length - 1;
@@ -584,7 +584,7 @@ public class GameManager : MonoBehaviour
     {
         Vector3[] dirs = {
             Vector3.right,
-            Vector3.left
+            Vector3.left,
         };
         var inc = 0;
         var checking = true;
@@ -606,7 +606,7 @@ public class GameManager : MonoBehaviour
     {
         Vector3[] dirs = {
             Vector3.up,
-            Vector3.down
+            Vector3.down,
         };
         var inc = 0;
         var checking = true;
@@ -625,13 +625,13 @@ public class GameManager : MonoBehaviour
 
     public static void MonsterMoveLineOfSight(BoxCollider2D playerBoxCollider2D, BoxCollider2D[] boxBoxCollider2Ds, BoxCollider2D[] obstacleBoxCollider2Ds, Monster monster, float SpeedX, float SpeedY)
     {
-        MonsterData.Direction lineOfSightDirection = monster.data.lineOfSightDirection;
-        Vector3 vel = Vector3.zero;
+        var lineOfSightDirection = monster.data.lineOfSightDirection;
+        var vel = Vector3.zero;
 
-        float playerX = playerBoxCollider2D.transform.localPosition.x;
-        float monsterX = monster.boxCollider.transform.localPosition.x;
-        float playerY = playerBoxCollider2D.transform.localPosition.y;
-        float monsterY = monster.boxCollider.transform.localPosition.y;
+        var playerX = playerBoxCollider2D.transform.localPosition.x;
+        var monsterX = monster.boxCollider.transform.localPosition.x;
+        var playerY = playerBoxCollider2D.transform.localPosition.y;
+        var monsterY = monster.boxCollider.transform.localPosition.y;
 
         if (lineOfSightDirection == MonsterData.Direction.Vertical) {
             if (Mathf.Abs(playerX - monsterX) <= 0.2) {
@@ -660,15 +660,12 @@ public class GameManager : MonoBehaviour
         if (!WillMonsterCollide(monster.boxCollider, vel, obstacleBoxCollider2Ds, boxBoxCollider2Ds, playerBoxCollider2D)) {
             monster.transform.localPosition += vel;
         }
-
     }
 
     public static bool IsWithinRange(Vector3 center, Vector3 point, float radius)
     {
         var diff = center - point;
-        if (Mathf.Abs(diff.x) <= radius && Mathf.Abs(diff.y) <= radius)
-            return true;
-        return false;
+        return Mathf.Abs(diff.x) <= radius && Mathf.Abs(diff.y) <= radius;
     }
 
     public static bool IsNightTime(int time)

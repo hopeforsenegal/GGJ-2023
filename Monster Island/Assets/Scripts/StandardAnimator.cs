@@ -56,7 +56,7 @@ using Spine.Unity;
             return animator;
         }
 
-        public void Play(string skin, string introOrDefault, string loop = "", Action EndAnimationEvent = null)
+        public void Play(string skin, string introOrDefault, string loop = "", Action endAnimationEvent = null)
         {
             Clear();
             //Debug.LogFormat("[StandardAnimator::Play] skin:'{0}' introOrDefault:'{1}' loop:'{2}'", skin, introOrDefault, loop);
@@ -70,7 +70,7 @@ using Spine.Unity;
             entry.TimeScale = 1;
             m_SkeletonAnimation.AnimationState.TimeScale = 1;
             m_MeshRenderer.enabled = true;
-            m_OnEndEvent = EndAnimationEvent;
+            m_OnEndEvent = endAnimationEvent;
         }
 
         public void Loop(string skin, string loop)
