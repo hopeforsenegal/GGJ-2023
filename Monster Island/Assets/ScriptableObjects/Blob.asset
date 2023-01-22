@@ -13,8 +13,7 @@ MonoBehaviour:
   m_Name: Blob
   m_EditorClassIdentifier: 
   killRadius: 1
-  stepsToUpdate: 1
+  stepsToUpdate: 0
   sleepHour: 0
   wakeHour: 4
   isRandom: 1
-  isSleep: 1

@@ -207,12 +207,12 @@ public class GameManager : MonoBehaviour
 
                     //check if monster is asleep
                     if (time == wakeHour && wakeHour != -1)
-                        monster.data.isSleep = false;
+                        monster.isSleep = false;
                     if (time == sleepHour && sleepHour != -1)
-                        monster.data.isSleep = true;
-                    if (monster.data.isSleep == true) {
+                        monster.isSleep = true;
+                    if (monster.isSleep == true) {
                         //Debug.Log("Monster is sleep");
-                        continue;
+                        continue;   // break out if sleeping
                     }
 
                     //check if can step
