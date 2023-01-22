@@ -311,7 +311,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   data: {fileID: 11400000, guid: 169c3e82bfd315a429fba00435c62d39, type: 2}
   boxCollider: {fileID: 0}
-  spineAnimation: {fileID: 1733914468}
+  spineAnimation: {fileID: 1733914471}
   isSleep: 0
 --- !u!61 &53044437
 BoxCollider2D:
@@ -3729,7 +3729,7 @@ MonoBehaviour:
   playerSpeedX: 2.2
   playerSpeedY: 2
   boxCollider: {fileID: 0}
-  spineAnimation: {fileID: 2096558471}
+  spineAnimation: {fileID: 2096558474}
 --- !u!61 &1032427893
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -5623,7 +5623,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   data: {fileID: 11400000, guid: 169c3e82bfd315a429fba00435c62d39, type: 2}
   boxCollider: {fileID: 0}
-  spineAnimation: {fileID: 1676827876}
+  spineAnimation: {fileID: 1676827879}
   isSleep: 0
 --- !u!1 &1460439064
 GameObject:
@@ -6156,6 +6156,7 @@ GameObject:
   - component: {fileID: 1676827878}
   - component: {fileID: 1676827877}
   - component: {fileID: 1676827876}
+  - component: {fileID: 1676827879}
   m_Layer: 0
   m_Name: Spine GameObject (blob)
   m_TagString: Untagged
@@ -6266,6 +6267,18 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1676827874}
   m_Mesh: {fileID: 0}
+--- !u!114 &1676827879
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1676827874}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8db1f46584a2f48d7b484b1170df40b7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1695058531
 GameObject:
   m_ObjectHideFlags: 0
@@ -6387,6 +6400,7 @@ GameObject:
   - component: {fileID: 1733914470}
   - component: {fileID: 1733914469}
   - component: {fileID: 1733914468}
+  - component: {fileID: 1733914471}
   m_Layer: 0
   m_Name: Spine GameObject (blob)
   m_TagString: Untagged
@@ -6497,6 +6511,18 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1733914466}
   m_Mesh: {fileID: 0}
+--- !u!114 &1733914471
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1733914466}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8db1f46584a2f48d7b484b1170df40b7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1771094704
 GameObject:
   m_ObjectHideFlags: 0
@@ -7320,6 +7346,7 @@ GameObject:
   - component: {fileID: 2096558473}
   - component: {fileID: 2096558472}
   - component: {fileID: 2096558471}
+  - component: {fileID: 2096558474}
   m_Layer: 0
   m_Name: Spine GameObject (islandbackgrounds(2))
   m_TagString: Untagged
@@ -7430,3 +7457,15 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2096558469}
   m_Mesh: {fileID: 0}
+--- !u!114 &2096558474
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2096558469}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8db1f46584a2f48d7b484b1170df40b7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

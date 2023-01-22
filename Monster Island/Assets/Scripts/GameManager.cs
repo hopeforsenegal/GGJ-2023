@@ -4,12 +4,19 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    private static class AnimNames
+    private static class MonsterAnim
+    {
+        public static readonly string awake = $"{nameof(awake)}";
+    }
+    private static class PlayerAnim
     {
         public static readonly string idle = $"{nameof(idle)}";
         public static readonly string move = $"{nameof(move)}";
         public static readonly string hit = $"{nameof(hit)}";
-        public static readonly string awake = $"{nameof(awake)}";
+    }
+    private static class SkinsNames
+    {
+        public static readonly string @default = $"{nameof(@default)}";
     }
 
     // inspector
@@ -30,6 +37,7 @@ public class GameManager : MonoBehaviour
     private Vector3 endMarkerPos;
     private Vector3 startMarkerPos;
     private float m_TimerDelayShowDeath;
+    private System.Action m_BackToIdle;
     private System.Action m_DeathAction;
     readonly Dictionary<CameraTransitionSquare, CameraState> cameraState = new Dictionary<CameraTransitionSquare, CameraState>();
     int points = 0;
@@ -61,9 +69,9 @@ public class GameManager : MonoBehaviour
 
         gameOverScreen.Visibility = false;
 
-        Util.LoopAnimation(player.spineAnimation, AnimNames.idle);
+        player.spineAnimation.Loop(SkinsNames.@default, PlayerAnim.idle);
         foreach (var monster in monsters) {
-            Util.LoopAnimation(monster.spineAnimation, AnimNames.awake);
+            monster.spineAnimation.Loop(SkinsNames.@default, MonsterAnim.awake);
         }
 
         if (IsNightTime(time)) {
@@ -214,7 +222,7 @@ public class GameManager : MonoBehaviour
                     if (IsWithinRange(monsters[i].boxCollider.transform.position, player.transform.position, killRadius)) {
                         Debug.Log("Monster can kill");
 
-                        Util.PlayAnimation(player.spineAnimation, AnimNames.hit, () =>
+                        player.spineAnimation.Play(SkinsNames.@default, PlayerAnim.hit, string.Empty, () =>
                         {
                             m_TimerDelayShowDeath = 0.1f;
                             m_DeathAction = () =>
@@ -246,10 +254,7 @@ public class GameManager : MonoBehaviour
                 time = IncrementTime(time);
 
 
-                Util.PlayAnimation(player.spineAnimation, AnimNames.move, () =>
-                {
-                    //Util.LoopAnimation(player.spineAnimation, AnimNames.idle);
-                });
+                player.spineAnimation.Play(SkinsNames.@default, PlayerAnim.move, PlayerAnim.idle);
 
                 Debug.Log($"Current time ${time}");
                 CheckPoints(resources, objective, ref points);
@@ -257,6 +262,7 @@ public class GameManager : MonoBehaviour
             if (Util.HasHitTimeOnce(ref m_TimerDelayShowDeath, Time.deltaTime)) {
                 m_DeathAction?.Invoke();
             }
+            m_BackToIdle?.Invoke();
             // Camera updates
             InterpolateActiveCamera(mainCamera.transform, cameraState, ref timeElapsed, LerpDuration, startMarkerPos, endMarkerPos);
         }

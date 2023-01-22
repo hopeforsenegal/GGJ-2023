@@ -1,3 +1,4 @@
+using MoonlitSystem.Animators;
 using Spine.Unity;
 using UnityEngine;
 
@@ -7,7 +8,7 @@ public class Player : MonoBehaviour
     public float playerSpeedX = 2.2f;
     public float playerSpeedY = 2;
     public BoxCollider2D boxCollider;
-    public SkeletonAnimation spineAnimation;
+    public StandardAnimator spineAnimation;
 
     protected void Awake()
     {
