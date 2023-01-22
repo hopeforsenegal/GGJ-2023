@@ -345,10 +345,10 @@ public class GameManager : MonoBehaviour
     {
         var action = new Actions
         {
-            left = Input.GetKeyDown(KeyCode.A),
-            up = Input.GetKeyDown(KeyCode.W),
-            down = Input.GetKeyDown(KeyCode.S),
-            right = Input.GetKeyDown(KeyCode.D),
+            left = Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow),
+            up = Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow),
+            down = Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow),
+            right = Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow),
         };
         action.movement = action.left || action.right || action.up || action.down;
         return action;
