@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public class TestCameraBasedOnPlayer : MonoBehaviour
@@ -7,7 +6,6 @@ public class TestCameraBasedOnPlayer : MonoBehaviour
     public Camera mainCamera;
     public BoxCollider2D player;
     public CameraTransitionSquare[] cameraEndLocationTransforms;
-
 
     private const float LerpDuration = 0.5f;
     float timeElapsed;
