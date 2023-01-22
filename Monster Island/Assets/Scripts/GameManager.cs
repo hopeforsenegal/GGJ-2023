@@ -538,7 +538,7 @@ public class GameManager : MonoBehaviour
             //Debug.Log("Checking moves");
             var vel = dirs[Random.Range(1, 4)];
             if (!WillObjectCollide(monster.boxCollider, vel, obstacleBoxCollider2Ds, boxBoxCollider2Ds, playerBoxCollider2D)) {
-                monster.transform.localPosition += vel;
+                monster.transform.localPosition += vel * monster.data.speed;
                 //Debug.Log($"moving monster {monster.transform.localPosition}");
                 checking = false;
             }

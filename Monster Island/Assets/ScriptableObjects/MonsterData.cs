@@ -7,6 +7,7 @@ public class MonsterData : ScriptableObject
     public int stepsToUpdate;
     public int sleepHour;
     public int wakeHour;
+    public int speed;
     
     //create selection list for types of navigation
     public enum NavigationType
