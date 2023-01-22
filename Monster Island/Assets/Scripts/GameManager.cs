@@ -97,6 +97,7 @@ public class GameManager : MonoBehaviour
 
         {   // Check if we died/won before processing any more logic
             if (Util.HasHitTimeOnce(ref m_TimerDelayShowGameOver, Time.deltaTime)) {
+                Debug.Log("Hey!!!");
                 m_GameOverAction?.Invoke();
             }
             if (m_IsGameOver)
@@ -310,15 +311,18 @@ public class GameManager : MonoBehaviour
 
                     //Handle attack
                     if (IsWithinRange(monsters[i].boxCollider.transform.position, player.transform.position, killRadius, SpeedX, SpeedY)) {
+
                         Debug.Log($"{monsters[i].data.name} can kill");
                         m_IsGameOver = true;
                         var clipName = monsters[i].data.attack;
                         clipName = string.IsNullOrWhiteSpace(clipName) ? MonsterAnim.explode : clipName;
-                        monsters[i].spineAnimation.Play(SkinsNames.@default, clipName, string.Empty, () =>
+                        monsters[i].spineAnimation.Play(SkinsNames.@default, clipName, () =>
                         {
+                            Debug.Log("Hello");
                             m_TimerDelayShowGameOver = 0.1f;
                             m_GameOverAction = () =>
                             {
+                                Debug.Log("Where are we?");
                                 gameOverScreen.Visibility = true;
                             };
                         });
@@ -357,11 +361,13 @@ public class GameManager : MonoBehaviour
                         m_IsGameOver = true;
                         var clipName = monsters[i].data.attack;
                         clipName = string.IsNullOrWhiteSpace(clipName) ? MonsterAnim.explode : clipName;
-                        monsters[i].spineAnimation.Play(SkinsNames.@default, clipName, string.Empty, () =>
+                        monsters[i].spineAnimation.Play(SkinsNames.@default, clipName, () =>
                         {
+                            Debug.Log("Hello");
                             m_TimerDelayShowGameOver = 0.1f;
                             m_GameOverAction = () =>
                             {
+                                Debug.Log("Where are we?");
                                 gameOverScreen.Visibility = true;
                             };
                         });
@@ -380,7 +386,10 @@ public class GameManager : MonoBehaviour
 
                 // increment time
                 time = IncrementTime(time);
-                player.spineAnimation.Play(SkinsNames.@default, hasAddedToInventory ? PlayerAnim.item_collect : PlayerAnim.move, PlayerAnim.idle);
+                player.spineAnimation.Play(SkinsNames.@default, hasAddedToInventory ? PlayerAnim.item_collect : PlayerAnim.move, () =>
+                {
+                    player.spineAnimation.Loop(SkinsNames.@default, PlayerAnim.idle);
+                });
 
                 //Debug.Log($"Current time ${time}");
 
@@ -389,7 +398,7 @@ public class GameManager : MonoBehaviour
                 if (IsOverlapping(player.boxCollider, objective) && points >= pointsNeededToWin) {
                     Debug.Log("Win");
                     m_IsWon = true;
-                    player.spineAnimation.Play(SkinsNames.@default, PlayerAnim.victory, string.Empty, () =>
+                    player.spineAnimation.Play(SkinsNames.@default, PlayerAnim.victory, () =>
                     {
                         m_TimerDelayShowWin = 0.1f;
                         m_WinAction = () =>
@@ -728,27 +737,25 @@ public class GameManager : MonoBehaviour
 
     public static bool IsWithinRange(Vector3 center, Vector3 point, float radius, float SpeedX, float SpeedY)
     {
-        Debug.Log($"snake is checkin if");
+        Debug.Log($"IsWithinRange");
 
         var diff = center - point;
         //log diff.x and diff.y to see if they are almost 0
-        Debug.Log($"snake diff.x {diff.x} diff.y {diff.y}");
+        Debug.Log($"IsWithinRange diff.x {diff.x} diff.y {diff.y}");
         //if radius is 0 just check if they are on the same spot by checking if diff is almost 0
         if (radius == 0) {
             return Mathf.Abs(diff.x) <= 0.5 && Mathf.Abs(diff.y) <= 0.5;
         }
 
         //check if on the same row by checking if diff.y is almost 0
-        if(Mathf.Abs(diff.y) <= 0.5)
-        {
+        if (Mathf.Abs(diff.y) <= 0.5) {
             return Mathf.Abs(diff.x) <= (radius * SpeedX);
         }
 
         //check if on the same column by checking if diff.x is almost 0
-        if(Mathf.Abs(diff.x) <= 0.5)
-        {
-            Debug.Log($"snake radius * SpeedY {radius * SpeedY}  SpeedY {SpeedY}    radius: {radius} diff.y {diff.y} abs {Mathf.Abs(diff.y)}");
-            return Mathf.Abs(diff.y) <= (radius * SpeedY );
+        if (Mathf.Abs(diff.x) <= 0.5) {
+            Debug.Log($"IsWithinRange radius * SpeedY {radius * SpeedY}  SpeedY {SpeedY}    radius: {radius} diff.y {diff.y} abs {Mathf.Abs(diff.y)}");
+            return Mathf.Abs(diff.y) <= (radius * SpeedY);
         }
 
         return false;
